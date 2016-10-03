@@ -1,3 +1,4 @@
+(add-to-list 'load-path (concat user-emacs-directory "site_specific"))
 (add-to-list 'load-path (concat user-emacs-directory "config"))
 (add-to-list 'load-path (concat user-emacs-directory "elisp"))
 (add-to-list 'load-path (concat user-emacs-directory "config" "/eyecandy"))
@@ -9,6 +10,7 @@
                          ("org" . "http://orgmode.org/elpa/")
                          ("gnu" . "http://elpa.gnu.org/packages/")))
 
+(require 'mugu-proxy)
 
 (require 'package)
 (package-initialize)

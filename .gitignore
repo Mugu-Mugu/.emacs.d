@@ -50,3 +50,4 @@ auto-save-list/
 elpa/
 eshell/
 *.eld
+site_specific/
