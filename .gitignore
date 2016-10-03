@@ -49,3 +49,4 @@ Temporary Items
 auto-save-list/
 elpa/
 eshell/
+*.eld

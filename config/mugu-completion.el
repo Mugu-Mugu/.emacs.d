@@ -1,29 +1,23 @@
 (use-package company
   :ensure
   :demand
-  :config (progn
-            (add-hook 'after-init-hook 'global-company-mode)
-            (setq company-idle-delay 0)
-            (setq company-require-match nil)
-            (define-key company-active-map (kbd "M-j") 'company-select-next)
-            (define-key company-active-map (kbd "M-k") 'company-select-previous)
-            (define-key company-active-map (kbd "C-j") 'company-select-next)
-            (define-key company-active-map (kbd "C-k") 'company-select-previous)
-            (define-key company-search-map (kbd "C-k") 'company-select-previous)
-            (define-key company-active-map (kbd "<tab>") 'company-select-next)
-            (define-key company-active-map (kbd "<S-tab>") 'company-select-previous)
-            (define-key company-active-map (kbd "SPC") 'company-abort)
-            (after 'evil
-              (evil-define-key 'insert company-active-map (kbd "C-j") 'company-select-next)
-              (evil-define-key 'insert company-active-map (kbd "C-k") 'company-select-previous)
-              (evil-define-key 'insert company-search-map (kbd "C-k") 'company-select-previous)
-              (evil-define-key 'emacs company-active-map (kbd "C-k") 'company-select-previous)
-              (evil-define-key 'normal company-active-map (kbd "C-k") 'company-select-previous)
-              (evil-define-key 'operator company-active-map (kbd "C-k") 'company-select-previous)
-              (evil-define-key 'visual company-active-map (kbd "C-k") 'company-select-previous)
-              (evil-define-key 'insert company-quickhelp-mode-map (kbd "C-k") 'company-select-previous)
-              )
-            )
+  :bind
+  (:map company-active-map
+        ("M-j"   . company-select-next)
+        ("M-k"   . company-select-previous)
+        ("M-j"   . company-select-next)
+        ("M-k"   . company-select-previous)
+        ("<tab>" . company-complete-selection)
+        ("SPC"   . mugu-company-space-exit))
+  :config 
+  (add-hook 'after-init-hook 'global-company-mode)
+  (setq company-idle-delay 0)
+  (setq company-require-match nil)
+  (defun mugu-company-space-exit ()
+    (interactive)
+    (progn (company-abort)
+           (insert " "))
+    )
   )
 
 (use-package company-flx
@@ -32,14 +26,14 @@
   :config (company-flx-mode +1)
   )
 
-;(use-package company-quickhelp
-;  :ensure
-;  :after 'company
-;  :config (progn
-;            (company-quickhelp-mode 1)
-;            (setq company-quickhelp-delay 0.3)
-;            )
-;  )
+(use-package company-quickhelp
+  :ensure
+  :after 'company
+  :config (progn
+            (company-quickhelp-mode 1)
+            (setq company-quickhelp-delay 0.3)
+            )
+  )
 
 (use-package ivy
   :ensure
@@ -49,6 +43,8 @@
   (setq ivy-use-virtual-buffers t)
   (setq ivy-count-format "(%d/%d) ")
   (setq ivy-height 20)
+  (setq ivy-re-builders-alist
+        '((t . ivy--regex-fuzzy)))
   (setq ivy-wrap t)
   )
 

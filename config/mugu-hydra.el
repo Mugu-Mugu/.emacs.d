@@ -47,6 +47,7 @@ _r_: recurve file
   ("r" counsel-rg-find-file-recursive)
   ("t" mugu-hydra-menu-tabs/body)
   ("h" hydra-emacs-help/body)
+  ("d" mugu-directory-with-current-file-path "cd to current file" :color red)
   ("q" nil "cancel hydra" :color blue)
   ("SPC" hydra-custom-mode-hook-run "mode custom binding"))
 (after 'evil 

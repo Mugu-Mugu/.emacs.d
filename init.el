@@ -68,6 +68,16 @@
 (use-package mugu-motion)
 (use-package mugu-completion)
 (use-package mugu-lisp)
+(use-package mugu-directory-fix)
+;(use-package mugu-lispy)
+
+
+;(defvar mugu-directory "C:/DAM")
+;(defun mugumugumugu () (progn
+;            (setq default-directory mugu-directory)))
+;
+;(add-hook 'buffer-list-update-hook 'mugumugumugu)
+;(add-hook 'eshell-directory-change-hook 'mugumugumugu)
 
 ;(require 'my-bookmarks)
 
@@ -109,7 +119,10 @@
 (use-package mugu-themes)
 
 ;;; loading package
-(require 'evil)
+(use-package evil
+  :ensure
+  :config
+  (evil-mode +1))
 
 ;(diminish 'whitespace-mode)
 ;(diminish 'whitespace-mode)
@@ -141,7 +154,6 @@
 ;(diminish 'whitespace-newline-mode)
 
 ;;; pluggin mode activation
-(evil-mode 1)
 (defun minibuffer-keyboard-quit ()
   "Abort recursive edit.
 In Delete Selection mode, if the mark is active, just deactivate it;
@@ -159,6 +171,7 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
     (minibuffer-keyboard-quit)))
 
 ;; super escape
+;; to improve 
 (key-chord-define evil-insert-state-map "jk" 'evil-normal-state)
 (key-chord-define evil-normal-state-map "jk" 'keyboard-quit)
 (key-chord-define minibuffer-local-map "jk" 'minibuffer-exit-or-unite)
@@ -166,24 +179,16 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 (key-chord-define minibuffer-local-completion-map "jk" 'minibuffer-keyboard-quit)
 (key-chord-define minibuffer-local-must-match-map "jk" 'minibuffer-keyboard-quit)
 (key-chord-define minibuffer-local-isearch-map "jk" 'minibuffer-keyboard-quit)
+(key-chord-define ivy-minibuffer-map "jk" 'minibuffer-keyboard-quit)
+
 
 ;;; evil settings mapping
-;(define-key evil-motion-state-map (kbd "C-h") 'evil-window-left)
+;(define-key evil-motion-stakTE-map (kbd "C-h") 'evil-window-left)
 ;(define-key evil-motion-state-map (kbd "C-j") 'evil-window-down)
 ;(define-key evil-motion-state-map (kbd "C-k") 'evil-window-up)
 ;(define-key evil-motion-state-map (kbd "C-l") 'evil-window-right)
 
-(use-package evil-jumper
-  :ensure
-  :config (evil-jumper-mode))
 
-(setq org-directory "c:/Dam/home/org")
-(defvar mugu-org-emacs-file (concat org-directory "/emacs.org")
-  "Var referencing where org files for emacs is located")
-(defvar mugu-org-vie-courante-file (concat org-directory "/vie_courante.org")
-  "Var referencing where org files for general day to day activities is located")
-(defvar mugu-org-travail-file (concat org-directory "/travail.org")
-  "Var referencing where org files for job related activities is located")
 
 ;(defvar autosave-dir "user-ema")
 ;(setq org-agenda-custom-commands
