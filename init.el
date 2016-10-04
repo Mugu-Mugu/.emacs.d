@@ -71,6 +71,8 @@
 (use-package mugu-completion)
 (use-package mugu-lisp)
 (use-package mugu-directory-fix)
+(use-package mugu-git)
+(use-package mugu-diff)
 ;(use-package mugu-lispy)
 
 
