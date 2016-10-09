@@ -4,7 +4,6 @@
   :diminish
   :config (progn
             (setq projectile-enable-caching t)
-            (setq projectile-indexing-method 'native)
             (after 'ivy (setq projectile-completion-system 'ivy))
             (setq projectile-cache-file (concat user-emacs-directory ".cache/projectile.cache"))
             (setq projectile-known-projects-file (concat user-emacs-directory "projectile-bookmarks.eld"))
@@ -19,7 +18,6 @@
   :after perspective
   :commands projectile-persp-switch-project
   :config
-  (persp-mode)
   (ivy-mode +1)
   )
 
@@ -32,7 +30,6 @@ _s_: switch project    _d_: find directory
 _c_: compile project   _f_: find file
 _r_: regenerate tag    _t_: find tag
 _v_: version control   _g_: find pattern
-_i_; invalidate cache
 "
     ("s" projectile-persp-switch-project)
     ("d" projectile-find-dir)
@@ -42,7 +39,6 @@ _i_; invalidate cache
     ("r" projectile-regenerate-tags)
     ("g" projectile-grep)
     ("v" projectile-vc)
-    ("i" projectile-invalidate-cache :color red)
     ("q" nil "quit menu" :color blue)
     ("SPC" hydra-main-menu/body "return to main menu"))
   )
