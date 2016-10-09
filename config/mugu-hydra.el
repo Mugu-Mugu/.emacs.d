@@ -26,12 +26,12 @@
   (add-hook mode-hook (apply-partially #'hydra-internal-custom-add-hook hydra-body) ))
 
  (defhydra mugu-hydra-menu-main
-  (:color blue :hint nil :idle 0.5)
+  (:color blue :hint nil :idle 0.3)
   "
 ^Files^                     ^Data^                ^Others^              ^Sub Menu^
 ^^^^^^^^-----------------------------------------------------------------------------------------------
 _b_: buffer                 _y_: yank ring         _x_ : execute         _SPC_ : major mode menu
-_m_: helm-mini              _S_: recursive grep    _cd_: cd              _w_   : workspace menu
+_dr_: find dir recursivly   _S_: recursive grep    _cd_: cd              _w_   : workspace menu
 _f_: find file              _g_: grep in file      _h_ : help submenu    _p_   : project menu
 _r_: find file recursivly                          
 "
@@ -39,16 +39,17 @@ _r_: find file recursivly
   ("m" counsel-recentf)
   ("f" counsel-find-file)
   ("y" counsel-yank-pop)
-  ("S" mugu-hydra-find-pattern-recursive)
+  ("S" counsel-git-grep)
   ("g" swiper)
   ("s" counsel-semantic)
   ("x" counsel-M-x)
-  ("r" counsel-rg-find-file-recursive)
+  ("r" (lambda () (message "not implemented yet")))
   ("w" mugu-workspace-hydra-menu/body)
   ("p" mugu-project-hydra-menu/body)
   ("cd" cd)
   ("h" hydra-emacs-help/body)
-  ("d" mugu-directory-with-current-file-path "cd to current file" :color red)
+  ("df" mugu-directory-with-current-file-path "cd to current file" :color red)
+  ("dr" (lambda () (message "not implemented yet")))
   ("q" nil "cancel hydra" :color blue)
   ("SPC" hydra-custom-mode-hook-run "mode custom binding"))
 (after 'evil 

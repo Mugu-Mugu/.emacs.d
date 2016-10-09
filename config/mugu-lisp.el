@@ -31,8 +31,15 @@
       (switch-to-buffer-other-window "*Help*" t))
     )
   :config 
-    (after 'evil
-      (evil-define-key 'normal emacs-lisp-mode-map (kbd "K")
-        'my-jump-to-elisp-docs)))
+  (after 'mugu-hydra
+    (defhydra mugu-lisp-help (:color teal
+                                     :hint nil)
+      "help lisp"
+      ("f" counsel-describe-function "describe function")
+      ("v" counsel-describe-variable "descibe variable"))
+    (mugu-hydra-register-mode-hook 'emacs-lisp-mode-hook 'mugu-lisp-help/body))
+  (after 'evil
+    (evil-define-key 'normal emacs-lisp-mode-map (kbd "K")
+      'my-jump-to-elisp-docs)))
 
 (provide 'mugu-lisp)
