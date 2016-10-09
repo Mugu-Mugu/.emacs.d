@@ -29,7 +29,7 @@
 _s_: switch project    _d_: find directory
 _c_: compile project   _f_: find file
 _r_: regenerate tag    _t_: find tag
-^^                     _g_: find pattern
+_v_: version control   _g_: find pattern
 "
     ("s" projectile-persp-switch-project)
     ("d" projectile-find-dir)
@@ -38,6 +38,7 @@ _r_: regenerate tag    _t_: find tag
     ("c" projectile-compile-project)
     ("r" projectile-regenerate-tags)
     ("g" projectile-grep)
+    ("v" projectile-vc)
     ("q" nil "quit menu" :color blue)
     ("SPC" hydra-main-menu/body "return to main menu"))
   )
