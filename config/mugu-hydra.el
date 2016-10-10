@@ -21,20 +21,19 @@
 (defun hydra-internal-custom-add-hook (hydra)
   "Internal function setting the given hydra to the local buffer custom hydra mapping"
   (add-hook 'hydra-custom-mode-hook hydra nil 'local))
-(defun hydra-custom-register-mode (mode-hook hydra-body)
+(defun mugu-hydra-register-mode-hook (mode-hook hydra-body)
   "Function to set a custom hydra body on an external hook (typically a major mode hook to prevent conflict)"
   (add-hook mode-hook (apply-partially #'hydra-internal-custom-add-hook hydra-body) ))
 
  (defhydra mugu-hydra-menu-main
-  (:color blue :hint nil)
+  (:color blue :hint nil :idle 0.5)
   "
-^Files^             ^Data^                ^Emacs^         
-^^^^^^^^---------------------------------------------------
-_b_: buffer        _y_: yank ring         _x_: execute       
-_m_: helm-mini     _S_: recursive grep    _h_: help submenu 
-_f_: find file     _g_: grep in file      
-_t_: tabs          _s_: semantic mode     
-_r_: recurve file
+^Files^                     ^Data^                ^Others^              ^Sub Menu^
+^^^^^^^^-----------------------------------------------------------------------------------------------
+_b_: buffer                 _y_: yank ring         _x_ : execute         _SPC_ : major mode menu
+_m_: helm-mini              _S_: recursive grep    _cd_: cd              _w_   : workspace menu
+_f_: find file              _g_: grep in file      _h_ : help submenu    _p_   : project menu
+_r_: find file recursivly                          
 "
   ("b" ivy-switch-buffer)
   ("m" counsel-recentf)
@@ -45,48 +44,17 @@ _r_: recurve file
   ("s" counsel-semantic)
   ("x" counsel-M-x)
   ("r" counsel-rg-find-file-recursive)
-  ("t" mugu-hydra-menu-tabs/body)
+  ("w" mugu-workspace-hydra-menu/body)
+  ("p" mugu-project-hydra-menu/body)
+  ("cd" cd)
   ("h" hydra-emacs-help/body)
   ("d" mugu-directory-with-current-file-path "cd to current file" :color red)
   ("q" nil "cancel hydra" :color blue)
   ("SPC" hydra-custom-mode-hook-run "mode custom binding"))
 (after 'evil 
   (define-key evil-normal-state-map (kbd "SPC") 'mugu-hydra-menu-main/body)
-  (define-key evil-motion-state-map (kbd "s") 'mugu-hydra-menu-main/body)
+  (define-key evil-motion-state-map (kbd "SPC") 'mugu-hydra-menu-main/body)
   (define-key evil-visual-state-map (kbd "SPC") 'mugu-hydra-menu-main/body))
-
-
-(defhydra mugu-hydra-menu-move
-  (:color blue :hint nil)
-  "Quick Move Menu:"
-  ("s" avy-goto-char-timer    "go to char")
-  ("l" ace-link    "go to link")
-  ("f" ace-window  "go to window"))
-(after 'evil 
-  (define-key evil-normal-state-map (kbd "s") 'mugu-hydra-menu-move/body)
-  (define-key evil-motion-state-map (kbd "s") 'mugu-hydra-menu-move/body)
-  (define-key evil-visual-state-map (kbd "s") 'mugu-hydra-menu-move/body))
-
-(defhydra mugu-hydra-menu-tabs (:color blue
-                                :hint nil)
-  "
-^tabs^             
-^^^^^^^^---------------------------------------------------
-_t_: tabs mgt        
-_f_: open file in project
-_r_: open recent file in project
-_b_: switch to buffer in project
-_d_: browse dir in project
-_e_: look for everythin in project
-"
-  ("t" mugu-hydra-tabs-main)
-  ("r" mugu-hydra-tabs-recent)
-  ("f" mugu-hydra-tabs-find-file)
-  ("d" mugu-hydra-tabs-find-dir)
-  ("e" mugu-hydra-tabs-find-everything)
-  ("b" mugu-hydra-tabs-find-buffer)
-  ("q" nil "cancel hydra" :color blue)
-  ("SPC" hydra-main-menu/body))
 
 (defhydra hydra-emacs-help (:color teal
                             :hint nil)

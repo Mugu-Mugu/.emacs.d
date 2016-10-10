@@ -7,6 +7,8 @@
 (tool-bar-mode -1)
 ;; garbage collection at 5MO
 (setq gc-cons-threshold 5000000)
+(custom-set-variables
+ '(initial-frame-alist (quote ((fullscreen . maximized)))))
 
 ;; disable auto-save and auto-backup
 (setq backup-inhibited t)
@@ -70,5 +72,21 @@
   (declare (indent defun))
   `(eval-after-load ,feature
      '(progn ,@body)))
+
+(global-hl-line-mode t)
+(set-face-background 'hl-line "#3e4446")
+;; Show parentheses
+(show-paren-mode 1)
+;; highlight entire expression when matching paren is not visible;
+;; otherwise just highlight matching paren
+(setq show-paren-style 'mixed)
+(setq whitespace-style '(trailing))
+(use-package whitespace
+  :ensure
+  :demand
+  :diminish global-whitespace-mode
+  :config
+  (global-whitespace-mode 1)
+  )
 
 (provide 'mugu-core)

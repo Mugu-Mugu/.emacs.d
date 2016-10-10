@@ -1,19 +1,24 @@
+(use-package eldoc
+  :ensure
+  :defer
+  :diminish eldoc-mode
+  )
+
 (use-package slime
   :ensure slime
-  :diminish eldoc-mode
-  :defer t)
+  :defer)
 
 (use-package elisp-slime-nav
   :ensure elisp-slime-nav
   :defer t
   :commands my-jump-to-elisp-docs
-  :diminish elisp-slime-nav-mode
+  :diminish elisp-slime-nav-mode 
   :init
   (progn
     (defun my-lisp-hook ()
       (progn
         (elisp-slime-nav-mode)
-        (turn-on-eldoc-mode)
+        (eldoc-mode +1)
         )
       )
     (add-hook 'emacs-lisp-mode-hook 'my-lisp-hook)
@@ -26,9 +31,8 @@
       (switch-to-buffer-other-window "*Help*" t))
     )
   :config 
-  (progn
     (after 'evil
       (evil-define-key 'normal emacs-lisp-mode-map (kbd "K")
-        'my-jump-to-elisp-docs))))
+        'my-jump-to-elisp-docs)))
 
 (provide 'mugu-lisp)
