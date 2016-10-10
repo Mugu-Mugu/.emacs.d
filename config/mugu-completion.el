@@ -14,7 +14,10 @@
   (add-hook 'after-init-hook 'global-company-mode)
   (setq company-idle-delay 0)
   (setq company-require-match nil)
-  (defun mugu-company-space-exit ()
+  (add-hook 'eshell-mode-hook
+            (lambda ()
+              (set (make-local-variable 'company-backends) '((company-capf)))))
+ (defun mugu-company-space-exit ()
     (interactive)
     (progn (company-abort)
            (insert " "))
