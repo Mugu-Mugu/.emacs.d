@@ -2,14 +2,12 @@
   :ensure
   :commands ivy-mode
   :diminish ivy-mode
-  :defer 3
+  :defer 1
   :config
   (ivy-mode 1)
   (setq ivy-use-virtual-buffers t)
   (setq ivy-count-format "(%d/%d) ")
   (setq ivy-height 20)
-  (setq ivy-re-builders-alist
-        '((t . ivy--regex-fuzzy)))
   (setq ivy-wrap t))
 
 (use-package ivy-hydra

@@ -5,11 +5,17 @@
 (defun mugu-directory-after-cd (&rest args) (cond ((called-interactively-p 'interactive)
                                                    (setq mugu-directory-path default-directory))))
 (defun mugu-directory-after-find-file () (setq default-directory mugu-directory-path))
+
+(defun mugu-directory-cd (dir)
+  "for non interactive cd"
+  (progn
+    (setq default-directory dir)
+    (setq mugu-directory-path dir)))
+
 (defun mugu-directory-with-current-file-path ()
   "update directory to path of current file"
   (interactive)
-  (setq default-directory (file-name-directory buffer-file-name))
-  (setq mugu-directory-path (file-name-directory buffer-file-name))
+  (mugu-directory-cd (file-name-directory buffer-file-name))
   )
 
 (add-hook 'buffer-list-update-hook 'mugu-directory-fix-dir)
