@@ -25,8 +25,12 @@
   "Function to set a custom hydra body on an external hook (typically a major mode hook to prevent conflict)"
   (add-hook mode-hook (apply-partially #'hydra-internal-custom-add-hook hydra-body) ))
 
+(defun mugu-hydra-switch-buffer ()
+  (interactive)
+  (ivy-switch-buffer))
+
  (defhydra mugu-hydra-menu-main
-  (:color blue :hint nil :idle 0.5)
+  (:color blue :hint nil :idle 0.1)
   "
 ^Files^                     ^Data^                ^Others^              ^Sub Menu^
 ^^^^^^^^-----------------------------------------------------------------------------------------------
@@ -35,7 +39,7 @@ _m_: helm-mini              _S_: recursive grep    _cd_: cd              _w_   :
 _f_: find file              _g_: grep in file      _h_ : help submenu    _p_   : project menu
 _r_: find file recursivly                          
 "
-  ("b" ivy-switch-buffer)
+  ("b" mugu-hydra-switch-buffer)
   ("m" counsel-recentf)
   ("f" counsel-find-file)
   ("y" counsel-yank-pop)

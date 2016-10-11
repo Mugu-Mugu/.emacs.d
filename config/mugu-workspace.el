@@ -2,13 +2,14 @@
   :ensure perspective
   :defer
   :commands persp-switch
-  :config (progn
-            (persp-mode)
-            (ivy-mode +1)
-            (require 'mugu-directory-fix)
-            (persp-make-variable-persp-local 'mugu-directory-path)
-            )
-  )
+  :config 
+  (require 'mugu-directory-fix)
+  (persp-mode)
+  (ivy-mode +1)
+  (persp-make-variable-persp-local 'mugu-directory-path)
+  (after 'mugu-hydra
+    ;;; switching to buffer also change perspective if needed
+    (advice-add #'mugu-hydra-switch-buffer :override #'persp-switch-to-buffer)))
 
 (after 'hydra
   (defhydra mugu-workspace-hydra-menu (:color blue
