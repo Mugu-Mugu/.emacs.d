@@ -8,6 +8,7 @@
 (add-to-list 'load-path "/usr/share/emacs/site-lisp")
 
 (setq package-archives '(("melpa" . "http://melpa.milkbox.net/packages/")
+                         ("elpa"  . "https://elpa.gnu.org/packages/")
                          ("org" . "http://orgmode.org/elpa/")
                          ("gnu" . "http://elpa.gnu.org/packages/")))
 
@@ -38,6 +39,9 @@
 (use-package mugu-workspace)
 (use-package mugu-themes)
 (use-package mugu-site-lisp)
+(use-package mugu-ada)
+(use-package mugu-lint)
+
 
 ;; Place custom settings in their own file.
 (setq custom-file (concat user-emacs-directory "config/" "mugu-custom.el"))
