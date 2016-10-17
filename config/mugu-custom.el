@@ -124,6 +124,7 @@
         (mode . lisp-mode)))))))
  '(ido-everywhere t)
  '(indent-tabs-mode nil)
+ '(initial-frame-alist (quote ((fullscreen . maximized))))
  '(kill-do-not-save-duplicates t)
  '(kill-ring-max 200)
  '(latex-run-command "pdflatex")
@@ -141,6 +142,9 @@
  '(org-startup-folded (quote content))
  '(org-startup-truncated nil)
  '(org-use-sub-superscripts (quote {}))
+ '(package-selected-packages
+   (quote
+    (flycheck-pos-tip flycheck use-package telephone-line slime persp-projectile noctilux-theme magit key-chord ivy-hydra helm-projectile evil-lispy elisp-slime-nav counsel company-quickhelp company-flx ada-mode ace-link)))
  '(powerline-evil-tag-style (quote verbose))
  '(preview-TeX-style-dir "/home/nathan/.emacs.d/elpa/auctex-11.87.2/latex")
  '(python-indent-guess-indent-offset nil)
@@ -190,7 +194,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:family "DejaVu Sans Mono for Powerline" :foundry "outline" :slant normal :weight normal :height 83 :width normal))))
+ '(default ((t (:family "DejaVu Sans Mono" :foundry "PfEd" :slant normal :weight normal :height 90 :width normal))))
  '(dired-directory ((t (:inherit font-lock-function-name-face :weight bold))))
  '(flycheck-info ((t (:underline nil))))
  '(flycheck-warning ((t (:underline nil))))
