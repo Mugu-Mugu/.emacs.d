@@ -1,5 +1,6 @@
 (use-package telephone-line
   :ensure
+  :disabled
   :after 'evil
   :config (progn
             
@@ -17,6 +18,17 @@
             (telephone-line-mode 1)
             (setq frame-title-format '("emacs@"mugu-directory-path))
             )
+  )
+
+(use-package spaceline
+  :ensure
+  :demand
+  :config
+  (require 'spaceline-config)
+  (setq spaceline-highlight-face-func 'spaceline-highlight-face-evil-state)
+  (setq spaceline-window-numbers-unicode t
+        spaceline-workspace-numbers-unicode t)
+  (spaceline-spacemacs-theme)
   )
 
 

@@ -7,7 +7,7 @@
 (add-to-list 'load-path (concat user-emacs-directory "config" "/hydra"))
 (add-to-list 'load-path "/usr/share/emacs/site-lisp")
 
-(setq package-archives '(("melpa" . "http://melpa.milkbox.net/packages/")
+(setq package-archives '(("melpa" . "https://melpa.org/packages/")
                          ("elpa"  . "https://elpa.gnu.org/packages/")
                          ("org" . "http://orgmode.org/elpa/")
                          ("gnu" . "http://elpa.gnu.org/packages/")))
@@ -41,6 +41,21 @@
 (use-package mugu-site-lisp)
 (use-package mugu-ada)
 (use-package mugu-lint)
+
+;; git log single file
+;; better magit support
+;; bind ace link
+;; smart mx with only selected command
+;; smart save
+;; bind grep
+;; better counsel occur support
+;; improve company configuration
+;; setup org
+;; setup ada
+;; retry  lipsy
+;; better workspace integration in modeline
+;; try spaceline?
+
 
 
 ;; Place custom settings in their own file.
