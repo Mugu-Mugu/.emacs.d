@@ -1,8 +1,8 @@
 (use-package projectile
   :ensure projectile
   :defer
-  :diminish
-  :config 
+  :diminish projectile-mode
+  :config
   (setq projectile-enable-caching t)
   (after 'ivy (setq projectile-completion-system 'ivy))
   (setq projectile-cache-file (concat user-emacs-directory ".cache/projectile.cache"))
@@ -43,6 +43,15 @@
   (require 'mugu-directory-fix)
   )
 
+(use-package counsel-projectile
+  :disabled ;;; useless??? no added value upon base ivy implementation it lacks history, and different action 
+  :after projectile
+  :ensure
+  :config
+  (require 'counsel)
+  (counsel-projectile-on)
+  )
+
 (defvar mugu-project-dir-root
   nil
   "directory root of the current project")
@@ -56,6 +65,7 @@ _s_: switch project    _d_: find directory
 _c_: compile project   _f_: find file
 _r_: regenerate tag    _t_: find tag
 _v_: version control   _g_: find pattern
+_i_: invalidate cache
 "
     ("s" projectile-persp-switch-project)
     ("d" mugu-project-find-dir)
@@ -65,6 +75,7 @@ _v_: version control   _g_: find pattern
     ("r" projectile-regenerate-tags)
     ("g" projectile-grep)
     ("v" projectile-vc)
+    ("i" projectile-invalidate-cache :color red)
     ("q" nil "quit menu" :color blue)
     ("SPC" hydra-main-menu/body "return to main menu"))
   )
