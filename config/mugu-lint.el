@@ -8,6 +8,7 @@
   (customize-set-value 'flycheck-display-errors-delay 0.2)
   (customize-set-value 'flycheck-check-syntax-automatically '(save idle-change mode-enabled))
   (customize-set-value 'flycheck-idle-change-delay 5)
+  (setq-default flycheck-disabled-checkers (cons 'emacs-lisp-checkdoc flycheck-disabled-checkers))
   (after 'hydra
     (defhydra mugu-lint-menu
       (:color red :hint nil :idle 0.1)
