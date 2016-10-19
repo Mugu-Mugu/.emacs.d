@@ -24,6 +24,7 @@
   (define-key evil-normal-state-map (kbd "f") 'ace-window)
   (define-key evil-motion-state-map (kbd "f") 'ace-window)
   (define-key evil-visual-state-map (kbd "f") 'ace-window)
+  ;;; azerty keyboard
   (define-key evil-normal-state-map (kbd "à") 'evil-beginning-of-line)
   (define-key evil-motion-state-map (kbd "à") 'evil-beginning-of-line)
   (define-key evil-visual-state-map (kbd "à") 'evil-beginning-of-line)
