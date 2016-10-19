@@ -41,6 +41,7 @@
 (use-package mugu-site-lisp)
 (use-package mugu-ada)
 (use-package mugu-lint)
+(use-package mugu-org)
 
 ;; git log single file
 ;; better magit support

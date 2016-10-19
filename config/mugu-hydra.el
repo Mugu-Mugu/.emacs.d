@@ -37,7 +37,8 @@
 _b_: buffer                 _y_: yank ring         _x_ : execute         _SPC_ : major mode menu
 _m_: helm-mini              _S_: recursive grep    _cd_: cd              _w_   : workspace menu
 _f_: find file              _g_: grep in file      _h_ : help submenu    _p_   : project menu
-_r_: find file recursivly                                                _!_   : lint menu
+_r_: find file recursivly                                            ^^^^_!_   : lint menu 
+                                                                   ^^^^^^_o_   : org menu 
 "
   ("b" mugu-hydra-switch-buffer)
   ("m" counsel-recentf)
@@ -54,9 +55,10 @@ _r_: find file recursivly                                                _!_   :
   ("h" hydra-emacs-help/body)
   ("d" mugu-directory-with-current-file-path "cd to current file" :color red)
   ("!" mugu-lint-menu/body)
+  ("o" mugu-org-main-menu/body)
   ("q" nil "cancel hydra" :color blue)
   ("SPC" hydra-custom-mode-hook-run "mode custom binding"))
-(after 'evil 
+(after 'evil
   (define-key evil-normal-state-map (kbd "SPC") 'mugu-hydra-menu-main/body)
   (define-key evil-motion-state-map (kbd "SPC") 'mugu-hydra-menu-main/body)
   (define-key evil-visual-state-map (kbd "SPC") 'mugu-hydra-menu-main/body))
