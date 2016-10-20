@@ -21,8 +21,15 @@
 (require 'use-package)
 (setq use-package-verbose t)
 
-;;; main emacs config here
+;;; mandatory dependecies declared there
+;; essentially user input package and libraries
+(use-package hydra     :demand :ensure)
+(use-package evil      :demand :ensure)
+(use-package key-chord :demand :ensure)
+
+;;; main 
 (use-package mugu-core)
+(use-package mugu-menu :disabled)
 (use-package mugu-sessions-persistance)
 (use-package mugu-hydra)
 (use-package mugu-modeline)
