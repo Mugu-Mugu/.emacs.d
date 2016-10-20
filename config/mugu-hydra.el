@@ -93,6 +93,6 @@ _a_: apropos       ^ ^
   ("h" helm-previous-source)
   ("l" helm-next-source)
   ("i" nil "cancel"))
-(key-chord-define helm-like-unite/keymap "jk" 'hydra-keyboard-quit)
+(after 'key-chord (key-chord-define helm-like-unite/keymap "jk" 'hydra-keyboard-quit))
 
 (provide 'mugu-hydra)
