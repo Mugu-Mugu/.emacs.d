@@ -58,8 +58,6 @@
 ;;; STARTUP conf
 ;; don't put intitial text in scratch buffer
 (setq initial-scratch-message nil)
-(ignore-errors ;; windows
-  (exec-path-from-shell-initialize))
 ;; Hide startup messages
 (setq inhibit-splash-screen t
       inhibit-startup-echo-area-message t

@@ -1,6 +1,6 @@
 ;;; goal of this package is to provide a global menu for common function such as open file, change dir etc...
-;;; a binding is provideded (double SPC) so major mode can provide their own menu
-
+;;; the main menu doesnt verify if bound features are present as they are meant to be loaded lazily
+;;; a binding (double SPC) is reserved for major mode submenu
 (require 'hydra)
 
 ;:color
@@ -12,23 +12,32 @@
 ;| teal     | :foreign-keys warn :exit t |
 ;| pink     | :foreign-keys run          |
 
-;;; stub function used as hook for mode needing additionnal mapping
-(defvar hydra-custom-mode-hook nil)
-(defun hydra-custom-mode-hook-run ()
+(defvar mugu-menu-mode-menus (list)
+  "association list between a major mode and a menu"
+  )
+
+(defun mugu-menu-stub-mode-menu ()
+  "placeholder menu that does nothing but display a message"
   (interactive)
-  (run-hooks 'hydra-custom-mode-hook))
-(defun hydra-internal-custom-add-hook (hydra)
-  "Internal function setting the given hydra to the local buffer custom hydra mapping"
-  (add-hook 'hydra-custom-mode-hook hydra nil 'local))
-(defun mugu-hydra-register-mode-hook (mode-hook hydra-body)
-  "Function to set a custom hydra body on an external hook (typically a major mode hook to prevent conflict)"
-  (add-hook mode-hook (apply-partially #'hydra-internal-custom-add-hook hydra-body) ))
+  (message "No menu registered for this mode [%s]" major-mode)
+  )
+
+(defun mugu-menu-call-mode-menu ()
+  "This function will display the menu applicable for the current mode or do 
+nothing but display a message if no menu has been registered for this mode"
+  (interactive)
+  (call-interactively (alist-get major-mode mugu-menu-mode-menus #'mugu-menu-stub-mode-menu)))
+
+(defun mugu-menu-register-mode-menu (mode-symbol menu-function)
+  "Bind a menu MENU-FUNCTION to the mode MODE-SYMBOL. This menu may be called
+at user request for the bound mode" 
+  (add-to-list 'mugu-menu-mode-menus `(,mode-symbol . ,menu-function) nil 'eq))
 
 (defun mugu-hydra-switch-buffer ()
   (interactive)
   (ivy-switch-buffer))
 
- (defhydra mugu-hydra-menu-main
+ (defhydra mugu-menu-main-hydra
   (:color blue :hint nil :idle 0.1)
   "
 ^Files^                     ^Data^                ^Others^              ^Sub Menu^
@@ -51,18 +60,14 @@ _r_: find file recursivly                                            ^^^^_!_   :
   ("w" mugu-workspace-hydra-menu/body)
   ("p" mugu-project-hydra-menu/body)
   ("cd" cd)
-  ("h" hydra-emacs-help/body)
+  ("h" mugu-menu-help-hydra/body)
   ("d" mugu-directory-with-current-file-path "cd to current file" :color red)
   ("!" mugu-lint-menu/body)
   ("o" mugu-org-main-menu/body)
   ("q" nil "cancel hydra" :color blue)
-  ("SPC" hydra-custom-mode-hook-run "mode custom binding"))
-(after 'evil
-  (define-key evil-normal-state-map (kbd "SPC") 'mugu-hydra-menu-main/body)
-  (define-key evil-motion-state-map (kbd "SPC") 'mugu-hydra-menu-main/body)
-  (define-key evil-visual-state-map (kbd "SPC") 'mugu-hydra-menu-main/body))
+  ("SPC" mugu-menu-call-mode-menu "mode custom binding"))
 
-(defhydra hydra-emacs-help (:color teal
+(defhydra mugu-menu-help-hydra (:color teal
                             :hint nil)
   "
 ^EMACS^             ^Helm^         
@@ -76,22 +81,7 @@ _a_: apropos       ^ ^
   ("a" helm-apropos)
   ("h" helm-documentation))
 
-; to move in my-helm
-(defhydra helm-like-unite ()
-  "vim movement"
-  ("?" helm-help "help")
-  ("<escape>" keyboard-escape-quit "exit")
-  ("q" keyboard-escape-quit "exit")
-  ("<SPC>" helm-toggle-visible-mark "mark")
-  ("a" helm-toggle-all-marks "(un)mark all")
-  ("v" helm-execute-persistent-action)
-  ("g" helm-beginning-of-buffer "top")
-  ("G" helm-end-of-buffer "bottom")
-  ("j" helm-next-line "down")
-  ("k" helm-previous-line "up")
-  ("h" helm-previous-source)
-  ("l" helm-next-source)
-  ("i" nil "cancel"))
-(after 'key-chord (key-chord-define helm-like-unite/keymap "jk" 'hydra-keyboard-quit))
+(defalias 'mugu-menu-main-menu 'mugu-menu-main-hydra/body)
+(defalias 'mugu-menu-help-menu 'mugu-menu-help-hydra)
 
-(provide 'mugu-hydra)
+(provide 'mugu-menu)

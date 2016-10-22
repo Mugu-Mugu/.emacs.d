@@ -25,7 +25,9 @@
 (use-package mugu-org-menu
   :commands mugu-org-main-menu/body
   :after org
-  :config
-  (after 'mugu-hydra (mugu-hydra-register-mode-hook 'org-mode-hook 'mugu-org-mode-menu)))
+  :init
+  :config 
+  (mugu-menu-register-mode-menu 'org-mode 'mugu-org-internal-menu)
+  )
 
 (provide 'mugu-org)
