@@ -20,7 +20,22 @@
 (use-package org
   :ensure
   :defer t
-  )
+  :config
+  (require 'mugu-org-utils)
+  (setq org-todo-keywords (quote ((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)"))))
+  (setq org-use-fast-todo-selection t)
+  (setq org-agenda-custom-commands
+        '(("ct" "list all active actions" todo "NEXT"
+          ((org-agenda-prefix-format "%i %-10:c %b")
+           (org-agenda-skip-function #'mugu-org-skip-project-or-inactive-branch)))
+          ("cs" "list all stuck projects" todo "NEXT" 
+           ((org-agenda-prefix-format "%i %-10:c %b")
+            (org-agenda-skip-function #'mugu-org-skip-project-not-stuck)))
+          ("cb" "list all actions not planified" todo "TODO" 
+           ((org-agenda-prefix-format "%i %-10:c %b")
+            (org-agenda-todo-list-sublevels nil)))
+          ))
+  (customize-set-value 'org-agenda-files (file-expand-wildcards "~/org/*.org")))
 
 (use-package mugu-org-menu
   :commands mugu-org-main-menu/body
