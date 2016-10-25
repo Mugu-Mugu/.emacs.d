@@ -29,11 +29,12 @@
     "\r"    'magit-visit-thing
     [C-return] 'magit-visit-thing
      "q"    'magit-mode-bury-buffer)) 
-  (after 'mugu-hydra
-    (mugu-hydra-register-mode-hook 'magit-status-mode-hook 'magit-dispatch-popup)
-    (mugu-hydra-register-mode-hook 'magit-log-mode-hook 'magit-dispatch-popup)
-    (key-chord-define magit-status-mode-map "jk" 'evil-normal-state)
-    (key-chord-define magit-log-mode-map "jk" 'evil-normal-state)
+  (after 'mugu-menu
+    ;(mugu-hydra-register-mode-hook 'magit-status-mode-hook 'magit-dispatch-popup)
+    ;(mugu-hydra-register-mode-hook 'magit-log-mode-hook 'magit-dispatch-popup)
+    (mugu-menu-register-mode-menu 'magit-status-mode 'magit-dispatch-popup)
+    ;(key-chord-define magit-status-mode-map "jk" 'evil-normal-state)
+    ;(key-chord-define magit-log-mode-map "jk" 'evil-normal-state)
     )
   :ensure
   )

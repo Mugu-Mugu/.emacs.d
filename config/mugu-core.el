@@ -6,7 +6,7 @@
 ;; Don't show those horrible buttons
 (tool-bar-mode -1)
 ;; garbage collection at 5MO
-(setq gc-cons-threshold 5000000)
+(setq gc-cons-threshold 500000)
 (custom-set-variables
  '(initial-frame-alist (quote ((fullscreen . maximized)))))
 
@@ -58,8 +58,6 @@
 ;;; STARTUP conf
 ;; don't put intitial text in scratch buffer
 (setq initial-scratch-message nil)
-(ignore-errors ;; windows
-  (exec-path-from-shell-initialize))
 ;; Hide startup messages
 (setq inhibit-splash-screen t
       inhibit-startup-echo-area-message t

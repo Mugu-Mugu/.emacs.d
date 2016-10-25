@@ -1,14 +1,17 @@
 (use-package flycheck
   :ensure
+  :diminish flycheck-mode
   ;;; not required at start but still eventually required and can not be activated automatically unless
   ;;; a hook is set up for each major mode. Easier to put a relatively large timer for defered loading.
   :defer 3
   :config
   (global-flycheck-mode +1)
+  
   (customize-set-value 'flycheck-display-errors-delay 0.2)
   (customize-set-value 'flycheck-check-syntax-automatically '(save idle-change mode-enabled))
   (customize-set-value 'flycheck-idle-change-delay 5)
   (setq-default flycheck-disabled-checkers (cons 'emacs-lisp-checkdoc flycheck-disabled-checkers))
+
   (after 'hydra
     (defhydra mugu-lint-menu
       (:color red :hint nil :idle 0.1)
