@@ -24,6 +24,9 @@
   (require 'mugu-org-utils)
   (setq org-todo-keywords (quote ((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)"))))
   (setq org-use-fast-todo-selection t)
+  (setq org-refile-targets (quote ((org-agenda-files :maxlevel . 9))))
+  (setq org-refile-use-outline-path file)
+  (setq org-outline-path-complete-in-steps nil)
   (setq org-agenda-custom-commands
         '(("ct" "list all active actions" todo "NEXT"
           ((org-agenda-prefix-format "%i %-10:c %b")
