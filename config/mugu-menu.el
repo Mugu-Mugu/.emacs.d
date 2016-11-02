@@ -13,14 +13,12 @@
 ;| pink     | :foreign-keys run          |
 
 (defvar mugu-menu-mode-menus (list)
-  "association list between a major mode and a menu"
-  )
+  "association list between a major mode and a menu")
 
 (defun mugu-menu-stub-mode-menu ()
   "placeholder menu that does nothing but display a message"
   (interactive)
-  (message "No menu registered for this mode [%s]" major-mode)
-  )
+  (message "No menu registered for this mode [%s]" major-mode))
 
 (defun mugu-menu-call-mode-menu ()
   "This function will display the menu applicable for the current mode or do 
@@ -64,6 +62,7 @@ _r_: find file recursivly                                            ^^^^_!_   :
   ("d" mugu-directory-with-current-file-path "cd to current file" :color red)
   ("!" mugu-lint-menu/body)
   ("o" mugu-org-main-menu/body)
+  ("u" counsel-unicode-char "insert unicode")
   ("q" nil "cancel hydra" :color blue)
   ("SPC" mugu-menu-call-mode-menu "mode custom binding"))
 

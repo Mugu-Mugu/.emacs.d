@@ -36,19 +36,17 @@ that is if all of its parent tasks are active or if it has no parent task"
     (widen)
     (save-excursion
       (let ((end-of-tree-point (save-excursion (org-end-of-subtree t))))
-        ;;; as long as there are still next heading
-        ;;; and provided we are still in the subtree of current project
-        ;;; iterate over headings and stop only if an active task as been found
-        ;;; when an inactive task is encountered, its subtree is skipped
+;;; as long as there are still next heading
+;;; and provided we are still in the subtree of current project
+;;; iterate over headings and stop only if an active task as been found
+;;; when an inactive task is encountered, its subtree is skipped
         (while (and (save-excursion (outline-next-heading) (< (point) end-of-tree-point))
                     (outline-next-heading)
                     (not (equal (org-get-todo-state) "NEXT")))
           ;; skip subtree of inactive task
-          (when (org-get-todo-state)
-            (org-end-of-subtree t)
-            (forward-line 1)))
-      ;;; project is stuck if stop heading state is not NEXT
-      (not (equal (org-get-todo-state) "NEXT"))))))
+          (when (org-get-todo-state) (org-end-of-subtree t)))
+;;; project is stuck if stop heading state is not NEXT
+        (not (equal (org-get-todo-state) "NEXT"))))))
 
 (defun mugu-org-skip-if-parent-inactive ()
   "Skip current subtree if it belongs to an inactive tree (without Next)"

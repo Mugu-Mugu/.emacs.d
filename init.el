@@ -27,6 +27,7 @@
 (use-package key-chord :demand :ensure)
 
 ;;; personal mandatory features 
+(use-package mugu-hydra)         ;; automatic hydra docstring generation
 (use-package mugu-core)          ;; base settings + some functions
 (use-package mugu-directory-fix) ;; provide control on current working directory
 (use-package mugu-menu)          ;; provide main interaction menu + some menu functions
@@ -49,7 +50,7 @@
 ;;; languages features
 (use-package mugu-ada)
 (use-package mugu-lisp)
-(use-package mugu-lispy :disabled)
+(use-package mugu-lispy)
 (use-package mugu-org)
 
 ;;; gather all *global* binding to enforce coherency
