@@ -165,7 +165,7 @@
                "[HJKL bindings for ORG mode]"
                mugu/org-menu-hjkl-heads)
 (mugu/defhydra-merged mugu-org-cmd-hydra
-                      (:color pink :hint nil :after-exit (when (eq major-mode 'org-mode) (mugu-org-hjkl-hydra/body)))
+                      (:color pink :hint nil)
                       "[cmd bindings for ORG mode]"
                       mugu/org-menu-cmd-heads
                       mugu/org-menu-hjkl-heads)
