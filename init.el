@@ -60,4 +60,5 @@
 (setq custom-file (concat user-emacs-directory "config/" "mugu-custom.el"))
 (when (file-exists-p custom-file) (load custom-file))
 
+(add-hook 'ada-mode-hook #'(lambda () (modify-syntax-entry ?_ "w")))
 (provide 'init)
