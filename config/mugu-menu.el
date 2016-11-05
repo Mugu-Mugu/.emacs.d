@@ -35,39 +35,28 @@ at user request for the bound mode"
   (interactive)
   (ivy-switch-buffer))
 
- (defhydra mugu-menu-main-hydra
-  (:color blue :hint nil :idle 0.1)
-  "
-^Files^                     ^Data^                ^Others^              ^Sub Menu^
-^^^^^^^^-----------------------------------------------------------------------------------------------
-_b_: buffer                 _y_: yank ring         _x_ : execute         _SPC_ : major mode menu
-_m_: helm-mini              _S_: recursive grep    _cd_: cd              _w_   : workspace menu
-_f_: find file              _g_: grep in file      _h_ : help submenu    _p_   : project menu
-_r_: find file recursivly                                            ^^^^_!_   : lint menu 
-                                                                   ^^^^^^_o_   : org menu 
-"
-  ("b" mugu-hydra-switch-buffer)
-  ("m" counsel-recentf)
-  ("f" counsel-find-file)
-  ("y" counsel-yank-pop)
-  ("S" mugu-hydra-find-pattern-recursive)
-  ("g" swiper)
-  ("s" counsel-semantic)
-  ("x" counsel-M-x)
-  ("r" counsel-rg-find-file-recursive)
-  ("w" mugu-workspace-hydra-menu/body)
-  ("p" mugu-project-hydra-menu/body)
-  ("cd" cd)
-  ("h" mugu-menu-help-hydra/body)
+(defhydra mugu-menu-main-hydra (:color blue :hint nil) " Main Menu "
+  ("b" mugu-hydra-switch-buffer "buffer" :column "1-Switch") 
+  ("m" counsel-recentf "recent")
+  ("f" counsel-find-file "file current dir")
+  ("r" counsel-rg-find-file-recursive "file recursively")
+  ("y" counsel-yank-pop "yank ring" :column "2-find")
+  ("g" swiper "swiper")
+  ("s" counsel-semantic "semantic")
+  ("x" counsel-M-x "execute" :column "3-Others")
+  ("cd" cd "change dir")
   ("d" mugu-directory-with-current-file-path "cd to current file" :color red)
-  ("!" mugu-lint-menu/body)
-  ("o" mugu-org-main-menu/body)
   ("u" counsel-unicode-char "insert unicode")
-  ("q" nil "cancel hydra" :color blue)
-  ("SPC" mugu-menu-call-mode-menu "mode custom binding"))
+  ("SPC" mugu-menu-call-mode-menu "major mode" :column "4-Submenu")
+  ("w" mugu-workspace-hydra-menu/body "workspace")
+  ("p" mugu-project-hydra-menu/body "project")
+  ("h" mugu-menu-help-hydra/body "help")
+  ("!" mugu-lint-menu/body "linting")
+  ("o" mugu-org-main-menu/body "orgmode")
+  ("q" nil "cancel hydra" :color blue :column nil))
 
 (defhydra mugu-menu-help-hydra (:color teal
-                            :hint nil)
+                                       :hint nil)
   "
 ^EMACS^             ^Helm^         
 ^^^^^^^^---------------------------
