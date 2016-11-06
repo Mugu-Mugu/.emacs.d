@@ -2,6 +2,7 @@
 ;;; the main menu doesnt verify if bound features are present as they are meant to be loaded lazily
 ;;; a binding (double SPC) is reserved for major mode submenu
 (require 'hydra)
+(require 'mugu-directory-fix)
 
 ;:color
 ;| color    | toggle                     |
