@@ -12,7 +12,7 @@
   (customize-set-value 'flycheck-idle-change-delay 5)
   (setq-default flycheck-disabled-checkers (cons 'emacs-lisp-checkdoc flycheck-disabled-checkers))
 
-  (after 'hydra
+  (after 'mugu-hydra
     (defhydra mugu-lint-menu
       (:color red :hint nil :idle 0.1)
       "
@@ -39,9 +39,7 @@ About         :[_am_] manual        [_ah_] local help      [_av_] version       
       ("ac" flycheck-verify-setup)
       ("x" flycheck-disable-checker)
       ("q" nil "cancel hydra" :color blue)
-      )
-    )
-  )
+      )))
 
 (use-package flycheck-pos-tip
   :ensure
