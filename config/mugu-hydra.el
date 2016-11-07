@@ -10,7 +10,6 @@
   "return non nil if head has the property"
   (plist-member (cdr head) prop))
 
-
 (defun hydra--normalize-heads (heads)
   "ensure each head from HEADS have a property column or set it to the same value as preceding head"
   (let ((current-col nil))
@@ -29,7 +28,6 @@ each heads of NORMALIZED-HEADS must have a column property"
     (cl-loop for head in heads-sorted
              for column-name = (hydra--head-property head :column)
              with prev-column-name = (hydra--head-property (nth 0 heads-sorted) :column)
-             do (message "prev = %s  current = %s" prev-column-name column-name )
              unless (equal prev-column-name column-name) collect heads-one-column into heads-all-columns and do (setq heads-one-column nil)
              collect head into heads-one-column
              do (setq prev-column-name column-name)
@@ -47,7 +45,7 @@ This is achieved by adding PADDING-HEAD were applicable"
            finally return balanced-head-groups))
 
 (defun hydra--generate-matrix (heads-grouped-by-col)
-  "Return a list of heads with even length from HEADS-GROUPED-BY-COL with padding heads where applicable and 2 virtual heads acting as table header
+  "Return a list of heads with even length from HEADS-GROUPED-BY-COL with padding heads where applicable and 2 virtual heads acting as table headerhttps://github.com/Mugu-Mugu/hydra
 a property max-key-len and max-doc-len is also applied to each head and represents the maximum dimensions of the column"
   (when heads-grouped-by-col
     (cl-loop for heads in (hydra--pad-heads heads-grouped-by-col '(" " nil " " :exit t))
@@ -90,8 +88,6 @@ Each head must have a property max-key-len and max-doc-len
   (let* ((sorted-heads (hydra--sort-heads (hydra--normalize-heads heads)))
          (heads-w-col (cl-remove-if-not (lambda (heads) (hydra--head-property (nth 0 heads) :column)) sorted-heads))
          (heads-wo-col (cl-remove-if (lambda (heads) (hydra--head-property (nth 0 heads) :column)) sorted-heads)))
-    ;; (message "mugu original %s" heads)
-    ;; (message "mugu unsorted %s" (hydra--normalize-heads heads))
     (concat "\n"
             (hydra--hint-from-matrix body (hydra--generate-matrix heads-w-col))
             (cond (heads-wo-col "\n" (funcall original-hydra-hint body (car heads-wo-col)))

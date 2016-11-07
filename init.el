@@ -1,4 +1,5 @@
 (add-to-list 'load-path (concat user-emacs-directory "site_specific"))
+(add-to-list 'load-path (concat user-emacs-directory "hydra"))
 (add-to-list 'load-path (concat user-emacs-directory "config"))
 (add-to-list 'load-path (concat user-emacs-directory "elisp"))
 (add-to-list 'load-path (concat user-emacs-directory "site-lisp"))
@@ -27,7 +28,7 @@
 (use-package key-chord :demand :ensure)
 
 ;;; personal mandatory features 
-(use-package mugu-hydra)         ;; automatic hydra docstring generation
+(use-package mugu-hydra :disabled)         ;; automatic hydra docstring generation
 (use-package mugu-core)          ;; base settings + some functions
 (use-package mugu-directory-fix) ;; provide control on current working directory
 (use-package mugu-menu)          ;; provide main interaction menu + some menu functions
