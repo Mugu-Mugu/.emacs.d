@@ -36,16 +36,22 @@ at user request for the bound mode"
   (interactive)
   (ivy-switch-buffer))
 
-(defhydra mugu-menu-main-hydra (:color blue :hint nil) " Main Menu "
+(defhydra mugu-menu-main-hydra (:color blue :hint nil)
+  "
+ Main Menu 
+
+Current Directory : %s(mugu-directory-pwd)
+File    Directory : %s(mugu-directory-pwd-file)
+" 
   ("b" mugu-hydra-switch-buffer "buffer" :column "1-Switch") 
   ("m" counsel-recentf "recent")
-  ("f" counsel-find-file "file current dir")
-  ("r" counsel-rg-find-file-recursive "file recursively")
+  ("f" (with-mugu-dir 'counsel-find-file) "file current dir")
+  ("r" (with-mugu-dir 'counsel-rg-find-file-recursive) "file recursively")
   ("y" counsel-yank-pop "yank ring" :column "2-find")
   ("g" swiper "swiper")
   ("s" counsel-semantic "semantic")
   ("x" counsel-M-x "execute" :column "3-Others")
-  ("cd" cd "change dir")
+  ("cd" (with-mugu-dir 'cd) "change dir")
   ("d" mugu-directory-with-current-file-path "cd to current file" :color red)
   ("u" counsel-unicode-char "insert unicode")
   ("SPC" mugu-menu-call-mode-menu "major mode" :column "4-Submenu")
