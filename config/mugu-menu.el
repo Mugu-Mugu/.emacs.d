@@ -38,10 +38,9 @@ at user request for the bound mode"
 
 (defhydra mugu-menu-main-hydra (:color blue :hint nil)
   "
- Main Menu 
-
-Current Directory : %s(mugu-directory-pwd)
-File    Directory : %s(mugu-directory-pwd-file)
+MAIN MENU :
+  -> File    Dir : %s(mugu-directory-pwd-file)
+  -> Current Dir : %s(mugu-directory-pwd)
 " 
   ("b" mugu-hydra-switch-buffer "buffer" :column "1-Switch") 
   ("m" counsel-recentf "recent")
