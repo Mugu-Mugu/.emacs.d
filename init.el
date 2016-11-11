@@ -51,7 +51,6 @@
 ;;; languages features
 (use-package mugu-ada)
 (use-package mugu-lisp)
-(use-package mugu-lispy)
 (use-package mugu-org)
 
 ;;; gather all *global* binding to enforce coherency
