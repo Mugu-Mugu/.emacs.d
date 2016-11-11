@@ -47,6 +47,7 @@
 (use-package mugu-themes)
 (use-package mugu-site-lisp)
 (use-package mugu-lint)
+(use-package mugu-window)
 
 ;;; languages features
 (use-package mugu-ada)
