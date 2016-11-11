@@ -36,9 +36,16 @@ may be called at user request for the bound mode"
 
 (defmacro mugu-menu-register-permanent-menu (head)
   "add given HEAD to the main menu. This HEAD will be permanently available in the main menu
-and gathered in a specific column" 
+and gathered in a specific column"
   (hydra--head-set-property head :column "5-Submenu")
-  `(defhydra mugu-menu-main-hydra (:color blue :hint nil :inherit (mugu-menu-main-hydra/heads)) ,head))
+  `(defhydra mugu-menu-main-hydra (:color blue :hint nil :inherit (mugu-menu-main-hydra/heads))
+     "
+                                -- MAIN MENU --
+
+  -> File    Dir : %s(mugu-directory-pwd-file)
+  -> Current Dir : %s(mugu-directory-pwd)
+"
+     ,head))
 
 (defun mugu-hydra-switch-buffer ()
   (interactive)
