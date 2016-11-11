@@ -1,13 +1,14 @@
 (require 'hydra)
 
-;; window resize
-;; window split
-;; window follow mode
-;; window undo
-;; buffer control
-
-
 (winner-mode +1)
+(add-to-list 'display-buffer-alist
+             (quote ("\\*Help\\*" . ((display-buffer-in-side-window)
+                                     .
+                                     ((side . right)
+                                      (window-height . 1)
+                                      (window-width . 80)
+                                      (inhibit-switch-frame . t)
+                                      (inhibit-same-window . t))))))
 
 (defhydra mugu-window-resize-hydra
   (:color red :hint nil)
