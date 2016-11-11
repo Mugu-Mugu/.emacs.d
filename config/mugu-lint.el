@@ -1,52 +1,54 @@
+(require 'hydra)
+
 (use-package flycheck
   :ensure
   :diminish flycheck-mode
-  ;;; not required at start but still eventually required and can not be activated automatically unless
-  ;;; a hook is set up for each major mode. Easier to put a relatively large timer for defered loading.
-  :defer 3
+  :defer
+  :commands flycheck-list-errors
+  :init 
+  (defhydra mugu-lint-menu
+               (:color pink :hint nil :idle 0.1
+                       :body-pre (flycheck-list-errors)
+                       :post (delete-window (flycheck-get-error-list-window)))
+               "
+                              -- Flycheck Zone --
+"
+               ("j" flycheck-next-error "↓ error" :column "1-Errors")
+               ("k" flycheck-previous-error "↑ error")
+               ("y" flycheck-copy-errors-as-kill "Copy errors")
+               ("v" flycheck-buffer "Recheck buffer" :column "2-Buffer Management")
+               ("p" flycheck-clear "Ignore errors")
+               ("c" flycheck-compile "Compile buffer")
+               ("s" flycheck-select-checker "select checker" :column "3-Checker Management")
+               ("d" flycheck-describe-checker "describe checker")
+               ("x" flycheck-disable-checker "disable checker")
+               ("av" flycheck-version "display version" :column nil)
+               ("ac" flycheck-verify-setup "display setup")
+               ("q" nil "cancel hydra" :color blue)) 
   :config
-  (global-flycheck-mode +1)
-  
-  (customize-set-value 'flycheck-display-errors-delay 0.2)
+  (global-flycheck-mode 1)
+
   (customize-set-value 'flycheck-check-syntax-automatically '(save idle-change mode-enabled))
   (customize-set-value 'flycheck-idle-change-delay 5)
   (setq-default flycheck-disabled-checkers (cons 'emacs-lisp-checkdoc flycheck-disabled-checkers))
 
-  (after 'hydra
-    (defhydra mugu-lint-menu
-      (:color red :hint nil :idle 0.1)
-      "
-[Flycheck zone]
-Error Mng     : [_j_] next error     [_k_] previous error   [_l_] list all errors [_y_] extract errors
-Buffer Action : [_v_] verify buffer  [_p_] purge buffer     [_c_] compile buffer
-Checker Mng   : [_s_] select checker [_d_] describe checker [_x_] disable checker
-About         :[_am_] manual        [_ah_] local help      [_av_] version        [_ac_] check setup
-"
-      ("v" flycheck-buffer)
-      ("p" flycheck-clear)
-      ("c" flycheck-compile)
-      ("j" flycheck-next-error)
-      ("k" flycheck-previous-error)
-      ("l" flycheck-list-errors)
-      ("y" flycheck-copy-errors-as-kill)
-      ("s" flycheck-select-checker)
-      ("d" flycheck-describe-checker)
-      ;("h" flycheck-display-error-at-point)
-      ;("e" flycheck-explain-error-at-point)
-      ("ah" Display-local-help)
-      ("am" flycheck-manual)
-      ("av" flycheck-version)
-      ("ac" flycheck-verify-setup)
-      ("x" flycheck-disable-checker)
-      ("q" nil "cancel hydra" :color blue)
-      )))
+  (add-to-list 'display-buffer-alist
+               (quote ("\\*Flycheck errors\\*" . ((display-buffer-in-side-window)
+                                                  .
+                                                  ((side . bottom)
+                                                   (window-height . 10)
+                                                   (window-width . 1)
+                                                   (inhibit-switch-frame . t)
+                                                   (inhibit-same-window . t)))))))
 
 (use-package flycheck-pos-tip
   :ensure
+  ;; its nice but it cause jerky refresh
+  ;; it will be reactivated once eamcs 25.2 is released with the double buffer
+  ;; :disabled
+  :disabled
   :after flycheck
-  :config
-  (flycheck-pos-tip-mode)
- )
+  :config (flycheck-pos-tip-mode))
 
 (provide 'mugu-lint)
 ;;; mugu-lint ends here

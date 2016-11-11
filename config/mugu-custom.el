@@ -72,6 +72,8 @@
  '(fci-rule-color "#282a2e")
  '(fill-column 80)
  '(flycheck-clang-language-standard "c++11")
+ '(flycheck-display-errors-delay 0.0)
+ '(flycheck-display-errors-function (quote flycheck-display-error-messages-unless-error-list))
  '(flycheck-haskell-ghc-executable "/usr/bin/ghc")
  '(flycheck-haskell-hlint-executable "/usr/bin/cabal exec hlint")
  '(gdb-many-windows t)
