@@ -57,7 +57,8 @@
   (defhydra mugu-project-hydra-menu
     (:color blue :hint nil :body-pre (unless mugu-project-dir-root (call-interactively 'projectile-persp-switch-project)))
     "
-PROJECT MENU : 
+                              -- PROJECT MENU --
+
   -> Project Root : %s`mugu-project-dir-root
   -> Current Dir  : %s(mugu-directory-pwd)
 "

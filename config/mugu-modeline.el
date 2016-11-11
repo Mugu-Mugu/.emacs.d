@@ -28,8 +28,7 @@
   (setq spaceline-highlight-face-func 'spaceline-highlight-face-evil-state)
   (setq spaceline-window-numbers-unicode t
         spaceline-workspace-numbers-unicode t)
-  (spaceline-spacemacs-theme)
-  )
+  (spaceline-spacemacs-theme))
 
 
 (provide 'mugu-modeline)

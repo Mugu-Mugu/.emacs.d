@@ -82,46 +82,6 @@
  '(helm-autoresize-max-height 70)
  '(helm-autoresize-min-height 20)
  '(helm-autoresize-mode t)
- '(ibuffer-saved-filter-groups
-   (quote
-    (("groups"
-      ("nasa-filer"
-       (filename . "/home/nathan/devel/nasa/filer/")))
-     ("default"
-      ("dired"
-       (mode . dired-mode))
-      ("haskell"
-       (mode . haskell-mode))
-      ("python"
-       (mode . python-mode))
-      ("notes"
-       (or
-        (name . "^\\*Calendar\\*$")
-        (name . "^diary$")
-        (mode . org-mode)))
-      ("*buffer*"
-       (name . "\\*.*\\*"))))))
- '(ibuffer-saved-filters
-   (quote
-    (("builtin-buffers"
-      ((name . "^\\*.*\\*$")))
-     ("nasa-filer"
-      ((filename . "/home/nathan/devel/nasa/filer/")))
-     ("gnus"
-      ((or
-        (mode . message-mode)
-        (mode . mail-mode)
-        (mode . gnus-group-mode)
-        (mode . gnus-summary-mode)
-        (mode . gnus-article-mode))))
-     ("programming"
-      ((or
-        (mode . emacs-lisp-mode)
-        (mode . cperl-mode)
-        (mode . c-mode)
-        (mode . java-mode)
-        (mode . idl-mode)
-        (mode . lisp-mode)))))))
  '(ido-everywhere t)
  '(indent-tabs-mode nil)
  '(initial-frame-alist (quote ((fullscreen . maximized))))
@@ -162,9 +122,8 @@
  '(org-use-sub-superscripts (quote {}))
  '(package-selected-packages
    (quote
-    (hydra counsel-projectile flycheck-pos-tip flycheck use-package telephone-line slime persp-projectile noctilux-theme magit key-chord ivy-hydra helm-projectile evil-lispy elisp-slime-nav counsel company-quickhelp company-flx ada-mode ace-link)))
+    (lispyville hydra counsel-projectile flycheck-pos-tip flycheck use-package telephone-line slime persp-projectile noctilux-theme magit key-chord ivy-hydra helm-projectile evil-lispy elisp-slime-nav counsel company-quickhelp company-flx ada-mode ace-link)))
  '(powerline-evil-tag-style (quote verbose))
- '(preview-TeX-style-dir "/home/nathan/.emacs.d/elpa/auctex-11.87.2/latex")
  '(python-indent-guess-indent-offset nil)
  '(python-indent-offset 0)
  '(semantic-mode t)

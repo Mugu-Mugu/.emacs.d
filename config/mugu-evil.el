@@ -28,8 +28,7 @@
   (define-key evil-normal-state-map (kbd "à") 'evil-beginning-of-line)
   (define-key evil-motion-state-map (kbd "à") 'evil-beginning-of-line)
   (define-key evil-visual-state-map (kbd "à") 'evil-beginning-of-line)
-  (define-key evil-normal-state-map (kbd ";") 'evil-repeat)
-  )
+  (define-key evil-normal-state-map (kbd ";") 'evil-repeat))
 
 ;; super escape
 ;; to improve 
