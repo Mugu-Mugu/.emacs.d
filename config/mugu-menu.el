@@ -1,7 +1,7 @@
-;;; goal of this package is to provide a global menu for common function such as
-;;; open file, change dir etc...  the main menu doesnt verify if bound features
-;;; are present as they are meant to be loaded lazily a binding (double SPC) is
-;;; reserved for major mode submenu
+;; goal of this package is to provide a global menu for common function such as
+;; open file, change dir etc...  the main menu doesnt verify if bound features
+;; are present as they are meant to be loaded lazily a binding (double SPC) is
+;; reserved for major mode submenu
 (require 'hydra)
 (require 'mugu-directory-fix)
 
@@ -69,6 +69,7 @@ and gathered in a specific column"
   ("cd" (with-mugu-dir 'cd) "change dir" :color red)
   ("d" mugu-directory-with-current-file-path "cd to current file" :color red)
   ("u" counsel-unicode-char "insert unicode")
+  (":" eval-expression "eval expression")
   ("SPC" mugu-menu-call-mode-menu "major mode" :column "4-Submenu")
   ("w" mugu-workspace-hydra-menu/body "workspace")
   ("p" mugu-project-hydra-menu/body "project")
@@ -80,16 +81,20 @@ and gathered in a specific column"
 (defhydra mugu-menu-help-hydra (:color teal
                                        :hint nil)
   "
-^EMACS^             ^Helm^         
-^^^^^^^^---------------------------
-_m_: man           _h_: helm
-_i_: info          ^ ^
-_a_: apropos       ^ ^
+                                -- HELP MENU --
+
 "
-  ("m" helm-man-woman)
-  ("i" helm-info-find)
-  ("a" helm-apropos)
-  ("h" helm-documentation))
+  ("s" counsel-info-lookup-symbol "symbol" :column "1-Describe")
+  ("f" counsel-describe-function "function")
+  ("v" counsel-describe-variable "variable")
+  ("b" counsel-descbinds "binding")
+  ("d" counsel-describe-face "face")
+  ("aa" apropos "symbols" :column "2-Apropos")
+  ("ac" apropos-command "commands")
+  ("av" apropos-variable "variables")
+  ("ar" apropos-value "value")
+  ("al" apropos-library "feature")
+  ("ad" apropos-documentation "documentation"))
 
 (defalias 'mugu-menu-main-menu 'mugu-menu-main-hydra/body)
 (defalias 'mugu-menu-help-menu 'mugu-menu-help-hydra)
