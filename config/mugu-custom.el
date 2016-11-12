@@ -124,7 +124,7 @@
  '(org-use-sub-superscripts (quote {}))
  '(package-selected-packages
    (quote
-    (lispyville hydra counsel-projectile flycheck-pos-tip flycheck use-package telephone-line slime persp-projectile noctilux-theme magit key-chord ivy-hydra helm-projectile evil-lispy elisp-slime-nav counsel company-quickhelp company-flx ada-mode ace-link)))
+    (smex lispyville hydra counsel-projectile flycheck-pos-tip flycheck use-package telephone-line slime persp-projectile noctilux-theme magit key-chord ivy-hydra helm-projectile evil-lispy elisp-slime-nav counsel company-quickhelp company-flx ada-mode ace-link)))
  '(powerline-evil-tag-style (quote verbose))
  '(python-indent-guess-indent-offset nil)
  '(python-indent-offset 0)

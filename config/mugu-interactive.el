@@ -10,6 +10,10 @@
   (setq ivy-height 20)
   (setq ivy-wrap t))
 
+(use-package  smex
+  :ensure
+  :defer)
+
 (use-package ivy-hydra
   :ensure
   :after ivy
