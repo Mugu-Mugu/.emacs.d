@@ -2,7 +2,7 @@
   :ensure
   :commands ivy-mode
   :diminish ivy-mode
-  :defer 1
+  :defer 
   :config
   (ivy-mode 1)
   (setq ivy-use-virtual-buffers t)
