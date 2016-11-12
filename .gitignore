@@ -52,3 +52,6 @@ eshell/
 *.eld
 site-lisp/*
 Server/*
+/smex-items
+/helm-doc.org
+/bookmarks
