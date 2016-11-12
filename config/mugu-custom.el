@@ -32,6 +32,9 @@
    [unspecified "#14191f" "#d15120" "#81af34" "#deae3e" "#7e9fc9" "#a878b5" "#7e9fc9" "#dcdddd"] t)
  '(backup-by-copying-when-mismatch nil)
  '(column-number-mode t)
+ '(comint-input-ignoredups t)
+ '(comint-prompt-read-only t)
+ '(comint-scroll-to-bottom-on-input t)
  '(company-auto-complete t)
  '(custom-enabled-themes nil)
  '(custom-safe-themes
