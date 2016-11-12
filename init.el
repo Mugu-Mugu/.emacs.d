@@ -1,17 +1,12 @@
-(add-to-list 'load-path (concat user-emacs-directory "site_specific"))
 (add-to-list 'load-path (concat user-emacs-directory "hydra"))
 (add-to-list 'load-path (concat user-emacs-directory "config"))
-(add-to-list 'load-path (concat user-emacs-directory "elisp"))
 (add-to-list 'load-path (concat user-emacs-directory "site-lisp"))
-(add-to-list 'load-path (concat user-emacs-directory "config" "/eyecandy"))
 (add-to-list 'load-path (concat user-emacs-directory "config" "/languages"))
-(add-to-list 'load-path (concat user-emacs-directory "config" "/hydra"))
-(add-to-list 'load-path "/usr/share/emacs/site-lisp")
+;; (add-to-list 'load-path "/usr/share/emacs/site-lisp")
 
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
                          ("elpa"  . "https://elpa.gnu.org/packages/")
-                         ("org" . "http://orgmode.org/elpa/")
-                         ("gnu" . "http://elpa.gnu.org/packages/")))
+                         ("org" . "http://orgmode.org/elpa/")))
 
 (require 'package)
 (package-initialize)
@@ -62,5 +57,4 @@
 (setq custom-file (concat user-emacs-directory "config/" "mugu-custom.el"))
 (when (file-exists-p custom-file) (load custom-file))
 
-(add-hook 'ada-mode-hook #'(lambda () (modify-syntax-entry ?_ "w")))
 (provide 'init)

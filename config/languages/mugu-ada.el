@@ -3,11 +3,14 @@
   :defer
   )
 
-(use-package mugu-ada-lint
-  :after ada-mode
-  :config
-  ;;; unregister the default ada checkers and register the custom one
-  (setq-default flycheck-disabled-checkers (cons 'ada-gnat flycheck-disabled-checkers))
-  (add-to-list 'flycheck-checkers 'ada-mugu))
+
+(after 'mugu-lint
+  (use-package mugu-ada-lint
+    :after ada-mode
+    :config
+;;; unregister the default ada checkers and register the custom one
+    (setq-default flycheck-disabled-checkers (cons 'ada-gnat flycheck-disabled-checkers))
+    (add-hook 'ada-mode-hook #'(lambda () (modify-syntax-entry ?_ "w")))
+    (add-to-list 'flycheck-checkers 'ada-mugu)))
 
 (provide 'mugu-ada)
