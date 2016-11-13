@@ -84,6 +84,7 @@ and gathered in a specific column"
                                 -- HELP MENU --
 
 "
+  ("h" help "general help" :column "1-Describe")
   ("s" counsel-info-lookup-symbol "symbol" :column "1-Describe")
   ("f" counsel-describe-function "function")
   ("v" counsel-describe-variable "variable")
