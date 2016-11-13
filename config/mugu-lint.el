@@ -28,6 +28,7 @@
   :config
   (global-flycheck-mode 1)
 
+  (customize-set-value 'flycheck-emacs-lisp-load-path 'inherit)
   (customize-set-value 'flycheck-check-syntax-automatically '(save idle-change mode-enabled))
   (customize-set-value 'flycheck-idle-change-delay 5)
   (setq-default flycheck-disabled-checkers (cons 'emacs-lisp-checkdoc flycheck-disabled-checkers))
