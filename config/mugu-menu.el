@@ -9,7 +9,7 @@
 (defvar hydra-stack nil)
 
 (defun hydra-push (expr)
-  (push `(lambda () ,expr) hydra-stack))
+  (push expr hydra-stack))
 
 (defun hydra-pop ()
   (interactive)
