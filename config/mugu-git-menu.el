@@ -32,13 +32,13 @@
   ("q" hydra-pop "quit menu" :color blue :column nil)
   ("<RET>" hydra-pop "" :color blue))
 
-(defhydra mugu-magit-navigation-hydra (:color red :hint nil)
-
+ (defhydra mugu-magit-navigation-hydra (:color red :hint nil)
   ("b" magit-section-up "↖ section" :column "Navigation")
   ("j" magit-section-forward "↓ section")
   ("k" magit-section-backward "↑ section")
   ("l" magit-section-forward-sibling "↓ section")
   ("h" magit-section-backward-sibling "↑ section")
+  ("g" magit-visit-thing "visit" :color blue)
   ("v" (progn
          (hydra-push hydra-curr-body-fn)
          (mugu-magit-visual-hydra/body)) "visual" :color blue "visual mode"))
@@ -54,7 +54,6 @@
   ("s" magit-stage "stage" :column "1-Actions")
   ("u" magit-unstage "unstage" :column "1-Actions")
   ("d" magit-discard "discard" :column "1-Actions")
-  ("g" push-button "visit" :column "1-Actions")
   ("q" nil "quit menu" :color blue :column nil)
   ("<RET>" magit-dispatch-popup "magit dispatch" :color blue)
   ("Q" magit-mode-bury-buffer "quit magit" :color blue))
