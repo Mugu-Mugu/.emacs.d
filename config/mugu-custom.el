@@ -87,6 +87,7 @@
  '(helm-autoresize-max-height 70)
  '(helm-autoresize-min-height 20)
  '(helm-autoresize-mode t)
+ '(hydra-look-for-remap t)
  '(ido-everywhere t)
  '(indent-tabs-mode nil)
  '(initial-frame-alist (quote ((fullscreen . maximized))))
