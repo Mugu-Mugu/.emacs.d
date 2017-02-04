@@ -11,7 +11,15 @@
 (defun mugu-directory-with-current-file-path ()
   "update directory to path of current file"
   (interactive)
-  (mugu-directory-cd (file-name-directory buffer-file-name)))
+  (mugu-directory-cd default-directory))
+
+(defun mugu-find-file-or-cd (vanilla-find-file filename &optional wildcards)
+  "same as find file but will change directory if input is a dirctory"
+  (if (file-directory-p filename)
+      (progn
+        (mugu-directory-cd filename)
+        (with-mugu-dir (counsel-find-file)))
+    (apply vanilla-find-file filename wildcards)))
 
 (defun with-mugu-dir (fun)
   "Call FUN with mugu directory"
@@ -30,5 +38,6 @@
 
 (add-hook 'eshell-directory-change-hook 'mugu-directory-after-eshell-cd)
 (advice-add 'cd :after #'mugu-directory-after-cd)
+(advice-add 'find-file :around #'mugu-find-file-or-cd)
 
 (provide 'mugu-directory-fix)
