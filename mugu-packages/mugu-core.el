@@ -84,8 +84,11 @@
   :demand
   :diminish global-whitespace-mode
   :config
-  (global-whitespace-mode 1)
-  )
+  (global-whitespace-mode 1))
+
+(defun mugu-compile-all ()
+  (interactive)
+  (byte-recompile-directory package-user-dir 0 'force))
 
 ;;; transparency
 (set-frame-parameter (selected-frame) 'alpha '(90 90))

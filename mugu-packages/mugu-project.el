@@ -3,11 +3,17 @@
   :ensure projectile
   :defer
   :diminish projectile-mode
+  :init
+  (setq projectile-cache-file (concat user-emacs-directory "var/projectile/projectile.cache"))
+  (setq projectile-known-projects-file (concat user-emacs-directory "var/projectile/projectile-bookmarks.eld"))
+
+  
   :config
   (setq projectile-enable-caching t)
   (after 'ivy (setq projectile-completion-system 'ivy))
-  (setq projectile-cache-file (concat user-emacs-directory ".cache/projectile.cache"))
-  (setq projectile-known-projects-file (concat user-emacs-directory ".cache/projectile-bookmarks.eld"))
+
+  (add-hook 'kill-emacs-hook 'projectile-save-known-projects)
+
   (add-to-list 'projectile-globally-ignored-directories "elpa")
   (add-to-list 'projectile-globally-ignored-directories ".cache")
   (add-to-list 'projectile-globally-ignored-directories "node_modules")

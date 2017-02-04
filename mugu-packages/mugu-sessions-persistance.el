@@ -1,13 +1,13 @@
 (use-package saveplace
   :config
   (progn
-    (setq save-place-file (concat user-emacs-directory ".cache/places"))
+    (setq save-place-file (concat user-emacs-directory "var/places"))
     (setq-default save-place t)))
 
 (use-package savehist
   :config
     (progn
-        (setq savehist-file (concat user-emacs-directory ".cache/savehist")
+        (setq savehist-file (concat user-emacs-directory "var/savehist")
             savehist-additional-variables '(search ring regexp-search-ring)
             savehist-autosave-interval 60)
         (savehist-mode t)))
@@ -15,7 +15,7 @@
 (use-package recentf
   :config
   (progn
-    (setq recentf-save-file (concat user-emacs-directory ".cache/recentf")
+    (setq recentf-save-file (concat user-emacs-directory "var/recentf")
           recentf-max-saved-items 1000
           recentf-max-menu-items 500)
     (recentf-mode +1)))

@@ -55,3 +55,6 @@ Server/*
 /smex-items
 /helm-doc.org
 /bookmarks
+var/*
+etc/*
+!**/.keep

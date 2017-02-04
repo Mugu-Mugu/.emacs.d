@@ -1,12 +1,12 @@
-(add-to-list 'load-path (concat user-emacs-directory "hydra"))
-(add-to-list 'load-path (concat user-emacs-directory "config"))
+(add-to-list 'load-path (concat user-emacs-directory "mugu-packages"))
+(add-to-list 'load-path (concat user-emacs-directory "mugu-packages" "/languages"))
 (add-to-list 'load-path (concat user-emacs-directory "site-lisp"))
-(add-to-list 'load-path (concat user-emacs-directory "config" "/languages"))
-;; (add-to-list 'load-path "/usr/share/emacs/site-lisp")
 
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
                          ("elpa"  . "https://elpa.gnu.org/packages/")
                          ("org" . "http://orgmode.org/elpa/")))
+
+(setq package-user-dir (concat user-emacs-directory "/my-melpa-packages")) 
 
 (require 'package)
 (package-initialize)
@@ -17,7 +17,12 @@
 (require 'use-package)
 (setq use-package-verbose t)
 
+;; Place custom settings in their own file.
+(setq custom-file (concat user-emacs-directory "mugu-packages/" "mugu-custom.el"))
+(when (file-exists-p custom-file) (load custom-file))
+
 ;;; external mandatory features
+(use-package no-littering :demand :ensure)
 (use-package hydra     :demand :ensure)
 (use-package evil      :demand :ensure)
 (use-package key-chord :demand :ensure)
@@ -53,8 +58,5 @@
 ;;; gather all *global* binding to enforce coherency
 (use-package mugu-keys)
 
-;; Place custom settings in their own file.
-(setq custom-file (concat user-emacs-directory "config/" "mugu-custom.el"))
-(when (file-exists-p custom-file) (load custom-file))
 
 (provide 'init)
