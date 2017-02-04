@@ -26,15 +26,14 @@
      ("^html?$" "." "netscape %o"))))
  '(ansi-color-faces-vector
    [default bold shadow italic underline bold bold-italic bold])
- '(ansi-color-names-vector
-   (vector "#c5c8c6" "#cc6666" "#b5bd68" "#f0c674" "#81a2be" "#b294bb" "#8abeb7" "#1d1f21"))
  '(ansi-term-color-vector
    [unspecified "#14191f" "#d15120" "#81af34" "#deae3e" "#7e9fc9" "#a878b5" "#7e9fc9" "#dcdddd"] t)
  '(backup-by-copying-when-mismatch nil)
  '(column-number-mode t)
  '(comint-input-ignoredups t)
+ '(comint-move-point-for-output (quote this))
  '(comint-prompt-read-only t)
- '(comint-scroll-to-bottom-on-input t)
+ '(comint-scroll-to-bottom-on-input (quote this))
  '(company-auto-complete t)
  '(counsel-bookmark-avoid-dired t)
  '(custom-enabled-themes nil)
