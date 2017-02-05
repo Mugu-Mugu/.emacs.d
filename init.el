@@ -49,6 +49,7 @@
 (use-package mugu-lint)
 (use-package mugu-window)
 (use-package mugu-shell)
+(use-package mugu-bookmark)
 
 ;;; languages features
 (use-package mugu-ada)
