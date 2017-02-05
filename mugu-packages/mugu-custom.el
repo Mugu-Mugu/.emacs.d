@@ -101,6 +101,7 @@
  '(kill-do-not-save-duplicates t)
  '(kill-ring-max 200)
  '(latex-run-command "pdflatex")
+ '(magit-completing-read-function (quote ivy-completing-read))
  '(mark-ring-max 100)
  '(nrepl-message-colors
    (quote

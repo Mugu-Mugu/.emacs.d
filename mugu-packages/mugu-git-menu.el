@@ -21,39 +21,32 @@
   ("-" magit-diff-less-context "- diff context")
   ("0" magit-diff-default-context "default diff context"))
 
-(defhydra mugu-magit-visual-hydra
-  (:color amaranth :body-pre (set-mark-command nil) :inherit (mugu-magit-visibility-hydra/heads))
-  ("j" next-line "↓ line" :column "Navigation")
-  ("k" previous-line "↑ line")
-  ("s" avy-goto-line "↓ line" :column "Navigation Avy")
-  ("J" avy-goto-line-below "↓ line")
-  ("K" avy-goto-line-above "↑ line")
-  ("v" set-mark-command "Toggle Selection" :column nil)
-  ("q" hydra-pop "quit menu" :color blue :column nil)
-  ("<RET>" hydra-pop "" :color blue))
-
- (defhydra mugu-magit-navigation-hydra (:color red :hint nil)
+(defhydra mugu-magit-navigation-hydra (:color red :hint nil)
   ("b" magit-section-up "↖ section" :column "Navigation")
   ("j" magit-section-forward "↓ section")
   ("k" magit-section-backward "↑ section")
-  ("l" magit-section-forward-sibling "↓ section")
-  ("h" magit-section-backward-sibling "↑ section")
-  ("g" magit-visit-thing "visit" :color blue)
-  ("v" (progn
-         (hydra-push hydra-curr-body-fn)
-         (mugu-magit-visual-hydra/body)) "visual" :color blue "visual mode"))
+  ("J" avy-goto-line-below "↓ jump")
+  ("K" avy-goto-line-above "↑ jump")
+  ("v" evil-visual-char "visual" :color blue)
+  ("m" evil-motion-state "free motion" :color blue))
 
-(defhydra mugu-magit-main-hydra (:color pink :inherit (mugu-magit-visibility-hydra/heads
+(defhydra mugu-magit-status-actions
+  (:color red :hint nil)
+  ("s" magit-stage "stage" :column "Actions (Status)")
+  ("u" magit-unstage "unstage")
+  ("d" magit-discard "discard")
+  ("c" magit-commit-popup "commit" :color blue))
+
+(defhydra mugu-magit-main-hydra (:color amaranth :inherit (mugu-magit-visibility-hydra/heads
+                                                       mugu-magit-status-actions/heads
                                                        mugu-magit-navigation-hydra/heads))
   "
                                   -- MAGIT --
 "
   ("r" magit-refresh "refresh" :column "3-Global Actions")
-  ("$" magit-process-buffer "goto magit status")
   ("R" magit-refresh-all "refresh all")
-  ("s" magit-stage "stage" :column "1-Actions")
-  ("u" magit-unstage "unstage" :column "1-Actions")
-  ("d" magit-discard "discard" :column "1-Actions")
+  ("$" magit-process-buffer "goto magit status")
+  ("g" magit-visit-thing "visit" :color blue)
   ("q" nil "quit menu" :color blue :column nil)
   ("<RET>" magit-dispatch-popup "magit dispatch" :color blue)
   ("Q" magit-mode-bury-buffer "quit magit" :color blue))
