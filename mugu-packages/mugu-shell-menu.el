@@ -13,6 +13,7 @@
 " 
   ("cd" (lambda () (interactive) (mugu-shell-change-directory 'mugu-shell--find-dir)) "find dir" :column "1-find")
   ("cr" (lambda () (interactive) (mugu-shell-change-directory 'mugu-shell--find-dir-recursive)) "find dir recursively")
+  ("cm" (lambda () (interactive) (mugu-shell-change-directory 'mugu-shell--load-bookmark-dir)) "find dir recursively")
   ("f" mugu-shell--find-file "find file")
   ("r" mugu-shell--find-file-recursive "find file recursively")
   ("t" comint-truncate-buffer "trucate shell" :column "2-command")

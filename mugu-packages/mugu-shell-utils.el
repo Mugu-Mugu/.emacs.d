@@ -53,6 +53,18 @@ INITIAL-INPUT and INITIAL-DIRECTORY"
                             (insert (concat "cd " (expand-file-name d)))))
                 :caller 'counsel-dired-jump)))
 
+(defun mugu-shell--load-bookmark-dir ()
+  (interactive)
+  (require 'cl-lib)
+  (ivy-read "Select bookmark name"
+            (cl-remove-if-not
+             (lambda (x) (file-directory-p (bookmark-location x)))
+             (bookmark-all-names))
+            :action (lambda (x)
+                      (with-ivy-window 
+                        (insert (concat "cd " (expand-file-name (bookmark-location x))))))
+            :caller 'counsel-bookmark))
+
   (defun mugu-shell--find-dir ()
     (interactive)
     (insert (concat "cd "
@@ -66,6 +78,7 @@ INITIAL-INPUT and INITIAL-DIRECTORY"
                                          (interactive)
                                          (insert (concat "cd " file-or-dir-result))))
         (insert file-or-dir-result)))))
+
 
 
 (defun mugu-shell-change-directory (select-dir-fun)
@@ -83,6 +96,7 @@ directory is selected through SELECT-DIR-FUN"
   (interactive)
   (comint-show-maximum-output)
   (comint-send-input))
+
 
 (after 'evil
   ;;  modify change line behaviour to apply only on the prompt regardless of point location
