@@ -15,10 +15,13 @@
 
 (defun mugu-find-file-or-cd (vanilla-find-file filename &optional wildcards)
   "same as find file but will change directory if input is a dirctory"
-  (if (file-directory-p filename)
+  (if (and (file-directory-p filename)
+           (not (equal filename mugu-directory-path)))
       (progn
         (mugu-directory-cd filename)
-        (with-mugu-dir (counsel-find-file)))
+        (with-mugu-dir (lambda ()
+                         (interactive)
+                         (call-interactively (command-remapping 'find-file)))))
     (apply vanilla-find-file filename wildcards)))
 
 (defun with-mugu-dir (fun)

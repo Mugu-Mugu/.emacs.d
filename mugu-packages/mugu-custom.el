@@ -92,7 +92,7 @@
  '(indent-tabs-mode nil)
  '(initial-frame-alist (quote ((fullscreen . maximized))))
  '(ivy-count-format "(%d/%d) ")
- '(ivy-extra-directories nil)
+ '(ivy-extra-directories (quote ("./")))
  '(ivy-height 20)
  '(ivy-mode t)
  '(ivy-use-virtual-buffers t)
