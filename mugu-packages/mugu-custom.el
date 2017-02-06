@@ -102,6 +102,10 @@
  '(kill-ring-max 200)
  '(latex-run-command "pdflatex")
  '(magit-completing-read-function (quote ivy-completing-read))
+ '(magit-dispatch-arguments nil)
+ '(magit-log-arguments
+   (quote
+    ("--graph" "--color" "--decorate" "--follow" "-n256")))
  '(mark-ring-max 100)
  '(nrepl-message-colors
    (quote
