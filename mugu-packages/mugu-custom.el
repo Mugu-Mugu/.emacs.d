@@ -75,6 +75,7 @@
  '(fci-rule-character-color "#192028")
  '(fci-rule-color "#282a2e")
  '(fill-column 80)
+ '(find-file-visit-truename t)
  '(flycheck-clang-language-standard "c++11")
  '(flycheck-display-errors-delay 0.0)
  '(flycheck-display-errors-function (quote flycheck-display-error-messages-unless-error-list))
@@ -112,9 +113,7 @@
     ("#CC9393" "#DFAF8F" "#F0DFAF" "#7F9F7F" "#BFEBBF" "#93E0E3" "#94BFF3" "#DC8CC3")))
  '(org-M-RET-may-split-line nil)
  '(org-agenda-dim-blocked-tasks nil)
- '(org-agenda-files
-   (quote
-    ("~/newMaster.org" "~/mugu-ft1.org" "~/mugu-ft2.org")))
+ '(org-agenda-files nil)
  '(org-agenda-restriction-lock-highlight-subtree nil)
  '(org-columns-ellipses "…")
  '(org-default-priority 68)
@@ -173,6 +172,7 @@
      (340 . "#f0c674")
      (360 . "#b5bd68"))))
  '(vc-annotate-very-old-color nil)
+ '(vc-follow-symlinks nil)
  '(verilog-auto-delete-trailing-whitespace t)
  '(verilog-auto-lineup (quote all))
  '(verilog-auto-newline nil)

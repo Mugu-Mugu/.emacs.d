@@ -1,0 +1,22 @@
+* TODO [#D] Better perspective handling
+*** TODO Powerline Integration
+*** TODO Better buffer handling
+    - A buffer should be present on a single perspective only
+    - Switching to a buffer should switch the perspective if needed
+    - A buffer switch command  within the perspective should be available
+* TODO [#D] Fixes some company issues
+  - More fuzzy completion
+  - Fixes some key triggering unwanted completion
+  - Investigate python completion
+  - Investigate ada completion
+* TODO [#D] make avy work for evil visual line 
+* TODO [#D] Dired interface
+* TODO [#B] Change todo font to be more readable org 
+* TODO [#B] change directory recursive should not prompt a dired
+* TODO [#B] Springboard like feature from bookmarked directory
+* TODO [#C] Add a directory history feature?
+* TODO [#C] Add a git global submenu
+*** TODO wrap buffer actions (diff/log etc...)
+*** TODO blame wrapper
+*** TODO quick access to status (though project binding)
+* TO_REFILE                                                          :REFILE:

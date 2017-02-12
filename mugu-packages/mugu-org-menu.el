@@ -1,5 +1,6 @@
 (require 'hydra)
 (require 'org)
+(require 'mugu-hydra)
 
 (defhydra mugu-org-agenda-hydra (:color amaranth :hint nil)
   "Mugu"
@@ -44,58 +45,6 @@
   ("x" org-agenda-exit "quit discard all change" :color blue)
   ("C-g" nil "exit this menu" :color blue))
 
-
-;; Agenda view
-;; (org-defkey org-agenda-mode-map "R" 'org-agenda-clockreport-mode)
-;; (org-defkey org-agenda-mode-map "l" 'org-agenda-log-mode)
-;; (org-defkey org-agenda-mode-map "v" 'org-agenda-view-mode-dispatch)
-;; ,(org-defkey org-agenda-mode-map "D" 'org-agenda-toggle-diary)
-  ;; ("\C-c\C-x\C-e" 'org-clock-modify-effort-estimate)
-;; (org-defkey org-agenda-mode-map "!" 'org-agenda-toggle-deadlines)
-;; (org-defkey org-agenda-mode-map "G" 'org-agenda-toggle-time-grid)
-;; (org-defkey org-agenda-mode-map "i" 'org-agenda-diary-entry)
-;; (org-defkey org-agenda-mode-map "c" 'org-agenda-goto-calendar)
-;; (org-defkey org-agenda-mode-map "C" 'org-agenda-convert-date)
-;; (org-defkey org-agenda-mode-map "M" 'org-agenda-phases-of-moon)
-;; (org-defkey org-agenda-mode-map "S" 'org-agenda-sunrise-sunset)
-;; (org-defkey org-agenda-mode-map "h" 'org-agenda-holidays)
-;; (org-defkey org-agenda-mode-map "H" 'org-agenda-holidays)
-;; (org-defkey org-agenda-mode-map "\C-c\C-n" 'org-agenda-next-date-line)
-;; (org-defkey org-agenda-mode-map "\C-c\C-p" 'org-agenda-previous-date-line)
-;; (org-defkey org-agenda-mode-map "f" 'org-agenda-later)
-;; (org-defkey org-agenda-mode-map "b" 'org-agenda-earlier)
-;; (org-defkey org-agenda-mode-map "\C-c\C-x\C-c" 'org-agenda-columns)
-
-;; (org-defkey org-agenda-mode-map "\C-c\C-x>" 'org-agenda-remove-restriction-lock)
-
-;; Clocking
-;; (org-defkey org-agenda-mode-map "\C-c\C-x\C-i" 'org-agenda-clock-in)
-;; (org-defkey org-agenda-mode-map "I" 'org-agenda-clock-in)
-;; (org-defkey org-agenda-mode-map "\C-c\C-x\C-o" 'org-agenda-clock-out)
-;; (org-defkey org-agenda-mode-map "O" 'org-agenda-clock-out)
-;; (org-defkey org-agenda-mode-map "\C-c\C-x\C-x" 'org-agenda-clock-cancel)
-;; (org-defkey org-agenda-mode-map "X" 'org-agenda-clock-cancel)
-;; (org-defkey org-agenda-mode-map "\C-c\C-x\C-j" 'org-clock-goto)
-;; (org-defkey org-agenda-mode-map "J" 'org-agenda-clock-goto)
-
-;; ???? not managed yet
-  ;; ("~" org-agenda-limit-interactively)
-;; (org-defkey org-agenda-mode-map "[" 'org-agenda-manipulate-query-add)
-;; (org-defkey org-agenda-mode-map "]" 'org-agenda-manipulate-query-subtract)
-;; (org-agenda-show-scroll-down)
-;; (org-agenda-show-and-scroll-up)
-;; (org-defkey org-agenda-mode-map "{" 'org-agenda-manipulate-query-add-re)
-;; (org-defkey org-agenda-mode-map "}" 'org-agenda-manipulate-query-subtract-re)
-;; (org-defkey org-agenda-mode-map ";" 'org-timer-set-timer)
-;; (define-key org-agenda-mode-map "?" 'org-agenda-show-the-flagging-note)
-;; (org-defkey org-agenda-mode-map "\C-c\C-x\C-mg"    'org-mobile-pull)
-;; (org-defkey org-agenda-mode-map "\C-c\C-x\C-mp"    'org-mobile-push)
-;; (org-defkey org-agenda-mode-map "R" 'org-agenda-clockreport-mode)
-;; (org-defkey org-agenda-mode-map "l" 'org-agenda-log-mode)
-;; (org-defkey org-agenda-mode-map "v" 'org-agenda-view-mode-dispatch)
-;; (org-defkey org-agenda-mode-map "D" 'org-agenda-toggle-diary)
-;; (org-defkey org-agenda-mode-map "!" 'org-agenda-toggle-deadlines)
-
 ;;; replace arrows binding by hjkl one
 ;;; can be used in insert mode (shift-ones are not really interesting there)
 ;;; is also used by another hydra
@@ -127,12 +76,12 @@
 (defhydra mugu-org-cmd-hydra
   (:color pink :hint nil :inherit (mugu-org-hjkl-hydra/heads))
   "bindings for ORG mode"
-  ("k" outline-previous-visible-heading "↑ headline" :column "Navigation") 
+  ("k" outline-previous-visible-heading "↑ headline" :column "Navigation")
   ("j" outline-next-visible-heading "↓ headline")
   ("l" org-forward-heading-same-level "↓ headline same level")
   ("h" org-backward-heading-same-level "↑ headline same level")
   ("b" outline-up-heading "↖ parent headline")
-  ("m" org-mark-element "✔ mark" :column "Copy") 
+  ("m" org-mark-element "✔ mark" :column "Copy")
   ("M" org-mark-subtree "✔✔ mark all")
   (" " nil "")
   ("y" org-copy-subtree "copy subtree")
@@ -148,14 +97,32 @@
   ("o" org-insert-todo-heading "insert todo" :color blue)
   ("q" nil "exit" :color blue))
 
-
 ;;; general main menu meant to be used outside or within org
 (defhydra mugu-org-main-menu (:color blue :hint nil)
   "Org mode external interface"
   ("a" org-agenda "agenda gateway" :column "Agenda")
-  ("o" (org-agenda nil "ca") "agenda overview")
+  ("oo" (org-agenda nil "ca") "agenda overview")
   ("l" org-store-link "store link" :column "Others")
   ("c" org-capture "capture"))
+
+(defun mugu-org-menu-register-agenda (head-char agenda-files docstring)
+ "Register in org menu a shortcut HEAD-CHAR to agenda overview for AGENDA-FILES.
+The real shortcut will be o + HEAD-CHAR.  HEAD-CHAR may be any char but should
+not be 'o' although this is not enforced.  Duplicates head are not checked
+either.
+DOCSTRING will be used to describe the head."
+ (mugu-hydra-add-head 'mugu-org-main-menu
+                      `(,(concat "o" head-char)
+                        (lambda ()
+                          (interactive)
+                          (let ((org-agenda-files ',agenda-files))
+                            (org-agenda nil "ca")))
+                        ,docstring
+                        :column "Agenda")))
+
+(mugu-org-menu-register-agenda "e"
+                               (file-expand-wildcards "~/.emacs.d/*.org")
+                               "emacs tasks overview")
 
 (defalias 'mugu-org-internal-menu 'mugu-org-cmd-hydra/body)
 (defalias 'mugu-org-agenda-menu 'mugu-org-agenda-hydra/body)
