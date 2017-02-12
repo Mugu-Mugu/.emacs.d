@@ -4,7 +4,7 @@
 (require 'mugu-core)
 (require 'mugu-menu)
 
-(define-key evil-motion-state-map (kbd "SPC") 'mugu-menu-main-hydra/body)
-(define-key evil-emacs-state-map (kbd "SPC") 'mugu-menu-main-hydra/body)
+(define-key evil-motion-state-map (kbd "SPC") 'mugu-menu-main-menu)
+(define-key evil-emacs-state-map (kbd "SPC") 'mugu-menu-main-menu)
 
 (provide 'mugu-keys)

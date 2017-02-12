@@ -26,10 +26,8 @@
 
 (defun with-mugu-dir (fun)
   "Call FUN with mugu directory"
-  (let ((old-directory default-directory))
-    (setq default-directory mugu-directory-path)
-    (with-demoted-errors "%s" (call-interactively fun))
-    (setq default-directory old-directory)))
+  (let ((default-directory mugu-directory-path))
+    (call-interactively fun)))
 
 (defun mugu-directory-pwd ()
   "return current mugu directory"

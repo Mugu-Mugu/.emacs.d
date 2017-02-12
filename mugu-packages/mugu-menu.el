@@ -118,6 +118,6 @@ and gathered in a specific column"
   ("ad" apropos-documentation "documentation"))
 
 (defalias 'mugu-menu-main-menu 'mugu-menu-main-hydra/body)
-(defalias 'mugu-menu-help-menu 'mugu-menu-help-hydra)
+(defalias 'mugu-menu-help-menu 'mugu-menu-help-hydra/body)
 
 (provide 'mugu-menu)

@@ -1,4 +1,7 @@
 (require 'hydra)
+(require 'mugu-menu)
+(require 'hydra)
+(require 'winner)
 
 (winner-mode +1)
 ;; configure boring buffer disposition
