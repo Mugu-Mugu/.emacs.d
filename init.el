@@ -21,14 +21,14 @@
 (setq custom-file (concat user-emacs-directory "mugu-packages/" "mugu-custom.el"))
 (when (file-exists-p custom-file) (load custom-file))
 
-;;; external mandatory features
+;;; external mandatory library and features
 (use-package no-littering :demand :ensure)
 (use-package hydra     :demand :ensure)
 (use-package evil      :demand :ensure)
 (use-package key-chord :demand :ensure)
 
-;;; personal mandatory features 
-(use-package mugu-hydra :disabled)         ;; automatic hydra docstring generation
+;;; personal mandatory library and features 
+(use-package mugu-hydra)         ;; hydra extensions (add-head feature)
 (use-package mugu-core)          ;; base settings + some functions
 (use-package mugu-directory-fix) ;; provide control on current working directory
 (use-package mugu-menu)          ;; provide main interaction menu + some menu functions
