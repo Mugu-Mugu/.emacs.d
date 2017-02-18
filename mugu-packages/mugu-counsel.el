@@ -1,6 +1,7 @@
 ;;; Package --- Summary
-;; Enable fast and truly async recursive file or directory search.
+;; defines various various reader method
 ;;; Commentary:
+;; Enable fast and truly async recursive file or directory search.
 
 ;;; Code:
 (require 'ivy)
@@ -52,7 +53,7 @@ search is done.  It defaults to default directory."
          (base-prompt "Recursive find (%d/%d")
          (proc-find-item (start-process-shell-command
                           "mugu" "mugu"
-                          (format "find * -type %s -not -path '*\/.git*' >%s  2>/dev/null"
+                          (format "find . -type %s -not -path '*\/.git*' >%s  2>/dev/null"
                                   f-or-d
                                   mugu-counsel-recursive-temp-file))))
     (ivy-set-prompt 'mugu-counsel-recursive-find
@@ -67,12 +68,13 @@ search is done.  It defaults to default directory."
               ;; (split-string
               :dynamic-collection t
               :history 'mugu-counsel-recursive-history
-              
+
               :unwind (lambda ()
                         (when proc-find-item
                           (delete-process proc-find-item)))
               :caller 'mugu-counsel-recursive-find)))
 
+;;;###autoload
 (defun mugu-counsel-read-recursive-dir (&optional starting-directory)
   "Read a directory recursivly and asynchronously.
 STARTING-DIRECTORY is the directory from which the recursive search is done.
@@ -82,6 +84,44 @@ Return the absolute path of selected directory"
   (let ((starting-directory
          (or starting-directory default-directory)))
     (expand-file-name (mugu-counsel--read-recursive "d" starting-directory) starting-directory)))
+
+
+;;;###autoload
+(defun mugu-counsel-read-recursive-file (&optional starting-directory)
+  "Read a file recursivly and asynchronously.
+STARTING-DIRECTORY is the directory from which the recursive search is done.
+It defaults to default directory.
+Return the absolute path of selected file"
+  (interactive)
+  (let ((starting-directory
+         (or starting-directory default-directory)))
+    (expand-file-name (mugu-counsel--read-recursive "f" starting-directory) starting-directory)))
+
+;;;###autoload
+(defun mugu-counsel-read-bookmark-dir ()
+  "Select a directory bookmark."
+  (interactive)
+  (require 'cl-lib)
+  (require 'bookmark)
+  (bookmark-location
+   (ivy-read "Select bookmark name (directory):  "
+             (cl-remove-if-not
+              (lambda (x) (file-directory-p (bookmark-location x)))
+              (bookmark-all-names))
+             :caller 'counsel-bookmark)))
+
+;;;###autoload
+(defun mugu-counsel-read-bookmark-file()
+  "Select a directory bookmark."
+  (interactive)
+  (require 'cl-lib)
+  (require 'bookmark)
+  (bookmark-location
+   (ivy-read "Select bookmark name (file):  "
+             (cl-remove-if-not
+              (lambda (x) (file-regular-p (bookmark-location x)))
+              (bookmark-all-names))
+             :caller 'counsel-bookmark)))
 
 (provide 'mugu-counsel)
 ;;; mugu-counsel ends here
