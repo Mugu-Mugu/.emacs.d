@@ -11,7 +11,8 @@
   - Investigate ada completion
 * TODO [#D] make avy work for evil visual line 
 * TODO [#D] Dired interface
-* TODO [#B] Change todo font to be more readable org 
+* DONE [#B] Change todo font to be more readable org 
+  CLOSED: [2017-02-12 dim. 18:35]
 * TODO [#B] change directory recursive should not prompt a dired
 * TODO [#B] Springboard like feature from bookmarked directory
 * TODO [#C] Add a directory history feature?

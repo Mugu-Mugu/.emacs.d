@@ -37,6 +37,18 @@
  '(comint-prompt-read-only t)
  '(comint-scroll-to-bottom-on-input (quote this))
  '(company-auto-complete t)
+ '(company-backends
+   (quote
+    (company-capf
+     (company-dabbrev-code)
+     company-dabbrev)))
+ '(company-flx-mode t)
+ '(company-idle-delay 0)
+ '(company-quickhelp-delay 0.3)
+ '(company-quickhelp-mode t)
+ '(company-require-match nil)
+ '(company-tooltip-minimum-width 40)
+ '(company-transformers (quote (company-flx-transformer)))
  '(counsel-bookmark-avoid-dired t)
  '(custom-enabled-themes nil)
  '(custom-safe-themes
@@ -83,6 +95,7 @@
  '(flycheck-haskell-ghc-executable "/usr/bin/ghc")
  '(flycheck-haskell-hlint-executable "/usr/bin/cabal exec hlint")
  '(gdb-many-windows t)
+ '(global-company-mode t)
  '(global-hl-line-mode t)
  '(global-semantic-decoration-mode t)
  '(global-semantic-highlight-func-mode t)
