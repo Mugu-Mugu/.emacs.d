@@ -28,6 +28,7 @@
 (use-package key-chord :demand :ensure)
 
 ;;; personal mandatory library and features 
+(use-package mugu-site-lisp)     ;; site dependant configuration
 (use-package mugu-hydra)         ;; hydra extensions (add-head feature)
 (use-package mugu-core)          ;; base settings + some functions
 (use-package mugu-directory-fix) ;; provide control on current working directory
@@ -45,7 +46,6 @@
 (use-package mugu-project)       
 (use-package mugu-workspace)
 (use-package mugu-themes)
-(use-package mugu-site-lisp)
 (use-package mugu-lint)
 (use-package mugu-window)
 (use-package mugu-shell)

@@ -1,3 +1,11 @@
+;;; Package --- Summary
+;; Provides tools for interactive interface (ie: ivy/helm/ido)
+;;; Commentary:
+
+;;; Code:
+(require 'hydra)
+(require 'mugu-core)
+
 (use-package ivy
   :ensure
   :commands ivy-mode
@@ -30,6 +38,7 @@
   (:map ivy-minibuffer-map
         ("C-o" . soo-ivy/body))
   :config
+  (require 'ivy)
   (defhydra soo-ivy (:hint nil :color amaranth)
     "
  Move     ^^^^^^^^^^ | Call         ^^^^ | Cancel^^ | Options^^ | Action _w_/_s_/_a_: %s(ivy-action-name)
@@ -79,7 +88,7 @@
   :after ivy
   :diminish counsel-mode
   :config
-  (counsel-mode +1)) 
+  (counsel-mode +1))
 
 (use-package swiper
   :ensure
@@ -88,6 +97,7 @@
 
 (use-package helm
   :ensure
+  :disabled
   :defer
   :config
   (progn
@@ -121,5 +131,9 @@
     (setq helm-command-prefix-key "C-c h")
     (setq helm-quick-update t)))
 
+(use-package mugu-counsel
+  :after ivy
+  :defer)
 
 (provide 'mugu-interactive)
+;;; mugu-interactive ends here
