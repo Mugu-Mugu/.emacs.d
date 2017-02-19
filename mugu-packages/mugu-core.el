@@ -1,12 +1,14 @@
-;; my-core.el
-;;²
+;;; Package --- Summary
 ;; All general purpose settings go there
+;;; Commentary:
+
+;;; Code:
 
 ;;; GUI conf
 ;; Don't show those horrible buttons
 (tool-bar-mode -1)
 ;; garbage collection at 5MO
-(setq gc-cons-threshold 500000)
+(setq gc-cons-threshold 5000000)
 (custom-set-variables
  '(initial-frame-alist (quote ((fullscreen . maximized)))))
 
@@ -68,7 +70,7 @@
 (defmacro after (feature &rest body)
   "After FEATURE is loaded, evaluate BODY."
   (declare (indent defun))
-  `(eval-after-load ,feature
+  `(with-eval-after-load ,feature
      '(progn ,@body)))
 
 (global-hl-line-mode t)
@@ -87,6 +89,7 @@
   (global-whitespace-mode 1))
 
 (defun mugu-compile-all ()
+  "Recompile every external package."
   (interactive)
   (byte-recompile-directory package-user-dir 0 'force))
 
@@ -97,3 +100,6 @@
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
 (provide 'mugu-core)
+
+(provide 'mugu-core)
+;;; mugu-core ends here

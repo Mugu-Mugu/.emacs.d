@@ -1,9 +1,9 @@
 (use-package telephone-line
   :ensure
   :disabled
-  :after 'evil
+  :after evil
   :config (progn
-            
+
             (setq telephone-line-lhs
                   '((evil   . (telephone-line-evil-tag-segment))
                     (accent . (telephone-line-vc-segment

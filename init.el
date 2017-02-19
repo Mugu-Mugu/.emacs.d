@@ -6,7 +6,7 @@
                          ("elpa"  . "https://elpa.gnu.org/packages/")
                          ("org" . "http://orgmode.org/elpa/")))
 
-(setq package-user-dir (concat user-emacs-directory "/my-melpa-packages")) 
+(setq package-user-dir (concat user-emacs-directory "/my-melpa-packages"))
 
 (require 'package)
 (package-initialize)
@@ -23,11 +23,11 @@
 
 ;;; external mandatory library and features
 (use-package no-littering :demand :ensure)
-(use-package hydra     :demand :ensure)
-(use-package evil      :demand :ensure)
-(use-package key-chord :demand :ensure)
+(use-package hydra        :demand :ensure)
+(use-package evil         :demand :ensure)
+(use-package key-chord    :demand :ensure)
 
-;;; personal mandatory library and features 
+;;; personal mandatory library and features
 (use-package mugu-site-lisp)     ;; site dependant configuration
 (use-package mugu-hydra)         ;; hydra extensions (add-head feature)
 (use-package mugu-core)          ;; base settings + some functions
@@ -43,7 +43,7 @@
 (use-package mugu-git)
 (use-package mugu-diff)
 (use-package mugu-evil)
-(use-package mugu-project)       
+(use-package mugu-project)
 (use-package mugu-workspace)
 (use-package mugu-themes)
 (use-package mugu-lint)

@@ -8,7 +8,7 @@
   (interactive)
   (save-excursion
     (goto-char (point-min))
-    (insert (format ";;; Package --- Summary\n"))
+    (insert (format ";;; %s --- Summary\n" (file-name-base)))
     (insert ";; tbc\n")
     (insert ";;; Commentary:\n")
     (insert "\n;;; Code:\n")

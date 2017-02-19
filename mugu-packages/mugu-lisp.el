@@ -13,22 +13,24 @@
 (defun mugu/lisp-init ()
 
   "Gather all configuration for Lisp mode."
-
   ;; mandatory package for serious lisp editing
-
   (use-package lispy
     :ensure
     :defer
     :diminish lispy-mode
-    :init (add-hook 'emacs-lisp-mode-hook (lambda () (lispy-mode +1))))
+    :init (add-hook 'emacs-lisp-mode-hook
+                    (lambda () (lispy-mode +1)))
+    :config
+    (message "lispy loaded"))
 
   ;; collection of some nice bindings and rebinding that evilify lispy
   (use-package evil-lispy
     :ensure
     :diminish evil-lispy-mode lispy-other-mode
-    :after 'lispy
+    :after lispy
     :config
     (require 'lispy)
+    (message "mugu lispy loaded")
     (add-hook 'emacs-lisp-mode-hook #'evil-lispy-mode)
     (add-hook 'clojure-mode-hook #'evil-lispy-mode)
     (evil-lispy-mode +1)
@@ -43,15 +45,18 @@
   ;; used to make evil normal mode commands safe with regards to lisp paren balancing
   (use-package lispyville
     :ensure
-    :after 'lispy
+    :after lispy
     :diminish lispyville-mode
     :init (add-hook 'emacs-lisp-mode-hook #'lispyville-mode))
 
   (use-package mugu-lisp-utils
-    :demand
-    :config
+    :defer
+    :functions mugu-menu-register-mode-menu
+    :commands mugu-lisp-main-menu
+    :init
     (require 'mugu-menu)
-    (mugu-menu-register-mode-menu 'emacs-lisp-mode 'mugu-lisp-main-menu))
+    (mugu-menu-register-mode-menu 'emacs-lisp-mode 'mugu-lisp-main-menu)
+    :config)
 
   (use-package eldoc
     :ensure
