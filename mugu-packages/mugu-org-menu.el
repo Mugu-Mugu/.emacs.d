@@ -1,5 +1,11 @@
+;;; Package --- Summary
+;; tbc
+;;; Commentary:
+
+;;; Code:
 (require 'hydra)
 (require 'org)
+(require 'org-agenda)
 (require 'mugu-hydra)
 
 (defhydra mugu-org-agenda-hydra (:color amaranth :hint nil)
@@ -71,7 +77,7 @@
   ("H" org-shiftleft "→ cycle todo/item/misc")
   ("L" org-shiftright "← cycle todo/item/misc")
   ("C-g" nil "quit" :column "Terminate"))
- 
+
 
 (defhydra mugu-org-cmd-hydra
   (:color pink :hint nil :inherit (mugu-org-hjkl-hydra/heads))
@@ -129,3 +135,4 @@ DOCSTRING will be used to describe the head."
 (defalias 'mugu-org-hjkl-menu 'mugu-org-hjkl-hydra/body)
 
 (provide 'mugu-org-menu)
+;;; mugu-org-menu ends here

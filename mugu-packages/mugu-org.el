@@ -1,27 +1,15 @@
+;;; Package --- Summary
+;; tbc
+;;; Commentary:
 
-;(defvar autosave-dir "user-ema")
-;(setq org-agenda-custom-commands
-;      '(("cx" "TODOs sorted by state, priority, effort"
-;         tags-todo "emacs+TODO=\"TODO\""
-;         ((org-agenda-overriding-header "\n Emacs backlog")
-;          (org-tags-match-list-sublevels 'indented)
-;          (org-agenda-sorting-strategy '(todo-state-down priority-down effort-up))))))
-;(setq org-stuck-projects
-;      '("+PROJECT" ("TODO" "ACTIVE") () ))
-;(setq org-tags-exclude-from-inheritance '("PROJECT"))
-;(setq org-capture-templates
-;      '(
-;        ("e" "emacs" entry (file+headline 
-;        ("v" "emacs" entry (file+headline 
-;        ("t" "emacs" entry (file+headline 
-;        )
-;      )
-
+;;; Code:
 (use-package org
   :ensure
   :defer t
+  :defines org-agenda-custom-commands org-capture-templates
   :config
   (require 'mugu-org-utils)
+  (require 'org-agenda)
   (setq org-todo-keywords (quote ((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)"))))
   (setq org-use-fast-todo-selection t)
   (setq org-refile-targets (quote ((org-agenda-files :maxlevel . 9))))
@@ -54,7 +42,7 @@
   (setq org-capture-templates
         `(("t" "Todo" entry (file+headline "~/org/torefile.org" "Tasks")
            "* TODO %?\n  %i")
-          ("e" "Emacs Todo" entry (file+headline ,(concat user-emacs-directory "emacs.org") TO_REFILE)
+          ("e" "Emacs Todo" entry (file+headline ,(concat user-emacs-directory "emacs.org") "TO_REFILE")
            "* TODO %?\n  %i")
           ("n" "Note" entry (file+headline+datetree "~/org/torefile.org" "Notes")
            "* %?\nEntered on %U\n  %i")))
@@ -62,9 +50,11 @@
                            ,(expand-file-name (concat user-emacs-directory "emacs.org")))))
 
 (use-package mugu-org-menu
+  :functions mugu-menu-register-mode-menu mugu-org-agenda-menu
   :commands mugu-org-main-menu/body
   :after org
   :config
+  (require 'mugu-menu)
   (add-hook 'org-agenda-mode-hook #'mugu-org-agenda-menu)
   (mugu-menu-register-mode-menu 'org-mode 'mugu-org-internal-menu)
   (mugu-menu-register-mode-menu 'org-agenda-mode 'mugu-org-agenda-menu))
@@ -76,3 +66,4 @@
         ("SPC" . mugu-menu-main-menu)))
 
 (provide 'mugu-org)
+;;; mugu-org ends here

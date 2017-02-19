@@ -1,10 +1,14 @@
+;;; Package --- Summary
 ;;; provide reusable function related to org
+;;; Commentary:
 ;;; most of these utils function were inspired from : Bernt Hansen
+
+;;; Code:
 
 (require 'org)
 
 (defun mugu-org-is-project-p ()
-  "Any task with a todo keyword subtask"
+  "Any task with a todo keyword subtask."
   (save-restriction
     (widen)
     (let ((has-subtask)
@@ -20,7 +24,7 @@
       (and is-a-task has-subtask))))
 
 (defun mugu-org-task-in-active-tree-p ()
-  "return t if header belongs to an active tree: 
+  "Return t if header belongs to an active tree.
 that is if all of its parent tasks are active or if it has no parent task"
   (save-restriction
     (widen)
@@ -31,7 +35,7 @@ that is if all of its parent tasks are active or if it has no parent task"
           (equal (org-get-todo-state) "NEXT")))))
 
 (defun mugu-org-project-stuck-p ()
-  "return t if project has a direct task which is active"
+  "Return t if project has a direct task which is active."
   (save-restriction
     (widen)
     (save-excursion
@@ -49,26 +53,28 @@ that is if all of its parent tasks are active or if it has no parent task"
         (not (equal (org-get-todo-state) "NEXT"))))))
 
 (defun mugu-org-skip-if-parent-inactive ()
-  "Skip current subtree if it belongs to an inactive tree (without Next)"
+  "Skip current subtree if it belongs to an inactive tree (without Next)."
   (cond ((mugu-org-task-in-active-tree-p) nil)
         (t (outline-next-heading))))
 
 (defun mugu-org-skip-project-or-inactive-branch ()
-  "Skip if current header is in inactive tree or if its a project"
+  "Skip if current header is in inactive tree or if its a project."
   (or (mugu-org-skip-project-header) (mugu-org-skip-if-parent-inactive))
   )
 
 (defun mugu-org-skip-project-not-stuck ()
-  "Skip current headline if it's not a stuck project. To be considered stuck, an headline shall meet the following conditions
+  "Skip current headline if it's not a stuck project.
+To be considered stuck, an headline shall meet the following conditions
 - it is within an active tree
 - it is a project
-- no direct subtask is active "
+- no direct subtask is active"
   (cond ((and (mugu-org-task-in-active-tree-p) (mugu-org-is-project-p) (mugu-org-project-stuck-p)) nil)
         (t (outline-next-heading))))
 
 (defun mugu-org-skip-project-header ()
-  "Skip header that are projects"
+  "Skip header that are projects."
   (cond ((mugu-org-is-project-p) (outline-next-heading))
         (t nil)))
 
 (provide 'mugu-org-utils)
+;;; mugu-org-utils ends here
