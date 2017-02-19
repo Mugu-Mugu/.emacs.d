@@ -1,44 +1,57 @@
-;; to prevent this annoying emacs behaviour to change working directory when a buffer is loaded
-(defvar mugu-directory-path user-emacs-directory)
-(defun mugu-directory-after-eshell-cd () (setq mugu-directory-path default-directory))
-(defun mugu-directory-after-cd (&rest args) (cond ((called-interactively-p 'interactive)
-                                                   (setq mugu-directory-path default-directory))))
+;;; Package --- Summary
+;; To prevent this annoying emacs behaviour where the default-directory is tied
+;; to the current buffer, this package defines an alternative
+;; 'default-directory' and means to synchronize it to the real one. It thus
+;; becomes possible to control where a command or a function is done thanks to
+;; the `with-mugu-dir' macro.
+;;; Commentary:
+
+;;; Code:
+(defvar mugu-directory user-emacs-directory
+  "The alternative and controllable `default-directory'.")
+
+(defmacro with-mugu-dir (&rest body)
+  "Execute the forms in BODY with mugu-directory as default directory."
+  (declare (indent 1) (debug t))
+  `(let ((default-directory mugu-directory))
+     ,@body))
+
 
 (defun mugu-directory-cd (dir)
-  "for non interactive cd"
-    (setq mugu-directory-path dir))
+  "Set mugu directory to DIR.
+Doesnt change default directory of current buffer"
+  (setq mugu-directory  dir))
 
 (defun mugu-directory-with-current-file-path ()
-  "update directory to path of current file"
+  "Update mugu-directory to current `default-directory'."
   (interactive)
   (mugu-directory-cd default-directory))
 
 (defun mugu-find-file-or-cd (vanilla-find-file filename &optional wildcards)
-  "same as find file but will change directory if input is a dirctory"
+  "Advice to `find-file' with identical purpose but may update `mugu-directory'.
+VANILLA-FIND-FILE is `find-file'.
+FILENAME is as in `find-file'.
+WILDCARDS is as in `find-file'.
+if FILENAME is a directory and happens to be different from `mugu-directory'
+instead of calling `find-file', `mugu-directory' will be updated instead to
+FILENAME.  Otherwise behaviour is the same."
   (if (and (file-directory-p filename)
-           (not (equal filename mugu-directory-path)))
+           (not (equal filename mugu-directory)))
       (progn
         (mugu-directory-cd filename)
-        (with-mugu-dir (lambda ()
-                         (interactive)
-                         (call-interactively (command-remapping 'find-file)))))
+        (with-mugu-dir
+            (call-interactively (command-remapping 'find-file))))
     (apply vanilla-find-file filename wildcards)))
 
-(defun with-mugu-dir (fun)
-  "Call FUN with mugu directory"
-  (let ((default-directory mugu-directory-path))
-    (call-interactively fun)))
-
 (defun mugu-directory-pwd ()
-  "return current mugu directory"
-  mugu-directory-path)
+  "Return `mugu-directory'."
+  mugu-directory)
 
 (defun mugu-directory-pwd-file ()
-  "return current directory of current file"
+  "Return `default-directory'."
   default-directory)
 
-(add-hook 'eshell-directory-change-hook 'mugu-directory-after-eshell-cd)
-(advice-add 'cd :after #'mugu-directory-after-cd)
 (advice-add 'find-file :around #'mugu-find-file-or-cd)
 
 (provide 'mugu-directory-fix)
+;;; mugu-directory-fix ends here

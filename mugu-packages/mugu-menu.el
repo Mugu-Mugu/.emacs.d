@@ -46,18 +46,13 @@ registered for this mode"
 may be called at user request for the bound mode"
   (add-to-list 'mugu-menu-mode-menus `(,mode-symbol . ,menu-function) nil 'eq))
 
-(defmacro mugu-menu-register-permanent-menu (head)
-  "add given HEAD to the main menu. This HEAD will be permanently available in the main menu
-and gathered in a specific column"
+(defun mugu-menu-register-permanent-menu (head)
+  "Add given HEAD to the main menu.
+This HEAD will be permanently available in the main menuan gathered in a
+specific column"
+  (require 'mugu-hydra)
   (hydra--head-set-property head :column "7-Submenu")
-  `(defhydra mugu-menu-main-hydra (:color blue :hint nil :inherit (mugu-menu-main-hydra/heads))
-     "
-                                -- MAIN MENU --
-
-  -> File    Dir : %s(mugu-directory-pwd-file)
-  -> Current Dir : %s(mugu-directory-pwd)
-"
-     ,head))
+  (mugu-hydra-add-head 'mugu-menu-main-hydra head))
 
 (defun mugu-hydra-switch-buffer ()
   (interactive)
@@ -69,19 +64,19 @@ and gathered in a specific column"
 
   -> File    Dir : %s(mugu-directory-pwd-file)
   -> Current Dir : %s(mugu-directory-pwd)
-" 
-  ("b" mugu-hydra-switch-buffer "previous buffer" :column "1-Change File") 
-  ("ff" (with-mugu-dir 'counsel-find-file) "file current dir")
-  ("fr" (with-mugu-dir 'counsel-file-jump) "file recursively")
+"
+  ("b" mugu-hydra-switch-buffer "previous buffer" :column "1-Change File")
+  ("ff" (with-mugu-dir (counsel-find-file)) "file current dir")
+  ("fr" (with-mugu-dir (find-file (mugu-counsel-read-recursive-file))) "file recursively")
   ("fl" counsel-recentf "file recently used")
-  ("fb" mugu-bookmark-load-file "file bookmarked")
+  ("fb" (find-file (mugu-counsel-read-bookmark-file)) "file bookmarked")
   ("d" mugu-directory-with-current-file-path "cd to current file" :color red :column "2-Change Dir")
-  ("cd" (with-mugu-dir 'cd) "change dir" :color red)
-  ("cr" (with-mugu-dir 'counsel-dired-jump) "change dir recursively" :color red)
-  ("cm" mugu-bookmark-load-dir "change dir from bookmark" :color red)
+  ("cd" (with-mugu-dir (mugu-directory-cd (read-directory-name "Change dir: "))) "change dir" :color red)
+  ("cr" (with-mugu-dir (mugu-directory-cd (mugu-counsel-read-recursive-dir))) "change dir recursively" :color red)
+  ("cm" (mugu-directory-cd (mugu-counsel-read-bookmark-dir)) "change dir from bookmark" :color red)
   ("mm" counsel-bookmark "go/register bookmark" :column "3-Bookmark")
-  ("mf" mugu-bookmark-load-file "go to file bookmark")
-  ("md" mugu-bookmark-load-dir "go to directory bookmark" :color red)
+  ("mf" (find-file (mugu-counsel-read-bookmark-file)) "go to file bookmark")
+  ("md" (mugu-directory-cd (mugu-counsel-read-bookmark-dir)) "go to directory bookmark" :color red)
   ("mr" mugu-bookmark-register-dir "register directory bookmark" :color red)
   ("y" counsel-yank-pop "yank ring" :column "4-Misc")
   ("u" counsel-unicode-char "insert unicode")

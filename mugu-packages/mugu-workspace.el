@@ -7,7 +7,7 @@
   (require 'mugu-directory-fix)
   (persp-mode)
   (ivy-mode +1)
-  (persp-make-variable-persp-local 'mugu-directory-path)
+  (persp-make-variable-persp-local 'mugu-directory)
   (customize-set-value 'persp-show-modestring t)
   (customize-set-value 'persp-modestring-dividers '("" "" "|"))
   (after 'mugu-hydra
@@ -29,7 +29,6 @@ _r_: rename workspace
     ("r" persp-rename)
     ("m" persp-set-buffer)
     ("q" nil "quit menu" :color blue)
-    ("SPC" hydra-main-menu/body "return to main menu"))
-  )
+    ("SPC" hydra-main-menu/body "return to main menu")))
 
 (provide 'mugu-workspace)

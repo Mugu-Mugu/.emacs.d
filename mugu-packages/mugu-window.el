@@ -106,6 +106,6 @@ If SIDE is non-nil only get windows on that side."
   ("SPC" mugu-menu-main-menu "return to main menu" :color blue))
 
 (defalias 'mugu-window-menu  'mugu-window-hydra/body )
-(mugu-menu-register-permanent-menu ("z" mugu-window-menu "windows menu" :color blue))
+(mugu-menu-register-permanent-menu '("z" mugu-window-menu "windows menu" :color blue))
 
 (provide 'mugu-window)
