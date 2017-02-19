@@ -1,29 +1,41 @@
+;;; Package --- Summary
+;; TBC
+;;; Commentary:
+
+;;; Code:
+
 ;; somehow emacs-lisp-mode-hook is called before loading is finished. Therefore,
 ;; as is, this hook is not usable with regards to lazy loading
 ;; Thus it must be bound only after emacs really started
+(require 'evil)
 (add-hook 'emacs-startup-hook #'mugu/lisp-init)
+
 (defun mugu/lisp-init ()
-  "gather all configuration for lisp mode"
+
+  "Gather all configuration for Lisp mode."
 
   ;; mandatory package for serious lisp editing
+
   (use-package lispy
     :ensure
     :defer
     :diminish lispy-mode
     :init (add-hook 'emacs-lisp-mode-hook (lambda () (lispy-mode +1))))
-  
+
   ;; collection of some nice bindings and rebinding that evilify lispy
   (use-package evil-lispy
     :ensure
     :diminish evil-lispy-mode lispy-other-mode
     :after 'lispy
     :config
+    (require 'lispy)
     (add-hook 'emacs-lisp-mode-hook #'evil-lispy-mode)
     (add-hook 'clojure-mode-hook #'evil-lispy-mode)
     (evil-lispy-mode +1)
     (key-chord-define evil-lispy-state-map "jk" 'evil-normal-state)
-    (define-key lispy-mode-map (kbd "C-&") #'lispy-describe-inline)
-    (define-key lispy-mode-map (kbd "C-é") #'lispy-arglist-inline)
+    (evil-define-key 'motion evil-lispy-mode-map
+      (kbd "C-&") #'lispy-describe-inline
+      (kbd "C-é") #'lispy-arglist-inline)
     (evil-define-key 'insert evil-lispy-mode-map
       (kbd "C-&") #'lispy-describe-inline
       (kbd "C-é") #'lispy-arglist-inline))
@@ -34,7 +46,13 @@
     :after 'lispy
     :diminish lispyville-mode
     :init (add-hook 'emacs-lisp-mode-hook #'lispyville-mode))
-  
+
+  (use-package mugu-lisp-utils
+    :demand
+    :config
+    (require 'mugu-menu)
+    (mugu-menu-register-mode-menu 'emacs-lisp-mode 'mugu-lisp-main-menu))
+
   (use-package eldoc
     :ensure
     :defer
@@ -48,7 +66,7 @@
     :ensure
     :commands my-jump-to-elisp-docs
     :diminish elisp-slime-nav-mode
-    :init 
+    :init
     (defun my-lisp-hook ()
       (progn
         (elisp-slime-nav-mode)
@@ -60,10 +78,7 @@
       "Jump to a pane and do elisp-slime-nav-describe-elisp-thing-at-point"
       (interactive (list (elisp-slime-nav--read-symbol-at-point)))
       (help-xref-interned (intern sym-name))
-      (switch-to-buffer-other-window "*Help*" t))
-    :config
-    (after 'evil
-      (evil-define-key 'normal emacs-lisp-mode-map (kbd "K")
-        'my-jump-to-elisp-docs))))
+      (switch-to-buffer-other-window "*Help*" t))))
 
 (provide 'mugu-lisp)
+;;; mugu-lisp ends here
