@@ -4,20 +4,28 @@
     - A buffer should be present on a single perspective only
     - Switching to a buffer should switch the perspective if needed
     - A buffer switch command  within the perspective should be available
-* TODO [#D] Fixes some company issues
+*** TODO Perspective gather all buffer on perspective creation
+* TODO [#B] Fixes some company issues
   - More fuzzy completion
   - Fixes some key triggering unwanted completion
   - Investigate python completion
   - Investigate ada completion
-* TODO [#D] make avy work for evil visual line 
+* TODO [#D] make avy work for evil visual line
 * TODO [#D] Dired interface
-* DONE [#B] Change todo font to be more readable org 
+* DONE [#B] Change todo font to be more readable org
   CLOSED: [2017-02-12 dim. 18:35]
-* TODO [#B] change directory recursive should not prompt a dired
-* TODO [#B] Springboard like feature from bookmarked directory
+* DONE [#B] change directory recursive should not prompt a dired
+  CLOSED: [2017-02-19 dim. 11:34]
 * TODO [#C] Add a directory history feature?
 * TODO [#C] Add a git global submenu
 *** TODO wrap buffer actions (diff/log etc...)
 *** TODO blame wrapper
 *** TODO quick access to status (though project binding)
 * TO_REFILE                                                          :REFILE:
+* TODO [#C] Fix window resize not taking into account left or right position and leading to inverted command for right windows
+* TODO [#C] Improve ivy interface and its hydra
+*** TODO change hydra color to pink or red
+*** TODO make C-W and C-Y work
+* TODO [#D] Make ivy takes into account history in buffer ordering
+* TODO [#C] set hydra for magit-diff-mode
+* TODO [#C] Add a hydra to magit rebase interactive
