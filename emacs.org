@@ -5,11 +5,12 @@
     - Switching to a buffer should switch the perspective if needed
     - A buffer switch command  within the perspective should be available
 *** TODO Perspective gather all buffer on perspective creation
-* TODO [#B] Fixes some company issues
-  - More fuzzy completion
-  - Fixes some key triggering unwanted completion
-  - Investigate python completion
-  - Investigate ada completion
+* TODO [#D] Fixes some company issues
+*** TODO More fuzzy completion
+*** DONE Fixes some key triggering unwanted completion
+    CLOSED: [2017-02-19 dim. 20:39]
+*** TODO Investigate python completion
+*** TODO Investigate ada completion
 * TODO [#D] make avy work for evil visual line
 * TODO [#D] Dired interface
 * DONE [#B] Change todo font to be more readable org
@@ -29,3 +30,10 @@
 * TODO [#D] Make ivy takes into account history in buffer ordering
 * TODO [#C] set hydra for magit-diff-mode
 * TODO [#C] Add a hydra to magit rebase interactive
+* TODO Maybe try QUELPA for package portability rather than embedding package as submodule
+* TODO [#B] Magic STAR => grep/swiper
+* DONE Improve avy interface
+    CLOSED: [2017-02-19 dim. 20:27]
+- map go to line
+- map go to char same line
+- map go to 2char
