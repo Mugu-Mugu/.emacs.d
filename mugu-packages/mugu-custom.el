@@ -28,6 +28,7 @@
    [default bold shadow italic underline bold bold-italic bold])
  '(ansi-term-color-vector
    [unspecified "#14191f" "#d15120" "#81af34" "#deae3e" "#7e9fc9" "#a878b5" "#7e9fc9" "#dcdddd"] t)
+ '(auto-revert-interval 30)
  '(backup-by-copying-when-mismatch nil)
  '(bookmark-save-flag 0)
  '(column-number-mode t)
