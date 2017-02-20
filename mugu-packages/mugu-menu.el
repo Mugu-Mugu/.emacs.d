@@ -1,43 +1,25 @@
+;;; mugu-menu --- Summary
 ;; goal of this package is to provide a global menu for common function such as
 ;; open file, change dir etc...  the main menu doesnt verify if bound features
 ;; are present as they are meant to be loaded lazily a binding (double SPC) is
 ;; reserved for major mode submenu
+;;; Commentary:
+
+;;; Code:
 (require 'hydra)
 (require 'mugu-directory-fix)
 
-
-(defvar hydra-stack nil)
-
-(defun hydra-push (expr)
-  (push expr hydra-stack))
-
-(defun hydra-pop ()
-  (interactive)
-  (let ((x (pop hydra-stack)))
-    (when x
-      (funcall x))))
-
-;:color
-;| color    | toggle                     |
-;|----------+----------------------------|
-;| red      |                            |
-;| blue     | :exit t                    |
-;| amaranth | :foreign-keys warn         |
-;| teal     | :foreign-keys warn :exit t |
-;| pink     | :foreign-keys run          |
-
 (defvar mugu-menu-mode-menus (list)
-  "association list between a major mode and a menu")
+  "Association list between a major mode and a menu.")
 
 (defun mugu-menu-stub-mode-menu ()
-  "placeholder menu that does nothing but display a message"
+  "Placeholder menu that does nothing but display a message."
   (interactive)
   (message "No menu registered for this mode [%s]" major-mode))
 
 (defun mugu-menu-call-mode-menu ()
-  "This function will display the menu applicable for the current
-mode or do nothing but display a message if no menu has been
-registered for this mode"
+  "This function will display the menu applicable for the current mode.
+If no menu has been registered for the registered for this mode"
   (interactive)
   (call-interactively (alist-get major-mode mugu-menu-mode-menus #'mugu-menu-stub-mode-menu)))
 
@@ -78,10 +60,11 @@ specific column"
   ("mf" (find-file (mugu-counsel-read-bookmark-file)) "go to file bookmark")
   ("md" (mugu-directory-cd (mugu-counsel-read-bookmark-dir)) "go to directory bookmark" :color red)
   ("mr" mugu-bookmark-register-dir "register directory bookmark" :color red)
+  ("ss" counsel-grep-or-swiper "swiper" :column "3-Search")
+  ("sr" counsel-grep "todo rgrep")
+  ("sg" counsel-git-grep "git grep")
   ("y" counsel-yank-pop "yank ring" :column "4-Misc")
   ("u" counsel-unicode-char "insert unicode")
-  ("g" swiper "swiper")
-  ("s" counsel-semantic "semantic")
   ("x" counsel-M-x "execute" :column "5-Execute")
   ("r" ivy-resume "resume last interactive session")
   (":" eval-expression "eval expression")
@@ -116,3 +99,6 @@ specific column"
 (defalias 'mugu-menu-help-menu 'mugu-menu-help-hydra/body)
 
 (provide 'mugu-menu)
+
+(provide 'mugu-menu)
+;;; mugu-menu ends here

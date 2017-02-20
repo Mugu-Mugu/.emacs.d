@@ -25,8 +25,10 @@
             (lambda ()
               (set (make-local-variable 'company-backends) '((company-capf)))))
   (defun mugu-company-return-exit ()
+    (interactive)
     (company-abort))
   (defun mugu-company-space-exit ()
+    (interactive)
     (company-abort)
     (insert " ")))
 

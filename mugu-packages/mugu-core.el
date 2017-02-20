@@ -70,7 +70,7 @@
 (defmacro after (feature &rest body)
   "After FEATURE is loaded, evaluate BODY."
   (declare (indent defun))
-  `(with-eval-after-load ,feature
+  `(eval-after-load ,feature
      '(progn ,@body)))
 
 (global-hl-line-mode t)
