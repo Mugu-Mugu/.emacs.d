@@ -61,7 +61,7 @@ specific column"
   ("md" (mugu-directory-cd (mugu-counsel-read-bookmark-dir)) "go to directory bookmark" :color red)
   ("mr" mugu-bookmark-register-dir "register directory bookmark" :color red)
   ("ss" counsel-grep-or-swiper "swiper" :column "3-Search")
-  ("sr" counsel-grep "todo rgrep")
+  ("sr" counsel-rg "rgrep")
   ("sg" counsel-git-grep "git grep")
   ("y" counsel-yank-pop "yank ring" :column "4-Misc")
   ("u" counsel-unicode-char "insert unicode")

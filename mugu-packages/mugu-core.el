@@ -7,8 +7,8 @@
 ;;; GUI conf
 ;; Don't show those horrible buttons
 (tool-bar-mode -1)
-;; garbage collection at 5MO
-(setq gc-cons-threshold 5000000)
+;; garbage collection at 50MO
+(setq gc-cons-threshold 50000000)
 (custom-set-variables
  '(initial-frame-alist (quote ((fullscreen . maximized)))))
 

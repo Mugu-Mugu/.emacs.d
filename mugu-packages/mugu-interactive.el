@@ -21,7 +21,9 @@
     (kill-new x))
   (defun ivy-copy-to-buffer-action (x)
     (with-ivy-window
-      (insert x)))
+      (if (file-exists-p x)
+          (insert (expand-file-name x))
+        (insert x))))
   (ivy-set-actions
    t
    '(("p" ivy-copy-to-buffer-action "insert")

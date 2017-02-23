@@ -23,16 +23,10 @@
 *** TODO blame wrapper
 *** TODO quick access to status (though project binding)
 * TO_REFILE                                                          :REFILE:
-*** TODO Install PDF TOOL
-*** TODO Interesting packages
-***** Expand region
-***** Origami
-***** wgrep
-***** Python tools
-***** Sublim minimap
-*** TODO Multi source on ivy
-*** TODO Ivy views could be nice for test
-*** TODO ivy occur wrapper
+*** TODO Org agenda menu improvement (swiper)
+- auto narrow
+- auto focus
+- open on left side always
 * TODO [#C] Fix window resize not taking into account left or right position and leading to inverted command for right windows
 * TODO [#C] Improve ivy interface and its hydra
 *** TODO change hydra color to pink or red
@@ -47,3 +41,14 @@
 - map go to line
 - map go to char same line
 - map go to 2char
+* TODO [#B] ivy occur wrapper
+* TODO [#C] create function to reload configuration
+* TODO [#D] Ivy views could be nice for test
+* TODO [#C] Multi source on ivy
+* TODO [#C] Interesting packages
+*** Expand region
+*** Origami
+*** wgrep
+*** Python tools
+*** Sublim minimap
+* TODO [#D] Install PDF TOOL
