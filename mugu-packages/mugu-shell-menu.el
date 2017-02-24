@@ -15,7 +15,7 @@
                                      (mugu-shell-scroll-before-insert)))
   "
                                 -- SHELL MENU --
-  -> Current Dir : %s(mugu-directory-pwd)
+  -> Current Dir : %s(mugu-directory-pwd-file)
 "
   ("cd" (mugu-shell-change-directory 'read-directory-name "directory:") "find dir" :column "1-find")
   ("cr" (mugu-shell-change-directory 'mugu-counsel-read-recursive-dir) "find dir recursively")

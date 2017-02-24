@@ -21,6 +21,7 @@ directory is selected through SELECT-DIR-FUN on which is applied ARGS"
   (comint-show-maximum-output)
   (comint-kill-input)
   (insert (concat "cd " (apply select-dir-fun args)))
+  (mugu-directory-cd default-directory)
   (comint-send-input)
   (mugu-directory-with-current-file-path))
 
