@@ -209,7 +209,6 @@ STRING, BASE-CMD and EXTRA-AG-ARGS have same semantic."
           nil)))))
 (advice-add #'counsel-ag-function :override #'mugu-counsel--ag-function)
 
-
 (defun small-recentf ()
   "A small recentf wrapper to be included in buffer list."
   (defvar recentf-list)
@@ -218,7 +217,6 @@ STRING, BASE-CMD and EXTRA-AG-ARGS have same semantic."
             (concat (file-name-base x) "." (file-name-extension x)))
           (cl-subseq recentf-list 0 20)))
 
-
 (ivy-set-sources 'ivy-switch-buffer '((small-recentf) (original-source)))
 (defun mugu--filter-without-dups (original-filter-func name candidates)
   "Ensure ivy candidates have no duplicates (especially for multi source.
@@ -226,7 +224,6 @@ This is an advice around ivy--filter as ORIGINAL-FILTER-FUNC with same semantics
 for NAME and CANDIDATES"
   (delete-dups (funcall original-filter-func name candidates)))
 ;; (advice-add #'ivy--filter :around #'mugu--filter-without-dups)
-
 
 ;;;###autoload
 (defun mugu-counsel-super-star ()

@@ -23,21 +23,6 @@
 *** TODO blame wrapper
 *** TODO quick access to status (though project binding)
 * TO_REFILE                                                          :REFILE:
-*** TODO Org agenda menu improvement (swiper)
-- auto narrow
-- auto focus
-- open on left side always
-*** TODO Install PDF TOOL
-*** TODO Interesting packages
-***** Expand region
-***** Origami
-***** wgrep
-***** Python tools
-***** Sublim minimap
-*** TODO Multi source on ivy
-*** TODO Ivy views could be nice for test
-*** TODO ivy occur wrapper
-*** TODO Evil delete + t/T/f/F still use old behaviour. Maybe fix it.
 * TODO [#C] Fix window resize not taking into account left or right position and leading to inverted command for right windows
 * TODO [#C] Improve ivy interface and its hydra
 *** TODO change hydra color to pink or red
@@ -46,7 +31,8 @@
 * TODO [#C] set hydra for magit-diff-mode
 * TODO [#C] Add a hydra to magit rebase interactive
 * TODO Maybe try QUELPA for package portability rather than embedding package as submodule
-* TODO [#B] Magic STAR => grep/swiper
+* DONE [#B] Magic STAR => grep/swiper
+  CLOSED: [2017-02-25 sam. 19:22]
 * DONE Improve avy interface
     CLOSED: [2017-02-19 dim. 20:27]
 - map go to line
@@ -63,3 +49,13 @@
 *** Python tools
 *** Sublim minimap
 * TODO [#D] Install PDF TOOL
+* TODO [#B] Org agenda menu improvement (swiper)
+- auto narrow
+- auto focus
+- open on left side always
+* TODO [#C] Interesting packages
+*** Expand region
+*** Origami
+*** wgrep
+*** Python tools
+*** Sublim minimap

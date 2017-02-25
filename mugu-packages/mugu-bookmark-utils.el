@@ -1,3 +1,8 @@
+;;; mugu-bookmark-utils --- Summary
+;; tbc
+;;; Commentary:
+
+;;; Code:
 (require 'bookmark)
 (require 'mugu-directory-fix)
 (require 'ivy)
@@ -16,3 +21,6 @@
      :caller 'counsel-bookmark))))
 
 (provide 'mugu-bookmark-utils)
+
+(provide 'mugu-bookmark-utils)
+;;; mugu-bookmark-utils ends here

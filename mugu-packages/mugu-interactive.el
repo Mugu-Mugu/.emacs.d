@@ -65,7 +65,7 @@
     ("<escape>" keyboard-escape-quit :exit t)
     ("C-o" nil)
     ("i" nil)
-    ("TAB" ivy-alt-done :exit nil)
+    ("TAB" ivy-dispatching-call ivy-alt-done :exit nil)
     ("C-j" ivy-alt-done :exit nil)
     ;; ("d" ivy-done :exit t)
     ("RET" ivy-done :exit t)
