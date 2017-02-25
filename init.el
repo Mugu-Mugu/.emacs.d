@@ -10,6 +10,12 @@
 
 (require 'package)
 (package-initialize)
+(let ((emacs-git (expand-file-name "mdf-ext-packages/" user-emacs-directory)))
+  (mapc (lambda (x)
+          (add-to-list 'load-path (expand-file-name x emacs-git)))
+        (delete ".." (directory-files emacs-git))))
+
+
 (setq package-enable-at-startup nil)
 (unless (package-installed-p 'use-package)
     (package-refresh-contents)

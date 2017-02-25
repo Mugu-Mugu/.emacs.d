@@ -28,5 +28,10 @@
 (define-key evil-motion-state-map (kbd "SPC") 'mugu-menu-main-menu)
 (define-key evil-emacs-state-map (kbd "SPC") 'mugu-menu-main-menu)
 
+
+;; super star remap
+(define-key evil-motion-state-map (kbd "*") 'mugu-counsel-super-star)
+(define-key evil-motion-state-map (kbd "µ") 'mugu-counsel-hyper-star)
+
 (provide 'mugu-keys)
 ;;; mugu-keys ends here

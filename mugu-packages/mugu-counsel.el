@@ -7,6 +7,10 @@
 (require 'ivy)
 (require 'counsel)
 
+;; silence byte compiler
+(declare-function bookmark-location "bookmark.el")
+(declare-function bookmark-all-names "bookmark.el")
+
 (defvar mugu-counsel-recursive-history
   nil
   "History for recursive reading.")
@@ -208,6 +212,7 @@ STRING, BASE-CMD and EXTRA-AG-ARGS have same semantic."
 
 (defun small-recentf ()
   "A small recentf wrapper to be included in buffer list."
+  (defvar recentf-list)
   (require 'recentf)
   (mapcar (lambda (x)
             (concat (file-name-base x) "." (file-name-extension x)))
@@ -220,8 +225,22 @@ STRING, BASE-CMD and EXTRA-AG-ARGS have same semantic."
 This is an advice around ivy--filter as ORIGINAL-FILTER-FUNC with same semantics
 for NAME and CANDIDATES"
   (delete-dups (funcall original-filter-func name candidates)))
-(advice-add #'ivy--filter :around #'mugu--filter-without-dups)
+;; (advice-add #'ivy--filter :around #'mugu--filter-without-dups)
 
+
+;;;###autoload
+(defun mugu-counsel-super-star ()
+  "A ivy swiper variant of vim famous super star."
+  (interactive)
+  (soo-ivy/body)
+  (counsel-grep-or-swiper (thing-at-point 'symbol t)))
+
+;;;###autoload
+(defun mugu-counsel-hyper-star ()
+  "A ivy swiper variant of vim famous super star.  Recursive!!"
+  (interactive)
+  (soo-ivy/body)
+  (counsel-rg (thing-at-point 'symbol t)))
 ;; ivy--sources-list is a variable defined in ‘ivy.el’.
 ;; Its value is (ivy-switch-buffer
  ;; ((original-source)
