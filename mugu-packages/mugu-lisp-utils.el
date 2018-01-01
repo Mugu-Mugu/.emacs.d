@@ -20,9 +20,16 @@
 (defun mugu-lisp-jump-symbol-at-point ()
   "Go to definition of symbol at point."
   (interactive)
-  (declare-function 'counsel--find-symbol "counsel.el")
-  (require 'counsel)
-  (counsel--find-symbol (thing-at-point 'symbol)))
+  (let ((sym (read (thing-at-point 'symbol t))))
+    (cond ((fboundp sym) (find-function `,sym))
+          ((boundp sym) (find-variable sym))
+          (t (message "%s not defined either as a var or a function" sym)))))
+
+(defun mugu-lisp--insert-package-prefix ()
+  "Insert package prefix at point."
+  (interactive)
+  (insert (format "'%s-" (file-name-base)))
+  (when (fboundp 'evil-insert) (evil-insert)))
 
 (defhydra mugu-lisp-main-hydra
   (:color blue :hint nil)
@@ -32,6 +39,7 @@
   ("eb" eval-buffer "eval buffer" :column "1-Eval")
   ("es" eval-last-sexp "eval sexp")
   ("d" mugu-lisp-insert-header-footer "insert header/footer docstring" :column "2-Misc")
+  ("p" mugu-lisp--insert-package-prefix "insert package prefix")
   ("g" mugu-lisp-jump-symbol-at-point "go to symbol" :column "3-Goto"))
 
 ;;;###autoload
