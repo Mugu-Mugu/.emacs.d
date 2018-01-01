@@ -1,5 +1,5 @@
 ;;; Package --- Summary
-;; tbc
+;; Provide base hydra bindings for org mode as well as means to dynamically bind more.
 ;;; Commentary:
 
 ;;; Code:
@@ -104,6 +104,7 @@
   ("q" nil "exit" :color blue))
 
 ;;; general main menu meant to be used outside or within org
+;;;###autoload
 (defhydra mugu-org-main-menu (:color blue :hint nil)
   "Org mode external interface"
   ("a" org-agenda "agenda gateway" :column "Agenda")
@@ -125,6 +126,11 @@ DOCSTRING will be used to describe the head."
                             (org-agenda nil "ca")))
                         ,docstring
                         :column "Agenda")))
+
+(defun mugu-orgm/add-head-to-main (head)
+  "Register HEAD to the main org menu."
+  (hydra--head-set-property head :column "Others")
+  (mugu-hydra-add-head 'mugu-org-main-menu head))
 
 (mugu-org-menu-register-agenda "e"
                                (file-expand-wildcards "~/.emacs.d/*.org")
