@@ -3,7 +3,12 @@
 (use-package magit
   :ensure
   :defer
-  :bind (:map magit-mode-map ("SPC" . mugu-menu-main-menu)))
+  :bind
+  (:map magit-mode-map ("SPC" . mugu-menu-main-menu))
+  :config
+  (setq magit-save-repository-buffers 'dontask)
+  (after 'evil (evil-set-initial-state 'git-commit-mode 'insert))
+  )
 
 (use-package mugu-git-menu
   :after magit
