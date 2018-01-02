@@ -28,8 +28,8 @@
 (defun mugu-lisp--insert-package-prefix ()
   "Insert package prefix at point."
   (interactive)
-  (insert (format "'%s-" (file-name-base)))
-  (when (fboundp 'evil-insert) (evil-insert)))
+  (insert (format " %s/" (file-name-base)))
+  (when (fboundp 'evil-insert) (evil-insert 1)))
 
 (defhydra mugu-lisp-main-hydra
   (:color blue :hint nil)
