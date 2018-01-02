@@ -6,6 +6,7 @@
 ;;; Code:
 
 (require 'org)
+(require 'swiper)
 
 (defun mugu-org-is-project-p ()
   "Any task with a todo keyword subtask."
@@ -75,6 +76,49 @@ To be considered stuck, an headline shall meet the following conditions
   "Skip header that are projects."
   (cond ((mugu-org-is-project-p) (outline-next-heading))
         (t nil)))
+
+(defun mugu-orgu/get-headline-metadata ()
+  "Return a cons cell with heading data and a standard org property alist.
+This alist is enriched with the point of the heading in the file."
+  (interactive)
+  (let ((heading (concat (mapconcat 'identity (org-get-outline-path) " > ") "> " (org-get-heading)))
+        (metadata-alist (org-entry-properties)))
+    (push (cons "POINT" (point)) metadata-alist)
+    `(,heading . ,metadata-alist)))
+
+(defun mugu-orgu/query-headline (action-function org-query)
+  "Apply ACTION-FUNCTION to headline selected from an search with ORG-QUERY.
+ORG-QUERY should have a format understandable by `org-map-entries'.
+Matching headlines are aggregated in a list of cons cell as returned by
+`mugu-orgu/get-headline-metadata'"
+  (ivy-read
+   "select a headline"
+   (org-map-entries #'mugu-orgu/get-headline-metadata org-query 'agenda 'archive)
+   :action (lambda (selected-headline) (funcall action-function selected-headline))))
+
+(defun mugu-org-utils/get-headline-prop (headline property)
+  "Return from HEADLINE the value of PROPERTY.
+HEADLINE is as returned by `mugu-orgu/get-headline-metadata'"
+  (cdr (assoc (symbol-name property) (cdr headline))))
+
+(defun mugu-org-utils/goto-headline (headline)
+  "Goto HEADLINE, and focus on it by minimizing all other.
+HEADLINE format is expected to be as returned by
+`mugu-orgu/get-headline-metadata' and should provide a file and a point."
+  (find-file (mugu-org-utils/get-headline-prop headline 'FILE))
+  (goto-char (mugu-org-utils/get-headline-prop headline 'POINT))
+  (org-shifttab 1)
+  (org-cycle))
+
+(defun mugu-org-utils/refile-headline (headline)
+  "Refile HEADLINE at point.
+HEADLINE format is expected to be as returned by
+`mugu-orgu/get-headline-metadata' and should provide a file and a point."
+  (let ((todo-only t))
+    (save-excursion
+      (find-file (mugu-org-utils/get-headline-prop headline 'FILE))
+      (goto-char (mugu-org-utils/get-headline-prop headline 'POINT))
+      (org-refile))))
 
 (provide 'mugu-org-utils)
 ;;; mugu-org-utils ends here

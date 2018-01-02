@@ -4,11 +4,12 @@
 
 ;;; Code:
 (require 'hydra)
+(require 'mugu-hydra)
 (require 'org)
 (require 'org-agenda)
-(require 'mugu-hydra)
+(require 'mugu-menu)
 
-(defhydra mugu-org-agenda-hydra (:color amaranth :hint nil)
+(defmenu mugu-org-menu/agenda (:color amaranth :hint nil)
   "Mugu"
   ("l" org-agenda-next-line "next line" :column "1-Navigation")
   ("h" org-agenda-previous-line "previous line")
@@ -54,7 +55,7 @@
 ;;; replace arrows binding by hjkl one
 ;;; can be used in insert mode (shift-ones are not really interesting there)
 ;;; is also used by another hydra
-(defhydra mugu-org-hjkl-hydra (:color pink :hint nil)
+(defmenu  mugu-org-menu/hjkl (:color pink :hint nil)
   "HJKL bindings for ORG mode"
   ("M-L" org-shiftmetaright "promote subtree" :column "Structured - Hierarchy")
   ("M-H" org-shiftmetaleft "demote subtree")
@@ -79,8 +80,8 @@
   ("C-g" nil "quit" :column "Terminate"))
 
 
-(defhydra mugu-org-cmd-hydra
-  (:color pink :hint nil :inherit (mugu-org-hjkl-hydra/heads))
+(defmenu mugu-org-cmd-hydra
+  (:color pink :hint nil :inherit (mugu-org-menu-hjkl-hydra/heads))
   "bindings for ORG mode"
   ("k" outline-previous-visible-heading "↑ headline" :column "Navigation")
   ("j" outline-next-visible-heading "↓ headline")
@@ -103,9 +104,7 @@
   ("o" org-insert-todo-heading "insert todo" :color blue)
   ("q" nil "exit" :color blue))
 
-;;; general main menu meant to be used outside or within org
-;;;###autoload
-(defhydra mugu-org-main-menu (:color blue :hint nil)
+(defmenu mugu-org-menu/main (:color blue :hint nil)
   "Org mode external interface"
   ("a" org-agenda "agenda gateway" :column "Agenda")
   ("oo" (org-agenda nil "ca") "agenda overview")
@@ -113,12 +112,12 @@
   ("c" org-capture "capture"))
 
 (defun mugu-org-menu-register-agenda (head-char agenda-files docstring)
- "Register in org menu a shortcut HEAD-CHAR to agenda overview for AGENDA-FILES.
+ "Register in org menu shortcut HEAD-CHAR to agenda overview for AGENDA-FILES.
 The real shortcut will be o + HEAD-CHAR.  HEAD-CHAR may be any char but should
 not be 'o' although this is not enforced.  Duplicates head are not checked
 either.
 DOCSTRING will be used to describe the head."
- (mugu-hydra-add-head 'mugu-org-main-menu
+ (mugu-menu-add-entries 'mugu-org-menu/main
                       `(,(concat "o" head-char)
                         (lambda ()
                           (interactive)
@@ -127,18 +126,14 @@ DOCSTRING will be used to describe the head."
                         ,docstring
                         :column "Agenda")))
 
-(defun mugu-orgm/add-head-to-main (head)
+(defun mugu-org-menu/add-head-to-main (head)
   "Register HEAD to the main org menu."
   (hydra--head-set-property head :column "Others")
-  (mugu-hydra-add-head 'mugu-org-main-menu head))
+  (mugu-menu-add-entries 'mugu-org-menu/main head))
 
 (mugu-org-menu-register-agenda "e"
                                (file-expand-wildcards "~/.emacs.d/*.org")
                                "emacs tasks overview")
-
-(defalias 'mugu-org-internal-menu 'mugu-org-cmd-hydra/body)
-(defalias 'mugu-org-agenda-menu 'mugu-org-agenda-hydra/body)
-(defalias 'mugu-org-hjkl-menu 'mugu-org-hjkl-hydra/body)
 
 (provide 'mugu-org-menu)
 ;;; mugu-org-menu ends here
