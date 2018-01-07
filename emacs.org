@@ -1,61 +1,56 @@
-* TODO [#D] Better perspective handling
-*** TODO Powerline Integration
-*** TODO Better buffer handling
-    - A buffer should be present on a single perspective only
-    - Switching to a buffer should switch the perspective if needed
-    - A buffer switch command  within the perspective should be available
-*** TODO Perspective gather all buffer on perspective creation
-* TODO [#D] Fixes some company issues
-*** TODO More fuzzy completion
-*** DONE Fixes some key triggering unwanted completion
-    CLOSED: [2017-02-19 dim. 20:39]
-*** TODO Investigate python completion
-*** TODO Investigate ada completion
-* TODO [#D] make avy work for evil visual line
-* TODO [#D] Dired interface
-* DONE [#B] Change todo font to be more readable org
-  CLOSED: [2017-02-12 dim. 18:35]
-* DONE [#B] change directory recursive should not prompt a dired
-  CLOSED: [2017-02-19 dim. 11:34]
-* TODO [#C] Add a directory history feature?
-* TODO [#C] Add a git global submenu
-*** TODO wrap buffer actions (diff/log etc...)
-*** TODO blame wrapper
-*** TODO quick access to status (though project binding)
-* TO_REFILE                                                          :REFILE:
-* TODO [#C] Fix window resize not taking into account left or right position and leading to inverted command for right windows
-* TODO [#C] Improve ivy interface and its hydra
-*** TODO change hydra color to pink or red
-*** TODO make C-W and C-Y work
-* TODO [#D] Make ivy takes into account history in buffer ordering
-* TODO [#C] set hydra for magit-diff-mode
-* TODO [#C] Add a hydra to magit rebase interactive
-* TODO Maybe try QUELPA for package portability rather than embedding package as submodule
-* DONE [#B] Magic STAR => grep/swiper
-  CLOSED: [2017-02-25 sam. 19:22]
-* DONE Improve avy interface
-    CLOSED: [2017-02-19 dim. 20:27]
-- map go to line
-- map go to char same line
-- map go to 2char
-* TODO [#B] ivy occur wrapper
-* TODO [#C] create function to reload configuration
-* TODO [#D] Ivy views could be nice for test
-* TODO [#C] Multi source on ivy
-* TODO [#C] Interesting packages
-*** Expand region
-*** Origami
-*** wgrep
-*** Python tools
-*** Sublim minimap
-* TODO [#D] Install PDF TOOL
-* TODO [#B] Org agenda menu improvement (swiper)
-- auto narrow
-- auto focus
-- open on left side always
-* TODO [#C] Interesting packages
-*** Expand region
-*** Origami
-*** wgrep
-*** Python tools
-*** Sublim minimap
+#+PROPERTY: MUGU-LABEL e
+* BACKLOG
+*** NEXT [#B] Better term mode for emacs
+***** TODO Bither with shell and autoenv reload
+***** TODO Br with a wraper around ansi-term
+*** NEXT [#B] Better diff mode in magit
+***** TODO Improve insane ediff default configuration
+- [ ] in merge view, it displays a 2 way diff while we need a 3 way diff
+- [ ] in diff view, it displays a 3 way diff while we need a 2 way diff
+- [ ] in merge view, it's not possible to take A or B contribution in one key press
+***** TODO Improve navigation in magit hunks
+So it's possible to partition a hunk. Maybe if it was handled by ediff, it would be better
+*** TODO [#C] Python environment for emacs
+***** TODO Bompletion
+***** TODO Butoindent
+***** TODO Better linter (less false positive)
+*** REVIEW [#C] Dired interface
+*** REVIEW [#C] Add a directory history feature?
+*** REVIEW [#C] Add a git global submenu
+***** TODO wrap buffer actions (diff/log etc...)
+***** TODO blame wrapper
+***** TODO quick access to status (though project binding)
+*** REVIEW [#D] ivy occur wrapper
+*** SOMEDAY Implement a journal overview where all timestamped item are displayed
+*** SOMEDAY [#D] Implement vview module
+A better perspective based on rule evaluation and scoring to track which buffer belong to which view.
+*** SOMEDAY [#C] Fix window resize not taking into account left or right position and leading to inverted command for right windows
+*** TODO [#C] Interesting packages
+**** FAST_TODO [#E] check expand region
+**** FAST_TODO [#E] check origami
+**** FAST_TODO [#E] check wgrep
+**** FAST_TODO [#E] check ripgrep
+**** FAST_TODO [#E] check fzf
+**** FAST_TODO [#E] check python tools
+**** SOMEDAY [#E] check sublim minimap
+* Inbox                                                              :REFILE:
+*** TODO Indentation dans org non intuitive et intrusive
+*** TODO Classement par facilité à implémenter
+*** TODO Recursive grep
+*** TODO windows configuration side window strange bug
+*** TODO better lispy behavior
+* Review
+*** TODO Emacs backlog
+SCHEDULED: <2018-01-14 Sun .+1w/2w>
+:LOGBOOK:
+- State "DONE"       from "TODO"       [2018-01-07 Sun 15:37]
+- State "DONE"       from "TODO"       [2018-01-07 Sun 15:36]
+:END:
+:PROPERTIES:
+:STYLE:    habit
+:LAST_REPEAT: [2018-01-07 Sun 15:37]
+:END:
+* 2018
+*** 2018-01 January
+***** 2018-01-07 Sunday
+******* [2018-01-07 Sun 16:14]  at last, the org workflow has been outlined and is ready to use
