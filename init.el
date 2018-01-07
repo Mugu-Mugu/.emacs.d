@@ -28,10 +28,11 @@
 (when (file-exists-p custom-file) (load custom-file))
 
 ;;; external mandatory library and features
-(use-package no-littering :demand :ensure)
-(use-package hydra        :demand :ensure)
-(use-package evil         :demand :ensure)
-(use-package key-chord    :demand :ensure)
+(use-package no-littering   :demand :ensure)
+(use-package hydra          :demand :ensure)
+(use-package evil           :demand :ensure)
+(use-package key-chord      :demand :ensure)
+(use-package mugu-lisp-libs :demand)
 
 ;;; personal mandatory library and features
 (use-package mugu-site-lisp)     ;; site dependant configuration

@@ -149,12 +149,13 @@
  '(org-odd-levels-only t)
  '(org-pretty-entities t)
  '(org-src-fontify-natively t)
+ '(org-src-window-setup (quote other-window))
  '(org-startup-folded (quote content))
  '(org-startup-truncated nil)
  '(org-use-sub-superscripts (quote {}))
  '(package-selected-packages
    (quote
-    (smex lispyville hydra counsel-projectile flycheck-pos-tip flycheck use-package telephone-line slime persp-projectile noctilux-theme magit key-chord ivy-hydra helm-projectile evil-lispy elisp-slime-nav counsel company-quickhelp company-flx ada-mode ace-link)))
+    (mugu-lisp-libs smex lispyville hydra counsel-projectile flycheck-pos-tip flycheck use-package telephone-line slime persp-projectile noctilux-theme magit key-chord ivy-hydra helm-projectile evil-lispy elisp-slime-nav counsel company-quickhelp company-flx ada-mode ace-link)))
  '(powerline-evil-tag-style (quote verbose))
  '(python-indent-guess-indent-offset nil)
  '(python-indent-offset 0)
