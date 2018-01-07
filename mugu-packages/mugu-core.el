@@ -104,6 +104,4 @@
   :demand)
 
 (provide 'mugu-core)
-
-(provide 'mugu-core)
 ;;; mugu-core ends here
