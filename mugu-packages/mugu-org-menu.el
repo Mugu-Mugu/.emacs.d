@@ -8,17 +8,22 @@
 (require 'org)
 (require 'org-agenda)
 (require 'mugu-menu)
+(require 'mugu-org-utils)
 
 (defmenu mugu-org-menu/agenda (:color amaranth :hint nil)
   "Mugu"
-  ("l" mugu-org-utils/agenda-forward-block "next line" :column "1-Navigation")
-  ("h" mugu-org-utils/agenda-backward-block "previous line")
+  ("l" mugu-org-utils/agenda-forward-block "next block" :column "1-Navigation")
+  ("h" mugu-org-utils/agenda-backward-block "previous block")
   ("j" org-agenda-next-item "next item")
   ("k" org-agenda-previous-item "previous item")
   ("J" org-agenda-drag-line-forward "drag up")
   ("K" org-agenda-drag-line-backward "drag bot")
+  ("zz" org-agenda-recenter "recenter view")
   ("r" org-agenda-refile "refile" :column "2a-Task Actions")
-  ("d" org-agenda-kill "kill")
+  ("C-d" org-agenda-kill "kill")
+  ("ds" org-schedule "set schedule date")
+  ("dd" org-deadline "set deadline date")
+  ("dt" org-timestamp "set deadline date")
   (":" org-agenda-set-tags "set tags" :column "2b-Task Data")
   ("n" org-agenda-add-note "add note")
   ("t" org-agenda-todo "set todos")
@@ -74,7 +79,6 @@
   ("C-j" org-shiftmetadown "↓ tree or table")
   ("J" org-shiftdown "↓ priority" :column "Priority")
   ("K" org-shiftup "↑  priority" :column "Priority")
-
   ("C-l" org-shiftcontrolright "→ change todo sequence" :column "Todo")
   ("C-h" org-shiftcontrolleft "← change todo sequence")
   (" " nil " ")
@@ -93,24 +97,27 @@
   ("p" org-paste-subtree "paste subtree")
   ("t" org-toggle-heading "morph headline/list" :column "Transform")
   ("s" org-sort "sort subtree")
+  ("a" org-archive-subtree "archive subtree")
   ("/" org-sparse-tree "search" :color blue :column "Search")
   ("q" mugu-org-menu/org-menu "Return to org menu" :color blue :column nil))
 
 (defmenu mugu-org-menu/org
   (:color blue :hint nil :inherit (mugu-org-menu-hjkl-hydra/heads))
   "bindings for ORG mode"
-  ("s" org-schedule "schedule" :column "Timing")
-  ("z" org-time-stamp "insert timestamp")
-  ("d" org-deadline "set deadline")
+  ("ds" org-schedule "schedule" :column "Timing")
+  ("dt" org-time-stamp "insert timestamp")
+  ("dd" org-deadline "set deadline")
   ("r" org-refile "refile subtree" :column "Misc")
   ("t" org-todo "change TODO status")
   ("c" org-ctrl-c-ctrl-c "ctrl-c²")
   ("e" mugu-org-menu/org-tree-tools-menu "expert mode")
   ("f" org-fill-paragraph "fill paragraph")
+  ("f" evil-scroll-line-to-center "recenter view")
   ("a" org-attach "attach interface" :column "Insert")
   ("l" org-insert-link "insert link")
   ("n" org-add-note "insert note")
   ("u" org-set-tags-command "update tags")
+  ("p" org-set-property "set property")
   ("RET" org-insert-heading "insert" :column "Terminate")
   ("o" org-insert-todo-heading "insert todo")
   ("q" nil "exit"))
@@ -118,33 +125,14 @@
 (defmenu mugu-org-menu/main (:color blue :hint nil)
   "Org mode external interface"
   ("a" org-agenda "agenda gateway" :column "Agenda")
-  ("oo" (org-agenda nil "ca") "agenda overview")
+  ("oo" (org-agenda nil "o") "global overview" :column "Agenda")
   ("l" org-store-link "store link" :column "Others")
   ("c" org-capture "capture"))
-
-(defun mugu-org-menu-register-agenda (head-char agenda-files docstring)
- "Register in org menu shortcut HEAD-CHAR to agenda overview for AGENDA-FILES.
-The real shortcut will be o + HEAD-CHAR.  HEAD-CHAR may be any char but should
-not be 'o' although this is not enforced.  Duplicates head are not checked
-either.
-DOCSTRING will be used to describe the head."
- (mugu-menu-add-entries 'mugu-org-menu/main
-                      `(,(concat "o" head-char)
-                        (lambda ()
-                          (interactive)
-                          (let ((org-agenda-files ',agenda-files))
-                            (org-agenda nil "ca")))
-                        ,docstring
-                        :column "Agenda")))
 
 (defun mugu-org-menu/add-head-to-main (head)
   "Register HEAD to the main org menu."
   (hydra--head-set-property head :column "Others")
   (mugu-menu-add-entries 'mugu-org-menu/main head))
-
-(mugu-org-menu-register-agenda "e"
-                               (file-expand-wildcards "~/.emacs.d/*.org")
-                               "emacs tasks overview")
 
 (provide 'mugu-org-menu)
 ;;; mugu-org-menu ends here

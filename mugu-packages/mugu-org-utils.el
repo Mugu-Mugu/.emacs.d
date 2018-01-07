@@ -6,6 +6,7 @@
 ;;; Code:
 
 (require 'org)
+(require 'org-agenda)
 (require 'swiper)
 
 (defun mugu-org-is-project-p ()
