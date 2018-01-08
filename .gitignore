@@ -59,3 +59,4 @@ var/*
 etc/*
 !**/.keep
 *.org_archive
+mugu-packages/mugu-custom.el

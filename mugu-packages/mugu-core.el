@@ -99,9 +99,9 @@
 
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
-(use-package auto-package-update
-  :ensure
-  :demand)
+;(use-package auto-package-update
+;  :ensure
+;  :demand)
 
 (provide 'mugu-core)
 ;;; mugu-core ends here
