@@ -42,10 +42,9 @@
 (defun mugu-org-workflow/-make-capture-binding ()
   "Build capture bindings for all registered org-file.
 Bindings are done if global property MUGU-LABEL is present.
-4 bindings are performed : capture immediate, regular, quick todo and journal note."
+4 bindings are performed : capture immediate, regular, todo and journal note."
   (let ((base-capture-template '(("t" "Capture a TODO entry")
                                  ("p" "Capture a IN_PROGRESS entry")
-                                 ("f" "Capture a FAST_TODO entry")
                                  ("j" "Capture a note")))
         (func-cap-cmd-< (lambda (it other)
                           "comparator based on binding of a capture cmd"
@@ -70,7 +69,6 @@ Bindings are done if global property MUGU-LABEL is present.
                   (-map (lambda (org-file)
                           (when (mugu-org-utils/get-file-hotkey org-file)
                             `(,(funcall func-gen-todo org-file "IN_PROGRESS" "p")
-                              ,(funcall func-gen-todo org-file "FAST_TODO" "f")
                               ,(funcall func-gen-todo org-file "TODO" "t")
                               ,(funcall func-gen-note org-file))))
                         (org-agenda-files))))))
@@ -98,7 +96,14 @@ Bindings are done if global property MUGU-LABEL is present.
              (> (length (org-map-entries nil "/!-DONE-CANCELED" 'tree)) 1))
     (save-excursion (outline-next-heading))))
 
-(defun mugu-org-workflow/-make-project-overview-cmd (binding filename)
+(defun mugu-org-workflow/-skip-next-parent? ()
+  "A skip function for NEXT task with in progress/next child."
+  (when (and (org-entry-is-todo-p)
+             (string= "NEXT" (org-get-todo-state))
+             (> (length (org-map-entries nil "/!NEXT|PROGRESS" 'tree)) 1))
+    (save-excursion (outline-next-heading))))
+
+ (defun mugu-org-workflow/-make-project-overview-cmd (binding filename)
   "Make a org agenda custom command entry for on BINDING for FILENAME.
 This will define a standard block agenda under the prefix p"
   (let ((the-file (file-name-base filename)))
@@ -108,38 +113,69 @@ This will define a standard block agenda under the prefix p"
                   ((org-agenda-overriding-header ,(format "Task in progress for project %s" the-file))
                    (org-agenda-prefix-format " %b")
                    (org-agenda-skip-function #'mugu-org-workflow/-skip-active-parent-with-active-child)))
-       (tags "REFILE+LEVEL>2"
-             ((org-agenda-overriding-header ,(format "Task to refile for project %s" the-file))
-              (org-agenda-prefix-format " %b")))
        (agenda ""
                ((org-agenda-overriding-header ,(format "Agenda for project %s" the-file))
                 (org-agenda-prefix-format " %s %b")
                 (org-agenda-show-all-dates nil)
                 (org-agenda-ndays 21)))
-       (todo "TODO|REVIEW|NEXT|SOMEDAY"
+       (todo "NEXT"
+             ((org-agenda-overriding-header ,(format "Next task for the project %s" the-file))
+              (org-agenda-skip-function #'mugu-org-workflow/-skip-next-parent?)
+              (org-agenda-todo-list-sublevels nil)
+              (org-tags-match-list-sublevels nil)
+              (org-agenda-prefix-format " %b")))
+       (tags "REFILE+LEVEL=2"
+             ((org-agenda-overriding-header ,(format "Task to refile for project %s" the-file))
+              (org-agenda-todo-list-sublevels nil)
+              (org-tags-match-list-sublevels nil)
+              (org-agenda-prefix-format " %b")))
+       (tags-todo "need_review"
+             ((org-agenda-overriding-header ,(format "Task to review for project %s" the-file))
+              (org-agenda-todo-list-sublevels nil)
+              (org-tags-match-list-sublevels nil)
+              (org-agenda-prefix-format " %b")))
+       (tags-todo "!TODO&fast_todo"
+             ((org-agenda-overriding-header ,(format "Easy todo for the project %s" the-file))
+              (org-agenda-todo-list-sublevels nil)
+              (org-tags-match-list-sublevels nil)
+              (org-agenda-prefix-format " %b")))
+       (tags-todo "-need_review/TODO"
              ((org-agenda-overriding-header ,(format "Backlog of the project %s" the-file))
-              (org-agenda-prefix-format " %b")
-              (org-agenda-skip-function #'mugu-org-workflow/-skip-todo-parent-with-todo-child)
-              (org-agenda-sorting-strategy '(todo-state-down priority-down)))))
+              (org-agenda-todo-list-sublevels nil)
+              (org-tags-match-list-sublevels nil)
+              (org-agenda-prefix-format " %b"))))
       ((org-agenda-files '(,filename))))))
 
 (defconst mugu-org-workflow/global-overview-agenda
   `(("o" "Global overview of all projects"
      ((tags-todo "SCHEDULED=\"<today>\"|DEADLINE=\"<today>\"|TODO=\"IN_PROGRESS\""
-            ((org-agenda-overriding-header "ALL tasks in progress or due today")
-             (org-agenda-prefix-format "%-14:c %b")
-             (org-agenda-skip-function #'mugu-org-workflow/-skip-active-parent-with-active-child)))
+                 ((org-agenda-overriding-header "ALL tasks in progress or due today")
+                  (org-agenda-prefix-format "%-10c | %b")
+                  (org-agenda-skip-function #'mugu-org-workflow/-skip-active-parent-with-active-child)))
       (agenda ""
               ((org-agenda-overriding-header "Global agenda")
-               (org-agenda-prefix-format " %s %-14:c %b")
+               (org-agenda-prefix-format " %-10c | %-12s | %b")
                (org-agenda-show-all-dates t)
                (org-agenda-ndays 14)))
       (todo "NEXT"
             ((org-agenda-overriding-header "Next actions ready")
-             (org-agenda-prefix-format "%-14:c %b")))
-      (todo "FAST_TODO"
-            ((org-agenda-overriding-header "Quick TODOs")
-             (org-agenda-prefix-format "%-14:c %b")))))))
+             (org-agenda-skip-function #'mugu-org-workflow/-skip-next-parent?)
+             (org-agenda-todo-list-sublevels nil)
+             (org-tags-match-list-sublevels nil)
+             (org-agenda-prefix-format "%-10c | %b")))
+      (tags-todo "@transport/!+TODO"
+                 ((org-agenda-overriding-header "Available quick TODOs for metro")
+                  (org-agenda-todo-list-sublevels nil)
+                  (org-tags-match-list-sublevels nil)
+                  (org-agenda-prefix-format "%-10c | %b")))
+      ;; (tags-todo "@fast_todo/!+TODO"
+      ;;            ((org-agenda-overriding-header "Available quick TODOs")
+      ;;             (org-agenda-todo-list-sublevels nil)
+      ;;             (org-tags-match-list-sublevels nil)
+      ;;             (org-agenda-prefix-format "%-10c | %b")))
+      ))
+    ;; ("p" . "Project overview")
+    ))
 
 (defun mugu-org-workflow/goto-progress-task ()
   "Goto any headline with PROGRESS status."
@@ -162,17 +198,22 @@ Will modify several key variables of Org mode and create dynamic bindings for
 each project file."
   (interactive)
   (push 'org-habit org-modules)
+  (setq org-todo-keywords
+        (quote ((sequence "TODO(t)" "WAIT(w)" "NEXT(n)" "IN_PROGRESS(p)" "|" "DONE(d)" "CANCELLED(c)"))))
   (setq org-habit-show-habits-only-for-today t)
   (setq org-habit-graph-column 80)
   (setq org-agenda-custom-commands
         (append mugu-org-workflow/global-overview-agenda
-               (--map
-                (mugu-org-workflow/-make-project-overview-cmd (mugu-org-utils/get-file-hotkey it) it)
-                (org-agenda-files))))
+                (--map
+                 (mugu-org-workflow/-make-project-overview-cmd (mugu-org-utils/get-file-hotkey it) it)
+                 (org-agenda-files))))
   (setq org-capture-templates (mugu-org-workflow/-make-capture-binding))
-  (setq org-todo-keywords (quote ((sequence "SOMEDAY(s)" "TODO(t)" "REVIEW(r)" "NEXT(n)"
-                                            "IN_PROGRESS(p)" "|" "DONE(d)" "CANCELLED(c)")
-                                  (sequence "FAST_TODO(f)" "|" "DONE(d)")))))
+  (setq org-tag-persistent-alist '((:startgroup . nil)
+                                   ("@transport" . nil)
+                                   ("fast_todo" . nil)
+                                   ("need_review" . nil)
+                                   (:endgroup . nil)))
+  (org-mode-restart))
 
 (provide 'mugu-org-workflow)
 ;;; mugu-org-workflow ends here

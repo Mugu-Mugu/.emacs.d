@@ -1,8 +1,5 @@
 #+PROPERTY: MUGU-LABEL e
 * BACKLOG
-*** NEXT [#B] Better term mode for emacs
-***** TODO Bither with shell and autoenv reload
-***** TODO Br with a wraper around ansi-term
 *** NEXT [#B] Better diff mode in magit
 ***** TODO Improve insane ediff default configuration
 - [ ] in merge view, it displays a 2 way diff while we need a 3 way diff
@@ -10,37 +7,48 @@
 - [ ] in merge view, it's not possible to take A or B contribution in one key press
 ***** TODO Improve navigation in magit hunks
 So it's possible to partition a hunk. Maybe if it was handled by ediff, it would be better
+*** NEXT [#D] Better term mode for emacs
+***** NEXT Either with shell and autoenv reload
+***** TODO Or with a wraper around ansi-term
+*** TODO [#C] Dired interface                                 :need_review:
+*** TODO [#C] Add a directory history feature?                :need_review:
+*** TODO [#C] Add a git global submenu                        :need_review:
+***** TODO wrap buffer actions (diff/log etc...)
+***** TODO blame wrapper
+***** TODO quick access to status (though project binding)
 *** TODO [#C] Python environment for emacs
 ***** TODO Bompletion
 ***** TODO Butoindent
 ***** TODO Better linter (less false positive)
-*** REVIEW [#C] Dired interface
-*** REVIEW [#C] Add a directory history feature?
-*** REVIEW [#C] Add a git global submenu
-***** TODO wrap buffer actions (diff/log etc...)
-***** TODO blame wrapper
-***** TODO quick access to status (though project binding)
-*** REVIEW [#D] ivy occur wrapper
-*** SOMEDAY Implement a journal overview where all timestamped item are displayed
-*** SOMEDAY [#D] Implement vview module
-A better perspective based on rule evaluation and scoring to track which buffer belong to which view.
-*** SOMEDAY [#C] Fix window resize not taking into account left or right position and leading to inverted command for right windows
-*** TODO [#C] Interesting packages
-**** FAST_TODO [#E] check expand region
-**** FAST_TODO [#E] check origami
-**** FAST_TODO [#E] check wgrep
-**** FAST_TODO [#E] check ripgrep
-**** FAST_TODO [#E] check fzf
-**** FAST_TODO [#E] check python tools
-**** SOMEDAY [#E] check sublim minimap
-* Inbox                                                              :REFILE:
-*** TODO Indentation dans org non intuitive et intrusive
-*** TODO Classement par facilité à implémenter
-*** TODO Recursive grep
-*** TODO windows configuration side window strange bug
+**** DONE Some org tweaks
+CLOSED: [2018-01-08 Mon 07:09]
+- [X] Suppression de SOMEDAY (redondant avec priorité)
+- [X] Implémentation du contexte @transport
+- [X] Implémentation du WAITING
+- [X] Remplacement du FAST-TODO par un tag
+- [X] Modification recherche projet
+** TODO [#C] Interesting packages
+**** TODO [#E] check expand region                            :@transport:
+**** TODO [#E] check origami                                  :@transport:
+**** TODO [#E] check wgrep                                    :@transport:
+**** TODO [#E] check ripgrep                                  :@transport:
+**** TODO [#E] check fzf                                      :@transport:
+**** TODO [#E] check python tools                             :@transport:
+**** TODO [#E] check sublim minimap                           :@transport:
+*** TODO [#C] Fix window resize not taking into account left or right position and leading to inverted command for right windows
+*** TODO [#D] ivy occur wrapper                               :need_review:
+*** TODO Improve emacs window configuration                   :need_review:
+*** TODO Improve agenda speed
+- Probably optimize skip function
 *** TODO better lispy behavior
+***** FAST_TODO reread lispy documentation
+***** TODO wrap/tweak/configure lispy
+*** TODO Implement a journal overview where all timestamped item are displayed
+*** TODO [#D] Implement vview module
+A beTrspective based on rule evaluation and scoring to track which buffer belong to which view.ODO
+* Inbox                                                              :REFILE:
 * Review
-*** TODO Emacs backlog
+*** TODO [#F] Emacs backlog
 SCHEDULED: <2018-01-14 Sun .+1w/2w>
 :LOGBOOK:
 - State "DONE"       from "TODO"       [2018-01-07 Sun 15:37]

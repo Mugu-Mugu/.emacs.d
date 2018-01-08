@@ -47,6 +47,7 @@
   (setq org-refile-use-outline-path 'file)
   (setq org-outline-path-complete-in-steps nil)
   (setq org-startup-indented t)
+  (setq org-lowest-priority ?F)
 
   ;; hjkl binding for quick date selection
   (define-key org-read-date-minibuffer-local-map (kbd "M-l")
@@ -86,6 +87,14 @@ Returns the newly created buffer."
 
   (setq org-agenda-window-setup 'current-window)
   (setq org-agenda-restore-windows-after-quit 't)
+
+  ;; speedup
+  (setq org-agenda-inhibit-startup t)
+  (setq org-agenda-dim-blocked-tasks nil)
+  (setq org-agenda-ignore-drawer-properties '(effort appt category))
+
+  ;;Use the current window for indirect buffer display
+  (setq org-indirect-buffer-display 'current-window)
 
   (mugu-org-workflow/activate)
 

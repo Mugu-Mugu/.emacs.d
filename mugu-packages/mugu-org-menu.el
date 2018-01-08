@@ -9,6 +9,7 @@
 (require 'org-agenda)
 (require 'mugu-menu)
 (require 'mugu-org-utils)
+(require 'mugu-core)
 
 (defmenu mugu-org-menu/agenda (:color amaranth :hint nil)
   "Mugu"
@@ -23,7 +24,7 @@
   ("C-d" org-agenda-kill "kill")
   ("ds" org-schedule "set schedule date")
   ("dd" org-deadline "set deadline date")
-  ("dt" org-timestamp "set deadline date")
+  ("dt" org-time-stamp "set deadline date")
   (":" org-agenda-set-tags "set tags" :column "2b-Task Data")
   ("n" org-agenda-add-note "add note")
   ("t" org-agenda-todo "set todos")
@@ -96,7 +97,8 @@
   ("d" org-cut-subtree "cut subtree")
   ("p" org-paste-subtree "paste subtree")
   ("t" org-toggle-heading "morph headline/list" :column "Transform")
-  ("s" org-sort "sort subtree")
+  ("s" mugu-org-utils/my-sort "default sort")
+  ("S" org-sort "interactive sort")
   ("a" org-archive-subtree "archive subtree")
   ("/" org-sparse-tree "search" :color blue :column "Search")
   ("q" mugu-org-menu/org-menu "Return to org menu" :color blue :column nil))
@@ -122,10 +124,14 @@
   ("o" org-insert-todo-heading "insert todo")
   ("q" nil "exit"))
 
+;; use the more usefull counsel command if available
+(declare-function counsel-org-tag "counsel.el")
+(after 'counsel (bind-key [remap org-set-tags-command] #'counsel-org-tag))
+
 (defmenu mugu-org-menu/main (:color blue :hint nil)
   "Org mode external interface"
   ("a" org-agenda "agenda gateway" :column "Agenda")
-  ("oo" (org-agenda nil "o") "global overview" :column "Agenda")
+  ("o" (org-agenda nil "o") "global overview" :column "Agenda")
   ("l" org-store-link "store link" :column "Others")
   ("c" org-capture "capture"))
 
