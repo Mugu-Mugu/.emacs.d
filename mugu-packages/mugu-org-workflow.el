@@ -210,6 +210,7 @@ each project file."
   (setq org-capture-templates (mugu-org-workflow/-make-capture-binding))
   (setq org-tag-persistent-alist '((:startgroup . nil)
                                    ("@transport" . nil)
+                                   ("@travail" . nil)
                                    ("fast_todo" . nil)
                                    ("need_review" . nil)
                                    (:endgroup . nil)))

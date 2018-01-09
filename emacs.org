@@ -47,6 +47,12 @@ CLOSED: [2018-01-08 Mon 07:09]
 *** TODO [#D] Implement vview module
 A beTrspective based on rule evaluation and scoring to track which buffer belong to which view.ODO
 * Inbox                                                              :REFILE:
+*** TODO fix problem on window configuration
+- Many unexpected behavior
+  - frame creation because side blocked
+  - command fail
+  - ugly window resize
+***** TODO Read documentation                      :@transport:fast_todo:
 * Review
 *** TODO [#F] Emacs backlog
 SCHEDULED: <2018-01-14 Sun .+1w/2w>
