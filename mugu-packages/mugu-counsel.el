@@ -19,17 +19,25 @@
   "Generate the file path to the temp file for the given SESSION-NAME."
   (expand-file-name (concat temporary-file-directory (format "tmp-%s.mugu" session-name))))
 
+(defun mugu-counsel--find-cmd (f-or-d)
+  "Return the best find cmd available on the current system.
+cmd will return all files or directories F-OR-D under current
+directory.
+fd is used if available with find as backup."
+  (if (executable-find "fd")
+      (format "(cd %s; fd --follow --hidden --exclude .git -file %s" default-directory f-or-d))
+  (format "find . -type %s -not -path '*\/.git*'" f-or-d))
+
 (defun mugu-counsel--read-recursive (f-or-d starting-directory)
    "Read a directory or a file recursivly and asynchronously.
 F-OR-D is a char f or d that determine whether a file or a dir is searched.
 It defaults to f. STARTING-DIRECTORY is the directory from which the recursive
 search is done.  It defaults to default directory."
    (let* ((default-directory starting-directory)
-          (base-prompt "Recursive find (%d/%d")
-          (cmd (format "find . -type %s -not -path '*\/.git*'" f-or-d)))
+          (base-prompt "Recursive find (%d/%d"))
      (ivy-read "Recursive find: "
                `(lambda (unused)
-                  (mugu-counsel--stream-candidates ,cmd
+                  (mugu-counsel--stream-candidates ,(mugu-counsel--find-cmd f-or-d)
                                                    ,(mugu-counsel--generate-temp-file "fdr")
                                                    #'mugu-counsel--select-filter-func
                                                    t)
@@ -170,9 +178,13 @@ TEMP-FILE-NAME contents are filtered to match `ivy-text'"
                              (let ((regex (counsel-unquote-regex-parens
                                            (setq ivy--old-re
                                                  (ivy--regex ivy-text)))))
-                               (call-process-shell-command
-                                (format "grep -iE \"%s\" %s" regex temp-file-name)
-                                nil t nil))
+                               (if (executable-find "fzf")
+                                   (call-process-shell-command
+                                    (format "fzf -f %s < %s" regex temp-file-name)
+                                    nil t nil)
+                                 (call-process-shell-command
+                                    (format "grep -iE \"%s\" %s" regex temp-file-name)
+                                    nil t nil)))
                              (let ((cands (split-string (buffer-string) counsel-async-split-string-re t)))
                                (if cands
                                    cands

@@ -9,12 +9,12 @@
 (require 'swiper)
 
 (defun mugu-org-utils/my-sort ()
-  "Sort tree by priority and after by todo state and lastly by timestamp.
+  "Sort tree by timestamp, priority and lastly by todo state.
 Important/mature entry will be at the top of the tree."
   (interactive)
   (org-sort-entries t ?p)
-  (org-sort-entries t ?O)
-  (org-sort-entries t ?s))
+  (org-sort-entries t ?s)
+  (org-sort-entries t ?O))
 
 (defun mugu-orgu/get-headline-metadata ()
   "Return a cons cell with heading data and a standard org property alist.

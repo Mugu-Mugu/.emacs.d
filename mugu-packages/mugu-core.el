@@ -88,6 +88,10 @@
   :config
   (global-whitespace-mode 1))
 
+(use-package diminish
+  :ensure
+  :demand)
+
 (defun mugu-compile-all ()
   "Recompile every external package."
   (interactive)
@@ -98,10 +102,6 @@
 (add-to-list 'default-frame-alist '(alpha 90 90))
 
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
-
-;(use-package auto-package-update
-;  :ensure
-;  :demand)
 
 (provide 'mugu-core)
 ;;; mugu-core ends here
