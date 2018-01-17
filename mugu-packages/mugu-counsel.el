@@ -195,12 +195,15 @@ TEMP-FILE-NAME contents are filtered to match `ivy-text'"
                                            (setq ivy--old-re
                                                  (ivy--regex ivy-text)))))
                                (if (executable-find "fzf")
-                                   (call-process-shell-command
-                                    (format "fzf -f %s < %s" regex temp-file-name)
-                                    nil t nil)
+                                   (if (string= "" regex)
+                                       ;; to at least display some results when no input
+                                       (insert-file-contents temp-file-name)
+                                     (call-process-shell-command
+                                        (format "fzf -f %s < %s" regex temp-file-name)
+                                        nil t nil))
                                  (call-process-shell-command
-                                    (format "grep -iE \"%s\" %s" regex temp-file-name)
-                                    nil t nil)))
+                                  (format "grep -iE \"%s\" %s" regex temp-file-name)
+                                  nil t nil)))
                              (sleep-for 0.05)
                              (let ((cands (split-string (buffer-string) counsel-async-split-string-re t)))
                                (if cands
