@@ -25,8 +25,23 @@ cmd will return all files or directories F-OR-D under current
 directory.
 fd is used if available with find as backup."
   (if (executable-find "fd")
-      (format "(cd %s; fd --follow --hidden --exclude .git -file %s" default-directory f-or-d))
+      (format "fd --follow --hidden --exclude .git -file %s %s" f-or-d default-directory))
   (format "find . -type %s -not -path '*\/.git*'" f-or-d))
+
+
+(defun mugu-counsel--fzf-matcher (regexp candidates)
+  "A ivy matcher using FZF.
+REGEXP and CANDIDATES have usual ivy definition."
+  (let ((temp-file (mugu-counsel--generate-temp-file "fzf-match")))
+    (with-temp-file temp-file (insert (mapconcat (lambda (it) (format "%s" it)) candidates "\n")))
+    (with-temp-buffer
+      (call-process-shell-command
+       (format "fzf -f %s < %s" regexp temp-file)
+       nil t nil)
+      (let ((cands (split-string (buffer-string) counsel-async-split-string-re t)))
+        (if cands
+            cands
+          (list "no match"))))))
 
 (defun mugu-counsel--read-recursive (f-or-d starting-directory)
    "Read a directory or a file recursivly and asynchronously.
@@ -45,6 +60,7 @@ search is done.  It defaults to default directory."
                ;; (split-string
                :dynamic-collection t
                :history 'mugu-counsel-recursive-history
+               :re-builder 'ivy--regex-fuzzy
                :unwind 'mugu-counsel--cleanup-candidates-stream
                :caller 'mugu-counsel-recursive-find)))
 
@@ -185,6 +201,7 @@ TEMP-FILE-NAME contents are filtered to match `ivy-text'"
                                  (call-process-shell-command
                                     (format "grep -iE \"%s\" %s" regex temp-file-name)
                                     nil t nil)))
+                             (sleep-for 0.05)
                              (let ((cands (split-string (buffer-string) counsel-async-split-string-re t)))
                                (if cands
                                    cands
@@ -197,7 +214,7 @@ STRING, BASE-CMD and EXTRA-AG-ARGS have same semantic."
     (setq extra-ag-args ""))
   (if (< (length string) 3)
       (counsel-more-chars 3)
-    (let ((default-directory counsel--git-grep-dir)
+    (let ((default-directory default-directory)
           (regex (counsel-unquote-regex-parens
                   (setq ivy--old-re
                         (ivy--regex string)))))
