@@ -1,7 +1,8 @@
 ;;; package --- summary
-;;; commentary 
+;;; commentary
 
 (require 'mugu-core)
+
 (use-package shell
   :ensure
   :defer
@@ -49,5 +50,23 @@
   :after shell
   :config
   (mugu-menu-register-mode-menu 'shell-mode 'mugu-menu-shell-main/body))
+
+(use-package term
+  :defer
+  :config
+  (define-key term-raw-map [remap evil-paste-after] 'term-paste)
+  ;; (setq term-input-autoexpand 'input)
+  ;; (setq term-input-ignoredups t)
+  ;; (setq term-completion-autolist t)
+  (setq ansi-term-color-vector [term
+                                term-color-black
+                                term-color-red
+                                term-color-green
+                                term-color-yellow
+                                term-color-blue
+                                term-color-magenta
+                                term-color-cyan
+                                term-color-white]))
+
 
 (provide 'mugu-shell)
