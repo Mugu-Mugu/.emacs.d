@@ -11,7 +11,18 @@
 
 (use-package noctilux-theme
   :demand
-  :ensure t)
+  :disabled
+  :ensure t
+  :config
+  (load-theme 'noctilux))
+
+(use-package zerodark-theme
+  :demand
+  :ensure
+  :config
+  (load-theme 'zerodark t)
+  ;; (zerodark-setup-modeline-format)
+  )
 
 (use-package badger-theme
   :disabled
