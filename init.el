@@ -14,7 +14,7 @@
   (mapc (lambda (x)
           (add-to-list 'load-path (expand-file-name x emacs-git)))
         (delete ".." (directory-files emacs-git))))
-
+(setq evil-want-C-i-jump nil)
 
 (setq package-enable-at-startup nil)
 (unless (package-installed-p 'use-package)
@@ -61,7 +61,11 @@
 ;;; languages features
 (use-package mugu-ada)
 (use-package mugu-lisp)
+(use-package mugu-py)
 (use-package mugu-org)
+(use-package mugu-rust)
+(use-package mugu-ruby)
+(require 'mugu-py)
 
 ;;; gather all *global* binding to enforce coherency
 (use-package mugu-keys)

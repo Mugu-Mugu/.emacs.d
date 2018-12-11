@@ -1,4 +1,4 @@
-(custom-set-variables
+custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
@@ -61,6 +61,9 @@
  '(edt-bottom-scroll-margin 0)
  '(edt-top-scroll-margin 0)
  '(electric-pair-mode t)
+ '(elpy-modules
+   (quote
+    (elpy-module-company elpy-module-eldoc elpy-module-pyvenv elpy-module-yasnippet elpy-module-django elpy-module-sane-defaults)))
  '(ess-swv-pdflatex-commands (quote ("texi2pdf" "pdflatex" "make" "xelatex")))
  '(evil-ex-search-vim-style-regexp t)
  '(evil-insert-state-modes
@@ -90,13 +93,18 @@
  '(fci-rule-color "#282a2e")
  '(fill-column 80)
  '(find-file-visit-truename t)
+ '(flycheck-check-syntax-automatically (quote (save new-line mode-enabled)))
  '(flycheck-clang-language-standard "c++11")
  '(flycheck-display-errors-delay 0.0)
  '(flycheck-display-errors-function (quote flycheck-display-error-messages-unless-error-list))
+ '(flycheck-emacs-lisp-load-path (quote inherit))
  '(flycheck-haskell-ghc-executable "/usr/bin/ghc")
  '(flycheck-haskell-hlint-executable "/usr/bin/cabal exec hlint")
+ '(flycheck-idle-change-delay 25)
+ '(flycheck-python-flake8-executable "python3")
  '(gdb-many-windows t)
  '(global-company-mode t)
+ '(global-flycheck-mode t)
  '(global-hl-line-mode t)
  '(global-semantic-decoration-mode t)
  '(global-semantic-highlight-func-mode t)
@@ -152,13 +160,11 @@
  '(org-src-window-setup (quote other-window))
  '(org-startup-folded (quote content))
  '(org-startup-truncated nil)
- '(org-use-sub-superscripts (quote {}))
- '(package-selected-packages
-   (quote
-    (zerodark-theme diminish lispy projectile company ace-window avy ivy spaceline s dash evil no-littering auto-package-update mugu-lisp-libs smex lispyville hydra counsel-projectile flycheck-pos-tip flycheck use-package telephone-line slime persp-projectile noctilux-theme magit key-chord ivy-hydra helm-projectile evil-lispy elisp-slime-nav counsel company-quickhelp company-flx ada-mode ace-link)))
- '(powerline-evil-tag-style (quote verbose))
+'(org-use-sub-superscripts (quote {}))
+'(powerline-evil-tag-style (quote verbose))
  '(python-indent-guess-indent-offset nil)
- '(python-indent-offset 0)
+ '(python-indent-offset 4)
+ '(python-indent-trigger-commands (quote (indent-for-tab-command)))
  '(semantic-mode t)
  '(show-paren-mode t)
  '(show-paren-style (quote expression))

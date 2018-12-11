@@ -100,6 +100,7 @@ Returns the newly created buffer."
 
   (after 'mugu-org-menu
     (mugu-menu-register-mode-menu 'org-mode 'mugu-org-menu/org-menu)
+    (mugu-org-menu/add-head-to-main '("g" (switch-to-buffer (mugu-orgu/get-last-buffer-name)) "go to last org buffer" :color blue))
     (mugu-org-menu/add-head-to-main '("r" mugu-org-workflow/refile-task "refile tasks" :color blue))
     (mugu-org-menu/add-head-to-main '("p" mugu-org-workflow/goto-progress-task "goto in progress task" :color blue))))
 

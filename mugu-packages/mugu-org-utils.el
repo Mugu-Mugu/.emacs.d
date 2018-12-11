@@ -7,6 +7,12 @@
 (require 'org)
 (require 'org-agenda)
 (require 'swiper)
+(require 'dash)
+
+(defun mugu-orgu/get-last-buffer-name ()
+    "Return the name of the last visited org buffer.
+If no org buffer was visited return scratch"
+    (--first (string-match-p ".*.org$" it) (--map (buffer-name it) (buffer-list))))
 
 (defun mugu-org-utils/my-sort ()
   "Sort tree by timestamp, priority and lastly by todo state.

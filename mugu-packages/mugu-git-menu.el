@@ -36,6 +36,7 @@
   ("s" magit-stage "stage" :column "Actions (Status)")
   ("u" magit-unstage "unstage")
   ("d" magit-discard "discard")
+  ("e" magit-ediff-popup "ediff" :color blue)
   ("c" magit-commit-popup "commit" :color blue))
 
 (defhydra mugu-magit-common-actions-hydra
