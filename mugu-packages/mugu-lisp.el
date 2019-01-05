@@ -1,6 +1,6 @@
 ;;; Package --- Summary
 ;; TBC
-;;; Commentary:
+;; * Commentary:
 
 ;;; Code:
 
@@ -8,14 +8,16 @@
 ;; as is, this hook is not usable with regards to lazy loading
 ;; Thus it must be bound only after emacs really started
 (require 'evil)
+(require 'general)
+(require 'use-package)
 (add-hook 'emacs-startup-hook #'mugu/lisp-init)
 
+;; * fe
 (defun mugu/lisp-init ()
 
   "Gather all configuration for Lisp mode."
   ;; mandatory package for serious lisp editing
   (use-package lispy
-    :ensure
     :defer
     :diminish lispy-mode
     :init (add-hook 'emacs-lisp-mode-hook
@@ -25,16 +27,21 @@
 
   ;; collection of some nice bindings and rebinding that evilify lispy
   (use-package evil-lispy
-    :ensure
     :diminish evil-lispy-mode lispy-other-mode
     :after lispy
     :config
     (require 'lispy)
-    (message "mugu lispy loaded")
     (add-hook 'emacs-lisp-mode-hook #'evil-lispy-mode)
     (add-hook 'clojure-mode-hook #'evil-lispy-mode)
     (evil-lispy-mode +1)
     (key-chord-define evil-lispy-state-map "jk" 'evil-normal-state)
+    (setq-default lispy-outline-header ";; ")
+    (general-define-key :states 'normal :keymaps 'emacs-lisp-mode-map
+                        "<M-return>" (lambda ()
+                                       (interactive)
+                                       (call-interactively #'lispy-meta-return)
+                                       (end-of-line)
+                                       (evil-insert-state)))
     (evil-define-key 'motion evil-lispy-mode-map
       (kbd "C-&") #'lispy-describe-inline
       (kbd "C-é") #'lispy-arglist-inline)
@@ -44,13 +51,13 @@
 
   ;; used to make evil normal mode commands safe with regards to lisp paren balancing
   (use-package lispyville
-    :ensure
     :after lispy
     :diminish lispyville-mode
     :init (add-hook 'emacs-lisp-mode-hook #'lispyville-mode))
 
   (use-package mugu-lisp-utils
     :defer
+    :straight (:local-repo)
     :functions mugu-menu-register-mode-menu
     :commands mugu-lisp-main-menu
     :init
@@ -59,16 +66,13 @@
     :config)
 
   (use-package eldoc
-    :ensure
     :defer
     :diminish eldoc-mode)
 
   (use-package slime
-    :ensure
     :defer)
 
   (use-package elisp-slime-nav
-    :ensure
     :commands my-jump-to-elisp-docs
     :diminish elisp-slime-nav-mode
     :init

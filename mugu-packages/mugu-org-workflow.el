@@ -1,3 +1,4 @@
+;; -*- lexical-binding: t -*-
 ;;; mugu-org-workflow --- Summary
 ;; A collection of defun and settings to implement my workflow
 ;;; Commentary:
@@ -31,189 +32,153 @@
 ;; for the project requirements
 
 ;;; Code:
+;; * Requirement
 (require 'mugu-org-utils)
 (require 'dash)
+(require 'ht)
 (require 'org)
 (require 'org-agenda)
 (require 'org-capture)
 (require 'org-habit)
 
+;; * Headlines predicate
+(defun mugu-orgw-refilable-headline-p (headline)
+  "Predicate determining if HEADLINE is refilable."
+  (-contains? (mugu-orgu-get-tags headline 'inherit 'inherit-only)
+              "refile"))
 
-(defun mugu-org-workflow/-make-capture-binding ()
-  "Build capture bindings for all registered org-file.
-Bindings are done if global property MUGU-LABEL is present.
-4 bindings are performed : capture immediate, regular, todo and journal note."
-  (let ((base-capture-template '(("t" "Capture a TODO entry")
-                                 ("p" "Capture a IN_PROGRESS entry")
-                                 ("j" "Capture a note")))
-        (func-cap-cmd-< (lambda (it other)
-                          "comparator based on binding of a capture cmd"
-                          (string< (-first-item it) (-first-item other))))
-        (func-gen-todo (lambda (org-file todo-state todo-hotkey)
-                         "generate a todo capture spec"
-                         `(,(format "%s%s" todo-hotkey (mugu-org-utils/get-file-hotkey org-file))
-                           ,(format "Capture a %s entry for %s" todo-state (file-name-base org-file))
-                           entry
-                           (file+headline ,org-file "Inbox")
-                           ,(format "* %s %%i %%?" todo-state))))
-        (func-gen-note (lambda (org-file)
-                         "generate a note capture spec"
-                         `(,(concat "j" (mugu-org-utils/get-file-hotkey org-file))
-                           ,(concat "Capture note for " (file-name-sans-extension org-file))
-                           entry
-                           (file+datetree ,org-file)
-                           "* %U %i %?"))))
-    (-sort func-cap-cmd-<
-           (apply 'append
-                  base-capture-template
-                  (-map (lambda (org-file)
-                          (when (mugu-org-utils/get-file-hotkey org-file)
-                            `(,(funcall func-gen-todo org-file "IN_PROGRESS" "p")
-                              ,(funcall func-gen-todo org-file "TODO" "t")
-                              ,(funcall func-gen-note org-file))))
-                        (org-agenda-files))))))
+(defun mugu-orgw-inbox-headline-p (headline)
+  "Predicate determining if HEADLINE is a inbox."
+  (-intersection (mugu-orgu-get-tags headline)
+                 '("inbox" "refile")))
 
-(defun mugu-org-workflow/-active-parent-with-active-childs? ()
-  "Return t if the current entry is active and at at least 1 active child."
-  (and (org-entry-is-todo-p)
-       (string= "IN_PROGRESS" (org-get-todo-state))
-       (> (length (org-map-entries nil "/!IN_PROGRESS" 'tree)) 1)))
+(defun mugu-orgw-active-headline-p (headline)
+  "Predicate determining if HEADLINE is active.
+Only leaf headline are considered."
+  (and (equal (org-element-property :todo-keyword headline) "ACTIVE")
+       (not (mugu-orgu-headline-has-child-with-todo-keywords headline '("ACTIVE")))))
 
-(defun mugu-org-workflow/-skip-active-parent-with-active-child ()
-  "A skip function for org agenda search to ignore redondant active todo."
-  (when (mugu-org-workflow/-active-parent-with-active-childs?)
-    (save-excursion (outline-next-heading))))
+(defun mugu-orgw-todo-headline-p (headline)
+  "Predicate determining if HEADLINE is active.
+Only leaf headline are considered."
+  (and (equal (org-element-property :todo-keyword headline) "TODO")
+       (not (mugu-orgu-headline-has-child-with-todo-keywords headline '("NEXT" "ACTIVE" "TODO")))))
 
-(defun mugu-org-workflow/-skip-inbox-headline ()
-  "A skip function for org agenda to ignore the inbox headline container."
-  (when (string= "Inbox" (-fifth-item (org-heading-components)))
-    (save-excursion (outline-next-heading))))
+(defun mugu-orgw-next-headline-p (headline)
+  "Predicate determining if HEADLINE is a next step.
+Only leaf headline are considered."
+  (and (equal (org-element-property :todo-keyword headline) "NEXT")
+       (not (mugu-orgu-headline-has-child-with-todo-keywords headline '("NEXT" "ACTIVE")))))
 
-(defun mugu-org-workflow/-skip-todo-parent-with-todo-child ()
-  "A skip function self explonatory."
-  (when (and (org-entry-is-todo-p)
-             (not (org-entry-is-done-p))
-             (> (length (org-map-entries nil "/!-DONE-CANCELED" 'tree)) 1))
-    (save-excursion (outline-next-heading))))
+(defun mugu-orgw-project-headline-p (headline)
+  "Predicate determining if HEADLINE is a project.
+A project is just a todo headline with a child todo.  This match all project,
+regardless of their nest level."
+  (and (equal (org-element-property :todo-type headline) 'todo)
+       (mugu-orgu-headline-has-child-with-todos headline)))
 
-(defun mugu-org-workflow/-skip-next-parent? ()
-  "A skip function for NEXT task with in progress/next child."
-  (when (and (org-entry-is-todo-p)
-             (string= "NEXT" (org-get-todo-state))
-             (> (length (org-map-entries nil "/!NEXT|PROGRESS" 'tree)) 1))
-    (save-excursion (outline-next-heading))))
+(defun mugu-orgw-top-project-headline-p (headline)
+  "Predicate determining if HEADLINE is a top project.
+Such a headline has no parent which is also a TODO headline."
+  (and (mugu-orgw-project-headline-p headline)
+       (not (mugu-orgu-headline-has-parent-with-todos? headline))))
 
- (defun mugu-org-workflow/-make-project-overview-cmd (binding filename)
-  "Make a org agenda custom command entry for on BINDING for FILENAME.
-This will define a standard block agenda under the prefix p"
-  (let ((the-file (file-name-base filename)))
-    `(,(format "p%s" binding)
-      ,(format "an overview for project %s" the-file)
-      ((tags-todo "SCHEDULED=\"<today>\"|DEADLINE=\"<today>\"|TODO=\"IN_PROGRESS\""
-                  ((org-agenda-overriding-header ,(format "Task in progress for project %s" the-file))
-                   (org-agenda-prefix-format " %b")
-                   (org-agenda-skip-function #'mugu-org-workflow/-skip-active-parent-with-active-child)))
-       (agenda ""
-               ((org-agenda-overriding-header ,(format "Agenda for project %s" the-file))
-                (org-agenda-prefix-format " %s %b")
-                (org-agenda-show-all-dates nil)
-                (org-agenda-ndays 21)))
-       (todo "NEXT"
-             ((org-agenda-overriding-header ,(format "Next task for the project %s" the-file))
-              (org-agenda-skip-function #'mugu-org-workflow/-skip-next-parent?)
-              (org-agenda-todo-list-sublevels nil)
-              (org-tags-match-list-sublevels nil)
-              (org-agenda-prefix-format " %b")))
-       (tags "REFILE+LEVEL=2"
-             ((org-agenda-overriding-header ,(format "Task to refile for project %s" the-file))
-              (org-agenda-todo-list-sublevels nil)
-              (org-tags-match-list-sublevels nil)
-              (org-agenda-prefix-format " %b")))
-       (tags-todo "need_review"
-             ((org-agenda-overriding-header ,(format "Task to review for project %s" the-file))
-              (org-agenda-todo-list-sublevels nil)
-              (org-tags-match-list-sublevels nil)
-              (org-agenda-prefix-format " %b")))
-       (tags-todo "!TODO&fast_todo"
-             ((org-agenda-overriding-header ,(format "Easy todo for the project %s" the-file))
-              (org-agenda-todo-list-sublevels nil)
-              (org-tags-match-list-sublevels nil)
-              (org-agenda-prefix-format " %b")))
-       (tags-todo "-need_review/TODO"
-             ((org-agenda-overriding-header ,(format "Backlog of the project %s" the-file))
-              (org-agenda-todo-list-sublevels nil)
-              (org-tags-match-list-sublevels nil)
-              (org-agenda-prefix-format " %b"))))
-      ((org-agenda-files '(,filename))))))
+(defun mugu-orgw-leaf-project-headline-p (headline)
+  "Predicate determining if HEADLINE is a leaf project.
+Such a headline is a project with no child project."
+  (and (mugu-orgw-project-headline-p headline)
+       (--none? (mugu-orgw-project-headline-p it) (mugu-orgu-headline-get-childs headline))))
 
-(defconst mugu-org-workflow/global-overview-agenda
-  `(("o" "Global overview of all projects"
-     ((tags-todo "SCHEDULED=\"<today>\"|DEADLINE=\"<today>\"|TODO=\"IN_PROGRESS\""
-                 ((org-agenda-overriding-header "ALL tasks in progress or due today")
-                  (org-agenda-prefix-format "%-10c | %b")
-                  (org-agenda-skip-function #'mugu-org-workflow/-skip-active-parent-with-active-child)))
-      (agenda ""
-              ((org-agenda-overriding-header "Global agenda")
-               (org-agenda-prefix-format " %-10c | %-12s | %b")
-               (org-agenda-show-all-dates t)
-               (org-agenda-ndays 14)))
-      (todo "NEXT"
-            ((org-agenda-overriding-header "Next actions ready")
-             (org-agenda-skip-function #'mugu-org-workflow/-skip-next-parent?)
-             (org-agenda-todo-list-sublevels nil)
-             (org-tags-match-list-sublevels nil)
-             (org-agenda-prefix-format "%-10c | %b")))
-      (tags-todo "@transport/!+TODO"
-                 ((org-agenda-overriding-header "Available quick TODOs for metro")
-                  (org-agenda-todo-list-sublevels nil)
-                  (org-tags-match-list-sublevels nil)
-                  (org-agenda-prefix-format "%-10c | %b")))
-      ;; (tags-todo "@fast_todo/!+TODO"
-      ;;            ((org-agenda-overriding-header "Available quick TODOs")
-      ;;             (org-agenda-todo-list-sublevels nil)
-      ;;             (org-tags-match-list-sublevels nil)
-      ;;             (org-agenda-prefix-format "%-10c | %b")))
-      ))
-    ;; ("p" . "Project overview")
-    ))
+(defun mugu-orgw-task-headline-p (headline)
+  "Predicate determining if HEADLINE is a task."
+  (equal 'todo (org-element-property :todo-type headline)))
 
-(defun mugu-org-workflow/goto-progress-task ()
-  "Goto any headline with PROGRESS status."
+(defun mugu-orgw-stuck-project-headline-p (headline)
+  "Predicate determining if HEADLINE is a stuck project.
+Such a headline is a project with no active or next child."
+  (and (mugu-orgw-project-headline-p headline)
+       (not (mugu-orgu-headline-has-child-with-todo-keywords headline '("ACTIVE" "NEXT")))))
+
+(defun mugu-orgw-sort-get-score-headline (&optional headline)
+  "Return a integer value representing the sorting priority of a given entry.
+Consider HEADLINE if it is provided otherwise look for element at point.
+Sorted by Todo types where active one are more prioritary and then by priority
+property."
   (interactive)
-  (mugu-org-utils/query-entries #'mugu-org-utils/goto-headline
-                                "SCHEDULED=\"<today>\"|DEADLINE=\"<today>\"|TODO=\"IN_PROGRESS\""
-                                'agenda
-                                #'mugu-org-workflow/-skip-active-parent-with-active-child))
+  (let* ((headline (or headline (org-element-at-point)))
+         (priority (mugu-orgu-get-priority headline))
+         (todo (org-element-property :todo-keyword headline))
+         (todo-score (pcase todo
+                       ("ACTIVE" 6)
+                       ("NEXT" 5)
+                       ("WAIT" 4)
+                       ("TODO" 3)
+                       ("DONE" 2)
+                       ("CANCELLED" 1)
+                       (_ 7)))
+         (final-score (- (* todo-score 1000) priority)))
+    final-score))
 
-(defun mugu-org-workflow/refile-task ()
-  "Goto any headline with REFILE tag."
-  (interactive)
-  (mugu-org-utils/query-entries #'mugu-org-utils/refile-headline
-                                "REFILE+LEVEL>1"
-                                'agenda))
+(defun mugu-orgw-sort-cmp-headlines (hl-left hl-right)
+  "Relation order between HL-LEFT and HL-RIGHT based on sorting priority."
+  (> (mugu-orgw-sort-get-score-headline hl-left)
+     (mugu-orgw-sort-get-score-headline hl-right)))
 
-(defun mugu-org-workflow/activate ()
+(defun mugu-orgw-capture-todo (find-loc-find)
+  "Capture a todo headline and store it in the headline selected by FIND-LOC-FIND."
+  (let ((org-capture-templates `(("x" "capture a task todo"
+                                  entry (function ,find-loc-find) "* TODO %i %?"))))
+    (org-capture nil "x")))
+
+(defun mugu-orgw-capture-note (file)
+  "Build a capture template for a note type headline and store it into FILE."
+  (let ((org-capture-templates `(("x" "capture a note"
+                                  entry (file+datetree ,file) "* %U %i %?"))))
+    (org-capture nil "x")))
+
+(defun mugu-orgw-agenda-global ()
+  "Display a global org agenda view."
+  (let ((org-agenda-custom-commands
+         `(("o"
+            "Global overview of all projects"
+            ((todo ""
+                   ((org-agenda-overriding-header "ALL tasks in progress or due today")
+                    (org-agenda-prefix-format "%-10c | %b")
+                    (org-agenda-skip-function (mugu-orgu-make-skip-function
+                                               #'mugu-orgw-active-headline-p))))
+             (agenda ""
+                     ((org-agenda-overriding-header "Global agenda")
+                      (org-agenda-prefix-format " %-10c | %-12s | %b")
+                      (org-agenda-show-all-dates t)
+                      (org-agenda-ndays 14)))
+             (todo ""
+                   ((org-agenda-overriding-header "Next actions ready")
+                    (org-agenda-skip-function (mugu-orgu-make-skip-function
+                                               #'mugu-orgw-next-headline-p))
+                    (org-agenda-prefix-format "%-10c | %b"))))))))
+
+    (org-agenda nil "o")))
+
+(defun mugu-orgw-set-configuration ()
   "Activate the workflow.
 Will modify several key variables of Org mode and create dynamic bindings for
 each project file."
-  (interactive)
   (push 'org-habit org-modules)
   (setq org-todo-keywords
-        (quote ((sequence "TODO(t)" "WAIT(w)" "NEXT(n)" "IN_PROGRESS(p)" "|" "DONE(d)" "CANCELLED(c)"))))
+        (quote ((sequence "TODO(t)" "WAIT(w)" "NEXT(n)" "ACTIVE(a)" "|" "DONE(d)" "CANCELLED(c)"))))
   (setq org-habit-show-habits-only-for-today t)
   (setq org-habit-graph-column 80)
-  (setq org-agenda-custom-commands
-        (append mugu-org-workflow/global-overview-agenda
-                (--map
-                 (mugu-org-workflow/-make-project-overview-cmd (mugu-org-utils/get-file-hotkey it) it)
-                 (org-agenda-files))))
-  (setq org-capture-templates (mugu-org-workflow/-make-capture-binding))
   (setq org-tag-persistent-alist '((:startgroup . nil)
                                    ("@transport" . nil)
                                    ("@travail" . nil)
                                    ("fast_todo" . nil)
                                    ("need_review" . nil)
+                                   ("inbox" . nil)
+                                   ("refile" . nil)
                                    (:endgroup . nil)))
+  (setq org-lowest-priority ?F)
+  (setq org-agenda-files `(,(expand-file-name "~/org/")
+                           ,(expand-file-name (concat user-emacs-directory "emacs.org"))))
   (org-mode-restart))
 
 (provide 'mugu-org-workflow)

@@ -1,10 +1,10 @@
 ;;; mugu-completion --- Summary
 ;; tbc
 ;;; Commentary:
+(require 'use-package)
 
 ;;; Code:
 (use-package company
-  :ensure
   :diminish company-mode
   :defer 3
   :bind
@@ -18,7 +18,7 @@
         ("SPC" . mugu-company-space-exit))
   :functions company-abort
   :config
-  (add-hook 'after-init-hook 'global-company-mode)
+  (global-company-mode +1)
   (setq company-idle-delay 0)
   (setq company-require-match nil)
   (add-hook 'eshell-mode-hook
@@ -33,13 +33,11 @@
     (insert " ")))
 
 (use-package company-flx
-  :ensure
   :diminish
   :after company
   :config (company-flx-mode 1))
 
 (use-package company-quickhelp
-  :ensure
   :diminish
   :after company
   :config (progn

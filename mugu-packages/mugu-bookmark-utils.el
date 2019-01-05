@@ -21,6 +21,4 @@
      :caller 'counsel-bookmark))))
 
 (provide 'mugu-bookmark-utils)
-
-(provide 'mugu-bookmark-utils)
 ;;; mugu-bookmark-utils ends here

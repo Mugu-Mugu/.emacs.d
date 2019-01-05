@@ -1,58 +1,120 @@
-#+PROPERTY: MUGU-LABEL e
+* [#A] Inbox                                                         :refile:
+*** TODO window management wrapper
+*** TODO window config save & restore
+*** TODO alt jklh movement
+- for org
+- for ivy
+*** TODO bug company ret
 * BACKLOG
-*** NEXT [#B] Better diff mode in magit
-***** TODO Improve insane ediff default configuration
+*** [#C] Bugs                                                         :inbox:
+***** ACTIVE super star is broken
+***** TODO [#E] windows zz error
+***** TODO [#F] Fix window resize not taking into account left or right position and leading to inverted command for right windows
+***** DONE org popup issue is back
+CLOSED: [2019-01-03 Thu 11:17]
+***** TODO  project root missing
+*** [#D] Enhancement                                                  :inbox:
+***** TODO [#C] Outline mode in elisp
+***** TODO Git
+******* NEXT Better diff
 - [ ] in merge view, it displays a 2 way diff while we need a 3 way diff
 - [ ] in diff view, it displays a 3 way diff while we need a 2 way diff
 - [ ] in merge view, it's not possible to take A or B contribution in one key press
-***** TODO Improve navigation in magit hunks
-So it's possible to partition a hunk. Maybe if it was handled by ediff, it would be better
-*** NEXT [#D] Better term mode for emacs
-***** NEXT Either with shell and autoenv reload
-***** TODO Or with a wraper around ansi-term
-*** TODO [#C] Dired interface                                 :need_review:
-*** TODO [#C] Add a directory history feature?                :need_review:
-*** TODO [#C] Add a git global submenu                        :need_review:
-***** TODO wrap buffer actions (diff/log etc...)
-***** TODO blame wrapper
-***** TODO quick access to status (though project binding)
-*** TODO [#C] Python environment for emacs
-***** TODO Bompletion
-***** TODO Butoindent
-***** TODO Better linter (less false positive)
-**** DONE Some org tweaks
-CLOSED: [2018-01-08 Mon 07:09]
-- [X] Suppression de SOMEDAY (redondant avec priorité)
-- [X] Implémentation du contexte @transport
-- [X] Implémentation du WAITING
-- [X] Remplacement du FAST-TODO par un tag
-- [X] Modification recherche projet
-** TODO [#C] Interesting packages
-**** TODO [#E] check expand region                            :@transport:
-**** TODO [#E] check origami                                  :@transport:
-**** TODO [#E] check wgrep                                    :@transport:
-**** TODO [#E] check ripgrep                                  :@transport:
-**** TODO [#E] check fzf                                      :@transport:
-**** TODO [#E] check python tools                             :@transport:
-**** TODO [#E] check sublim minimap                           :@transport:
-*** TODO [#C] Fix window resize not taking into account left or right position and leading to inverted command for right windows
-*** TODO [#D] ivy occur wrapper                               :need_review:
-*** TODO Improve emacs window configuration                   :need_review:
-*** TODO Improve agenda speed
-- Probably optimize skip function
-*** TODO better lispy behavior
-***** FAST_TODO reread lispy documentation
-***** TODO wrap/tweak/configure lispy
-*** TODO Implement a journal overview where all timestamped item are displayed
-*** TODO [#D] Implement vview module
-A beTrspective based on rule evaluation and scoring to track which buffer belong to which view.ODO
-* Inbox                                                              :REFILE:
-*** TODO fix problem on window configuration
-- Many unexpected behavior
-  - frame creation because side blocked
-  - command fail
-  - ugly window resize
-***** TODO Read documentation                      :@transport:fast_todo:
+******* TODO buffer local commands
+- To be able to look for history of a file
+- To be able to compare this file vs any other version
+******* TODO [#F] blame wrapper
+***** TODO Directory history
+***** TODO Ivy occur wrapper
+***** TODO Emacs.d management
+- navigate to emacs source from everywhere either by perspective or by custom entry in mugu menu
+- make dependencies explicit
+***** TODO [#D] Term mode
+******* NEXT Some bugs with ctrl-c
+***** TODO Refactoring tools
+******* NEXT [#B] Elisp
+***** TODO Better customization
+******* NEXT Counsel support
+- list customizations variables with counsel
+- list modified variables with counsel
+******* TODO Custom file should be temporary
+Value setted inside should be moved back into their configuration package
+***** DONE Melpa to Straight
+***** DONE Folding
+CLOSED: [2019-01-05 Sat 03:30]
+******* DONE Origami
+CLOSED: [2019-01-04 Fri 13:48]
+******* DONE Outline
+CLOSED: [2019-01-04 Fri 13:48]
+******* DONE Integration
+CLOSED: [2019-01-05 Sat 03:30]
+- [X] define local commands
+- [X] define global commands
+- [X] detect if fold present at point
+- [X] define navi commands
+- [X] improve navi fold commands
+- [X] configure initialisation
+******* DONE Outline new style in elisp
+changed the lispy outline commad + different header
+CLOSED: [2019-01-05 Sat 07:55]
+*** Projects
+***** TODO [#A] Org Mode
+******* Context
+******* Inbox                                                        :refile:
+******* Bugs
+********* DONE Prevent the frame popup for capture
+********* DONE Implement selector for todo and any task
+********* DONE prevent the frame popup for org todo
+********* DONE file is broken in outline in task queries
+******* DONE capture to headline marked with a tag
+CLOSED: [2019-01-05 Sat 13:55]
+- bug base headline to query headlines with exact :bugs: tag
+- todo base headline to query headlines with exact :inbox-bugs: tag
+- quickie :quicky: with exact tag to :inbox:
+- enhancement :enhancement:
+- metro :train:
+******* NEXT [#E] Implement headline counsel action
+******* TODO Workflow enhancement
+- is next really usefull?
+- when selecting all task, local task priority takes over. Is priority global or should it be local and guided by headline order?
+- relative priority concept
+******* TODO [#E] implement narrowing for org mode
+******* DONE Recursive sort
+CLOSED: [2019-01-03 Thu 07:23]
+very important because a sorted tree is paramount to visualize data and org mode doesnt provide a way to organize data aside of agenda
+******* DONE Implement sorting strategy
+******* DONE Je veux pouvoir enregistrer une action future depuis n'importe où
+******* DONE Use case: deadline, scheduling
+******* DONE Query for active tasks
+******* DONE Use case: visualising task
+******* DONE Use case: complex task
+********* DONE Select both
+********* DONE Select only project task
+********* DONE Select only leaf task
+********* DONE Configure stuck project
+********* DONE What next task should be done?
+******* DONE Je veux pouvoir reclasser rapidement une action
+******* DONE implement agenda with new feature
+******* DONE Enable local task selection
+******* DONE Substitute old implementation
+******* DONE set property
+CLOSED: [2019-01-03 Thu 08:36]
+******* DONE focus after goto
+CLOSED: [2019-01-05 Sat 13:59]
+***** TODO [#F] Wiew
+*** [#E] Future package
+***** NEXT wgrep
+***** TODO historian
+***** TODO general
+***** TODO expand region
+***** TODO sublim minimap
+*** [#F] Language
+***** TODO [#C] Ruby on Rails
+***** TODO [#E] Python
+******* NEXT [#A] Fix the indentation issue  (O index)
+******* TODO Completion
+******* TODO Autoindent
+******* TODO Better linter (less false positive)
 * Review
 *** TODO [#F] Emacs backlog
 SCHEDULED: <2018-01-14 Sun .+1w/2w>

@@ -1,5 +1,4 @@
 (use-package ediff
-  :ensure
   :defer
   :config
   (customize-set-variable 'ediff-window-setup-function 'ediff-setup-windows-plain)

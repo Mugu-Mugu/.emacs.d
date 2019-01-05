@@ -3,15 +3,14 @@
 ;;; Commentary:
 
 ;;; Code:
-
-
 (use-package dash
-  :demand
-  :ensure)
+  :demand)
 
 (use-package s
-  :demand
-  :ensure)
+  :demand)
+
+(use-package ht
+  :demand)
 
 (provide 'mugu-lisp-libs)
 ;;; mugu-lisp-libs ends here

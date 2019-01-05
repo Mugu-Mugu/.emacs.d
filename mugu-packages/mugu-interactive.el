@@ -7,7 +7,6 @@
 (require 'mugu-core)
 
 (use-package ivy
-  :ensure
   :commands ivy-mode
   :diminish ivy-mode
   :defer
@@ -30,11 +29,9 @@
      ("y" ivy-yank-action "yank"))))
 
 (use-package  smex
-  :ensure
   :defer)
 
 (use-package ivy-hydra
-  :ensure
   :after ivy
   :bind
   (:map ivy-minibuffer-map
@@ -86,19 +83,16 @@
 
 
 (use-package counsel
-  :ensure
   :after ivy
   :diminish counsel-mode
   :config
   (counsel-mode +1))
 
 (use-package swiper
-  :ensure
   :defer
   :after ivy)
 
 (use-package helm
-  :ensure
   :disabled
   :defer
   :config
@@ -135,7 +129,8 @@
 
 (use-package mugu-counsel
   :after ivy
-  :defer)
+  :defer
+  :straight  (:local-repo))
 
 (provide 'mugu-interactive)
 ;;; mugu-interactive ends here

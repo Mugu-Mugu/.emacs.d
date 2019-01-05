@@ -103,6 +103,10 @@
   ("/" org-sparse-tree "search" :color blue :column "Search")
   ("q" mugu-org-menu/org-menu "Return to org menu" :color blue :column nil))
 
+(defmenu mugu-orgi-org-goto
+  (:color blue :hint nil)
+  )
+
 (defmenu mugu-org-menu/org
   (:color blue :hint nil :inherit (mugu-org-menu-hjkl-hydra/heads))
   "bindings for ORG mode"

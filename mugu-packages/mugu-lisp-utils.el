@@ -12,6 +12,7 @@
     (insert ";; tbc\n")
     (insert ";;; Commentary:\n")
     (insert "\n;;; Code:\n")
+    (insert "\n;; * begin:\n")
     (goto-char (point-max))
     (insert (format "\n(provide '%s)" (file-name-base)))
     (insert (format "\n;;; %s ends here" (file-name-base)))

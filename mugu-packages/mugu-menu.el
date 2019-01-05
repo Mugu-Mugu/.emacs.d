@@ -11,9 +11,11 @@
 (require 's)
 
 (defmacro defmenu (name body &optional docstring &rest heads)
-  "Wrapper around defhydra.
-Will create a hydra NAME-hydra as well as a direct alias NAME-menu.
-All arguments NAME BODY DOCSTRING and HEADS are passed as is to defhydra."
+  "Same as `defhydra' but naming is different and args are recorded for replay.
+Will create a hydra NAME-hydra as well as a direct alias NAME-menu and NAME.
+All arguments NAME BODY DOCSTRING and HEADS are recorded then passed as is to
+`defhydra'.
+This recording allows hydra replaying and enable some dynamic behavior."
   (declare (indent defun) (doc-string 3))
   (let* ((hydra-name (format "%s-hydra" (s-replace "/" "-" (symbol-name name))))
          (hydra-sym (intern hydra-name))
@@ -21,7 +23,12 @@ All arguments NAME BODY DOCSTRING and HEADS are passed as is to defhydra."
          (menu-sym (intern (format "%s-menu" name))))
     `(progn
        (defhydra ,hydra-sym ,body ,docstring ,@heads)
-       (defalias ',menu-sym ',hydra-body-sym))))
+       (defvar ,(intern (format "%S-hydra/body" name)) body
+         "BODY argument that was used for this hydra generation")
+       (defvar ,(intern (format "%S-hydra/docstring" name)) docstring
+         "DOSTRING argument that was used for this hydra generation")
+       (defalias ',menu-sym ',hydra-body-sym)
+       (defalias ',name ',hydra-body-sym))))
 
 (defun mugu-menu-add-entries (name &rest heads)
   "Wrapper around `mugu-hydra-add-head'.
@@ -95,7 +102,7 @@ specific column"
   ("p" mugu-project-hydra-menu/body "project")
   ("h" mugu-menu-help-hydra/body "help")
   ("!" mugu-lint-menu/body "linting")
-  ("o" mugu-org-menu/main-menu "orgmode")
+  ("o" mugu-orgi-menu-global "orgmode")
   ("q" nil "cancel hydra" :color blue :column nil))
 
 (defhydra mugu-menu-help-hydra (:color teal

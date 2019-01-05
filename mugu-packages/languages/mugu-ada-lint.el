@@ -3,6 +3,7 @@
 ;;; and errors that a project compilation would
 ;;; this means no more xxx files was not found or false positives because
 ;;; wrong file or warning switch was used
+(require 'flycheck)
 
 
 (flycheck-def-args-var mugu-ada-lint-args ada-mugu
@@ -67,6 +68,6 @@ Uses the GNAT compiler from GCC.  See URL
           t)
       (error (message "%s" (error-message-string err)))
       )))
-                                    
-      
+
+
 (provide 'mugu-ada-lint)

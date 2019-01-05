@@ -6,7 +6,6 @@
 
 (use-package robe
   :defer
-  :ensure
   :config
   (require 'mugu-menu)
   ;; (defhydra mugu-rs-main-hydra
@@ -53,7 +52,6 @@
          ("\\(Rake\\|Thor\\|Guard\\|Gem\\|Cap\\|Vagrant\\|Berks\\|Pod\\|Puppet\\)file\\'" . enh-ruby-mode)
          ("\\.\\(rb\\|rabl\\|ru\\|builder\\|rake\\|thor\\|gemspec\\|jbuilder\\)\\'" . enh-ruby-mode))
   :interpreter "ruby"
-  :ensure
   :custom
   (enh-ruby-deep-indent-paren nil)
   (enh-ruby-hanging-paren-deep-indent-level 2))

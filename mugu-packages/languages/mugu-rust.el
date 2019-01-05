@@ -6,7 +6,6 @@
 
 (use-package rust-mode
   :defer
-  :ensure
   :custom
   (rust-rustfmt-bin "~/.cargo/bin/rustfmt")
   :config
@@ -29,13 +28,11 @@
 
 (use-package cargo
   :after rust-mode
-  :ensure
   :config
   (add-hook 'rust-mode-hook 'cargo-minor-mode))
 
 (use-package racer
   :after rust-mode
-  :ensure
   :config
   (setq racer-cmd "~/.cargo/bin/racer") ;; Rustup binaries PATH
   (setq racer-rust-src-path "~/.cargo/rust/src") ;; Rust source code PATH
@@ -50,7 +47,6 @@
 
 (use-package flycheck-rust
   :after rust-mode
-  :ensure
   :config
   (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
 

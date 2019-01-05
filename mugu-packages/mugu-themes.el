@@ -2,49 +2,30 @@
 ;; NICE THEMES
 (use-package zenburn-theme
   :demand t
-  :disabled
-  :ensure zenburn-theme)
+  :disabled)
 
 (use-package color-theme-sanityinc-tomorrow
-  :disabled
-  :ensure)
+  :disabled)
 
 (use-package noctilux-theme
-  :demand
-  :disabled
-  :ensure t
-  :config
-  (load-theme 'noctilux))
-
-(use-package zerodark-theme
-  :demand
-  :ensure
-  :config
-  (load-theme 'zerodark t)
-  ;; (zerodark-setup-modeline-format)
-  )
+  :demand))
 
 (use-package badger-theme
-  :disabled
-  :ensure t)
+  :disabled)
 
 
 ;; AVERAGE THEMES
 (use-package base16-theme
-  :disabled
-  :ensure t)
+  :disabled)
 
 (use-package solarized-theme
   :disabled
-  :init (load-theme 'solarized-dark t)
-  :ensure solarized-theme)
+  :init (load-theme 'solarized-dark t))
 
 (use-package spacegray-theme
-  :disabled
-  :ensure t)
+  :disabled)
 
 (use-package moe-theme
-  :ensure
   :disabled
   :config
   (progn
@@ -60,30 +41,24 @@
     ))
 
 (use-package monokai-theme
-  :ensure
   :disabled
   :init (load-theme 'monokai t))
 
 ;; bad or unknown THEMES
 (use-package aurora-theme
-  :disabled
-  :ensure t)
+  :disabled)
 
 (use-package afternoon-theme
-  :disabled
-  :ensure)
+  :disabled)
 
 (use-package seti-theme
-  :ensure
   :disabled)
 
 (use-package tangotango-theme
-  :disabled
-  :ensure t)
+  :disabled)
 
 (use-package grandshell-theme
-  :disabled
-  :ensure t)
+  :disabled)
 
 (use-package alect-themes
   :disabled

@@ -1,3 +1,6 @@
+# straight file
+straight/*
+
 # Windows image file caches
 Thumbs.db
 ehthumbs.db

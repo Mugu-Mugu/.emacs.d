@@ -5,8 +5,10 @@
 ;;; Code:
 ;; For elpy
 
-(semantic-mode -1)
-(elpy-enable)
+(use-package elpy
+  :defer t
+  :config
+  (elpy-enable))
 
 (defhydra mugu-py-main-hydra
   (:color blue :hint nil)

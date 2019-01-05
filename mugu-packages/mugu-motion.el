@@ -6,7 +6,6 @@
 
 ;;; Code:
 (use-package avy
-  :ensure
   :defer
   :bind
   (:map evil-normal-state-map
@@ -33,15 +32,14 @@
     "F" 'evil-mugu-motion-F))
 
 (use-package mugu-motion-utils
-  :defer)
+  :defer
+  :straight (:local-repo))
 
 (use-package ace-window
-  :ensure
   :defer
   :config (setq aw-keys '(?a ?z ?e ?r ?t)))
 
 (use-package ace-link
-  :ensure
   :defer)
 
 (provide 'mugu-motion)

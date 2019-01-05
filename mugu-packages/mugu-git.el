@@ -1,18 +1,17 @@
+;;; mugu-git --- Summary
+;; tbc
+;;; Commentary:
+
+;;; Code:
 (require 'mugu-menu)
 
 (use-package magit
-  :ensure
   :defer
   :bind
   (:map magit-mode-map ("SPC" . mugu-menu-main-menu))
   :config
   (setq magit-save-repository-buffers 'dontask)
-  (after 'evil (evil-set-initial-state 'git-commit-mode 'insert))
-  )
-
-(use-package mugu-git-menu
-  :after magit
-  :config
+  (require 'mugu-git-menu)
   (defun mugu-magit-register-menu-mode (the-magit-mode the-menu)
     "register the menu for the given magit mode.
 That is: bind SPC SPC for the mode and autoload the menu on first buffer entering"
@@ -21,7 +20,8 @@ That is: bind SPC SPC for the mode and autoload the menu on first buffer enterin
       (add-hook `,the-hook `,the-menu)))
   (mugu-magit-register-menu-mode 'magit-revision-mode 'mugu-magit-default-menu/body)
   (mugu-magit-register-menu-mode 'magit-log-mode 'mugu-magit-default-menu/body)
-  (mugu-magit-register-menu-mode 'magit-status-mode 'mugu-magit-status-menu/body))
-
+  (mugu-magit-register-menu-mode 'magit-status-mode 'mugu-magit-status-menu/body)
+  (after 'evil (evil-set-initial-state 'git-commit-mode 'insert)))
 
 (provide 'mugu-git)
+;;; mugu-git ends here

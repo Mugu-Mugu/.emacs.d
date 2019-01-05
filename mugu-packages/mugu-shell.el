@@ -4,8 +4,7 @@
 (require 'mugu-core)
 
 (use-package shell
-  :ensure
-  :defer
+  :defer t
   :bind
   (:map shell-mode-map
         ("C-x" . comint-get-next-from-history)
@@ -47,7 +46,9 @@
     (evil-define-key 'normal shell-mode-map "o" 'evil-append-line)))
 
 (use-package mugu-shell-menu
+  :defer t
   :after shell
+  :straight (:local-repo)
   :config
   (mugu-menu-register-mode-menu 'shell-mode 'mugu-menu-shell-main/body))
 

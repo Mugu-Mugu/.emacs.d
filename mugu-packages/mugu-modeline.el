@@ -21,7 +21,6 @@
   )
 
 (use-package spaceline
-  :ensure
   :demand
   :config
   (require 'spaceline-config)

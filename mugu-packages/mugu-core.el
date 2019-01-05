@@ -3,6 +3,7 @@
 ;;; Commentary:
 
 ;;; Code:
+(require 'use-package)
 
 ;;; GUI conf
 ;; Don't show those horrible buttons
@@ -81,21 +82,15 @@
 ;; otherwise just highlight matching paren
 (setq show-paren-style 'mixed)
 (setq whitespace-style '(trailing))
+(use-package diminish
+  :demand)
+(use-package delight)
 (use-package whitespace
-  :ensure
   :demand
-  :diminish global-whitespace-mode
+  :delight global-whitespace-mode
   :config
   (global-whitespace-mode 1))
 
-(use-package diminish
-  :ensure
-  :demand)
-
-(defun mugu-compile-all ()
-  "Recompile every external package."
-  (interactive)
-  (byte-recompile-directory package-user-dir 0 'force))
 
 ;;; transparency
 (set-frame-parameter (selected-frame) 'alpha '(90 90))

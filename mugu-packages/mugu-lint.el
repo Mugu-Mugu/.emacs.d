@@ -1,11 +1,10 @@
 (require 'hydra)
 
 (use-package flycheck
-  :ensure
   :diminish flycheck-mode
   :defer
   :commands flycheck-list-errors
-  :init 
+  :init
   (defhydra mugu-lint-menu
                (:color pink :hint nil :idle 0.1
                        :body-pre (flycheck-list-errors)
@@ -24,7 +23,7 @@
                ("x" flycheck-disable-checker "disable checker")
                ("av" flycheck-version "display version" :column nil)
                ("ac" flycheck-verify-setup "display setup")
-               ("q" nil "cancel hydra" :color blue)) 
+               ("q" nil "cancel hydra" :color blue))
   :config
   (global-flycheck-mode 1)
 
@@ -43,7 +42,6 @@
                                                    (inhibit-same-window . t)))))))
 
 (use-package flycheck-pos-tip
-  :ensure
   ;; its nice but it cause jerky refresh
   ;; it will be reactivated once eamcs 25.2 is released with the double buffer
   ;; :disabled

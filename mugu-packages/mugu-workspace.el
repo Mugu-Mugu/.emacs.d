@@ -1,5 +1,4 @@
 (use-package perspective
-  :ensure perspective
   :defer
   :commands persp-switch
   :init

@@ -1,13 +1,21 @@
+;;; mugu-project --- Summary
+;; tbc
+;;; Commentary:
+
+;;; Code:
+
+;; * begin:
+(require 'use-package)
+
 
 (use-package projectile
-  :ensure projectile
-  :defer
   :diminish projectile-mode
+  :defer
   :init
   (setq projectile-cache-file (concat user-emacs-directory "var/projectile/projectile.cache"))
   (setq projectile-known-projects-file (concat user-emacs-directory "var/projectile/projectile-bookmarks.eld"))
 
-  
+
   :config
   (setq projectile-enable-caching t)
   (after 'ivy (setq projectile-completion-system 'ivy))
@@ -31,7 +39,6 @@
   (projectile-global-mode 1))
 
 (use-package persp-projectile
-  :ensure
   :after projectile
   :commands projectile-persp-switch-project
   :config
@@ -41,6 +48,7 @@
   (persp-make-variable-persp-local 'mugu-project-dir-root))
 
 (use-package mugu-project-ext
+  :straight (:local-repo)
   :after projectile
   :commands mugu-project-find-dir
   :config
@@ -48,9 +56,8 @@
   (require 'mugu-directory-fix))
 
 (use-package counsel-projectile
-  :disabled ;;; useless??? no added value upon base ivy implementation it lacks history, and different action 
+  :disabled ;;; useless??? no added value upon base ivy implementation it lacks history, and different action
   :after projectile
-  :ensure
   :config
   (require 'counsel)
   (counsel-projectile-on))
@@ -84,3 +91,6 @@
     ("SPC" mugu-menu-main-menu "return to main menu" :color blue)))
 
 (provide 'mugu-project)
+
+(provide 'mugu-project)
+;;; mugu-project ends here

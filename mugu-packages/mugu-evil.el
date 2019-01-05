@@ -4,19 +4,21 @@
 
 ;;; Code:
 (use-package key-chord
-  :ensure key-chord
   :demand
   :config (progn
             (key-chord-mode t)
             (setq key-chord-two-keys-delay 0.1)))
 
+(use-package undo-tree
+  :straight (:host gitlab :repo "mwasilewski/undo-tree"))
+
 ;;; loading package
 (use-package evil
-  :ensure
   :demand
-  :diminish undo-tree-mode
+  :diminish
   :config
   (evil-mode +1)
+  (setq evil-want-C-i-jump nil)
 
 ;;; motion
   )
