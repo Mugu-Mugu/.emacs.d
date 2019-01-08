@@ -1,4 +1,4 @@
-custom-set-variables
+(custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
@@ -125,6 +125,11 @@ custom-set-variables
  '(kill-do-not-save-duplicates t)
  '(kill-ring-max 200)
  '(latex-run-command "pdflatex")
+ '(lispy-close-quotes-at-end-p t)
+ '(lispy-safe-actions-no-pull-delimiters-into-comments t)
+ '(lispy-safe-copy t)
+ '(lispy-safe-delete t)
+ '(lispy-safe-paste t)
  '(magit-completing-read-function (quote ivy-completing-read))
  '(magit-dispatch-arguments nil)
  '(magit-log-arguments
@@ -160,14 +165,18 @@ custom-set-variables
  '(org-src-window-setup (quote other-window))
  '(org-startup-folded (quote content))
  '(org-startup-truncated nil)
-'(org-use-sub-superscripts (quote {}))
-'(powerline-evil-tag-style (quote verbose))
+ '(org-use-sub-superscripts (quote {}))
+ '(powerline-evil-tag-style (quote verbose))
  '(python-indent-guess-indent-offset nil)
  '(python-indent-offset 4)
  '(python-indent-trigger-commands (quote (indent-for-tab-command)))
  '(semantic-mode t)
  '(show-paren-mode t)
  '(show-paren-style (quote expression))
+ '(straight-check-for-modifications (quote (find-when-checking)))
+ '(straight-package-neutering-mode t)
+ '(straight-use-package-by-default t)
+ '(straight-use-package-mode t)
  '(tab-always-indent (quote complete))
  '(tab-width 4)
  '(tool-bar-mode nil)
@@ -222,8 +231,8 @@ custom-set-variables
  '(info-title-2 ((t (:inherit info-title-3 :height 0.9))))
  '(mode-line-highlight ((t (:box nil))))
  '(org-block-background ((t (:background "gray23"))))
- '(org-block-begin-line ((t (:inherit org-meta-line :background "gray21"))) t)
- '(org-block-end-line ((t (:inherit org-meta-line :background "gray21"))) t)
+ '(org-block-begin-line ((t (:inherit org-meta-line :background "gray21"))))
+ '(org-block-end-line ((t (:inherit org-meta-line :background "gray21"))))
  '(persp-selected-face ((t (:foreground "royal blue" :weight bold))))
  '(tooltip ((t (:inherit default :background "lightyellow" :foreground "black"))))
  '(variable-pitch ((t (:height 1.0 :family "Courier")))))

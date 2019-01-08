@@ -31,7 +31,7 @@
   (advice-add #'projectile-switch-project-by-name :before (lambda (project-file-path &rest args)
                                                             (setq mugu-project-dir-root (file-name-directory project-file-path))))
   ;; All projectile action use this recorded root no matter the current directory
-  (advice-add #'projectile-project-root :override (lambda () mugu-project-dir-root))
+  (advice-add #'projectile-project-root :override (lambda (&optional dir) mugu-project-dir-root))
 
   ;; this prevent these annoying behaviour ("not in a project" or others automatic project change)
   ;; changing a project should not be performed behind the scene (ie: indirectly through a directory change)

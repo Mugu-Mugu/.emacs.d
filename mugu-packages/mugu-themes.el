@@ -8,7 +8,7 @@
   :disabled)
 
 (use-package noctilux-theme
-  :demand))
+  :demand)
 
 (use-package badger-theme
   :disabled)

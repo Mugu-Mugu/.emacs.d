@@ -1,18 +1,23 @@
 * [#A] Inbox                                                         :refile:
-*** TODO window management wrapper
-*** TODO window config save & restore
-*** TODO alt jklh movement
-- for org
-- for ivy
-*** TODO bug company ret
 * BACKLOG
 *** [#C] Bugs                                                         :inbox:
-***** ACTIVE super star is broken
+***** ACTIVE super star refactoring
+- [X] Just a problem of dependency and initialisation
+- [X] performance is 10 times slower
+- [X] implemented poc
+- [X] find file recursive
+- [X] integrate file
+- [X] find dir recursive
+- [X] integrate dir
+- [ ] limit selection to 5000
+- [ ] improve dynamic prompt
 ***** TODO [#E] windows zz error
-***** TODO [#F] Fix window resize not taking into account left or right position and leading to inverted command for right windows
 ***** DONE org popup issue is back
 CLOSED: [2019-01-03 Thu 11:17]
-***** TODO  project root missing
+***** DONE project root missing
+CLOSED: [2019-01-05 Sat 14:48]
+***** TODO window config save & restore
+***** TODO bug company ret
 *** [#D] Enhancement                                                  :inbox:
 ***** TODO [#C] Outline mode in elisp
 ***** TODO Git
@@ -57,6 +62,13 @@ CLOSED: [2019-01-05 Sat 03:30]
 ******* DONE Outline new style in elisp
 changed the lispy outline commad + different header
 CLOSED: [2019-01-05 Sat 07:55]
+***** TODO window management wrapper
+***** TODO alt jklh movement
+- for org
+- for ivy
+***** TODO insert checkbox cmd
+***** TODO captured issues should be queriable or inserted first
+Those issues may not be complete at capture time and should be easily selectable so they may be finalized
 *** Projects
 ***** TODO [#A] Org Mode
 ******* Context
@@ -105,13 +117,14 @@ CLOSED: [2019-01-05 Sat 13:59]
 *** [#E] Future package
 ***** NEXT wgrep
 ***** TODO historian
-***** TODO general
+***** DONE general
+CLOSED: [2019-01-06 Sun 00:09]
 ***** TODO expand region
 ***** TODO sublim minimap
 *** [#F] Language
-***** TODO [#C] Ruby on Rails
+***** NEXT [#C] Ruby on Rails
 ***** TODO [#E] Python
-******* NEXT [#A] Fix the indentation issue  (O index)
+******* NEXT Fix the indentation issue  (O index)
 ******* TODO Completion
 ******* TODO Autoindent
 ******* TODO Better linter (less false positive)

@@ -28,7 +28,7 @@
    '(("p" ivy-copy-to-buffer-action "insert")
      ("y" ivy-yank-action "yank"))))
 
-(use-package  smex
+(use-package smex
   :defer)
 
 (use-package ivy-hydra
@@ -81,7 +81,6 @@
   (after 'key-chord
     (key-chord-define ivy-minibuffer-map "jk" 'soo-ivy/body)))
 
-
 (use-package counsel
   :after ivy
   :diminish counsel-mode
@@ -128,9 +127,9 @@
     (setq helm-quick-update t)))
 
 (use-package mugu-counsel
-  :after ivy
+  :commands (mugu-counsel-find-dir-recursive mugu-counsel-find-file-recursive mugu-counsel-find-anything-recursive )
   :defer
-  :straight  (:local-repo))
+  :straight (:local-repo))
 
 (provide 'mugu-interactive)
 ;;; mugu-interactive ends here
