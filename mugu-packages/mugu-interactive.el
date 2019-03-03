@@ -33,10 +33,15 @@
 
 (use-package ivy-hydra
   :after ivy
+  :commands soo-ivy/body
   :bind
   (:map ivy-minibuffer-map
-        ("C-o" . soo-ivy/body))
+        ("C-o" . soo-ivy/body)
+        ("M-j" . ivy-next-line)
+        ("M-k" . ivy-previous-line))
   :config
+  (general-def ivy-minibuffer-map
+    "<escape>" 'minibuffer-keyboard-quit)
   (require 'ivy)
   (defhydra soo-ivy (:hint nil :color amaranth)
     "
@@ -62,11 +67,12 @@
     ("<escape>" keyboard-escape-quit :exit t)
     ("C-o" nil)
     ("i" nil)
-    ("TAB" ivy-dispatching-call ivy-alt-done :exit nil)
+    ("TAB" ivy-dispatching-call  :exit nil)
     ("C-j" ivy-alt-done :exit nil)
     ;; ("d" ivy-done :exit t)
     ("RET" ivy-done :exit t)
     ("C-m" ivy-done :exit t)
+
     ("f" ivy-call)
     ("c" ivy-toggle-calling)
     ("m" ivy-toggle-fuzzy)
@@ -78,6 +84,13 @@
     ("t" (setq truncate-lines (not truncate-lines)))
     ("C" ivy-toggle-case-fold)
     ("o" ivy-occur :exit t))
+
+  (general-def ivy-minibuffer-map
+    "<escape>" 'minibuffer-keyboard-quit)
+
+  (after 'evil
+    (evil-set-initial-state 'grep-mode 'normal))
+
   (after 'key-chord
     (key-chord-define ivy-minibuffer-map "jk" 'soo-ivy/body)))
 
@@ -127,9 +140,15 @@
     (setq helm-quick-update t)))
 
 (use-package mugu-counsel
-  :commands (mugu-counsel-find-dir-recursive mugu-counsel-find-file-recursive mugu-counsel-find-anything-recursive )
+  :commands (call-with-fzf-matcher mugu-counsel-find-dir-recursive mugu-counsel-find-file-recursive mugu-counsel-find-anything-recursive mugu-counsel-super-star mugu-counsel-hyper-star)
   :defer
-  :straight (:local-repo))
+  :straight nil)
+
+(use-package smooth-scrolling
+  :defer 4
+  :disabled
+  :config
+  (smooth-scrolling-mode))
 
 (provide 'mugu-interactive)
 ;;; mugu-interactive ends here

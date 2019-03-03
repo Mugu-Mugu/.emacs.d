@@ -12,6 +12,9 @@
 
 (add-to-list 'load-path (concat user-emacs-directory "mugu-packages"))
 (add-to-list 'load-path (concat user-emacs-directory "mugu-packages" "/languages"))
+(add-to-list 'load-path (concat user-emacs-directory "mugu-packages" "/wrappers"))
+(add-to-list 'load-path (concat user-emacs-directory "src" "/pkg"))
+(add-to-list 'load-path (concat user-emacs-directory "src"))
 (add-to-list 'load-path (concat user-emacs-directory "site-lisp"))
 ;; Place custom settings in their own file.
 (setq custom-file (concat user-emacs-directory "mugu-packages/" "mugu-custom.el"))
@@ -49,41 +52,54 @@
 (require 'mugu-general)
 
 ;;; personal mandatory library and features
-(use-package mugu-site-lisp :straight (:local-repo))     ;; site dependant configuration
-(use-package mugu-hydra :straight (:local-repo))         ;; hydra extensions (add-head feature)
-(use-package mugu-core :straight (:local-repo))          ;; base settings + some functions
-(use-package mugu-directory-fix :straight (:local-repo)) ;; provide control on current working directory
-(use-package mugu-menu :straight (:local-repo))          ;; provide main interaction menu + some menu functions
+(use-package mugu-site-lisp :straight nil)
+(require 'mugu-hydra )
+(require 'mugu-core )
+(require 'mugu-directory-fix )
+(require 'mugu-menu )
 
 ;;; personal or external optional features
-(use-package mugu-sessions-persistance :straight (:local-repo))
-(use-package mugu-modeline :straight (:local-repo))
-(use-package mugu-interactive :straight (:local-repo))   ;; provide interactive selection (like ido/helm/ivy)
-(use-package mugu-motion :straight (:local-repo))        ;; provide goto-{anything} features
-(use-package mugu-completion :straight (:local-repo))
-(use-package mugu-git :straight (:local-repo))
-(use-package mugu-diff :straight (:local-repo))
-(use-package mugu-evil :straight (:local-repo))
-(use-package mugu-project :straight (:local-repo))
-(use-package mugu-workspace :straight (:local-repo))
-(use-package mugu-themes :straight (:local-repo))
-(use-package mugu-lint :straight (:local-repo))
-(use-package mugu-window :straight (:local-repo))
-(use-package mugu-shell :straight (:local-repo))
-(use-package mugu-bookmark :straight (:local-repo))
-(use-package mugu-fold :straight (:local-repo))
+(require 'mugu-sessions-persistance)
+(require 'mugu-modeline)
+(require 'mugu-interactive)
+(require 'mugu-motion)
+(require 'mugu-completion)
+(require 'mugu-git)
+(require 'mugu-diff)
+(require 'mugu-evil)
+(require 'mugu-project)
+(require 'mugu-themes)
+(require 'mugu-lint)
+(require 'mugu-window)
+(require 'mugu-shell)
+(require 'mugu-bookmark)
+(require 'mugu-fold)
+(require 'mugu-search )
+(require 'mugu-cosmetics)
 
 ;;; languages features
-(use-package mugu-ada :straight (:local-repo))
-(use-package mugu-lisp :straight (:local-repo))
-(use-package mugu-py :straight (:local-repo))
-(use-package mugu-org :straight (:local-repo))
-(use-package mugu-rust :straight (:local-repo))
-(use-package mugu-ruby :straight (:local-repo))
+(require 'mugu-lang)
 
 ;;; mugu
-(use-package mugu-keys :straight (:local-repo))
-(use-package mugu-autoload :straight (:local-repo))
+(require 'mugu-keys)
+(require 'mugu-autoload)
+
+;; to move elsewhere
+(use-package yaml-mode :defer)
+(set-frame-font "DejaVu Sans Mono-9:bold")
+(use-package web-mode :defer)
+(use-package rainbow-delimiters :defer 10
+  :hook
+  (prog-mode . rainbow-delimiters-mode)
+  :config)
+(use-package expand-region
+  :config
+  (general-def '(motion visual)
+    "RET" 'er/expand-region))
+
+(general-def '(motion visual)
+  "M-n" 'mc/mark-next-like-this)
+(use-package wgrep :defer)
 
 ;;; gather all *global* binding to enforce coherency
 

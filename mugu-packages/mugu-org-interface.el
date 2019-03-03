@@ -1,4 +1,4 @@
-;;; mugu-org-interface --- Summary
+;; mugu-org-interface --- Summary
 ;; tbc
 ;;; Commentary:
 ;;; Code:
@@ -7,6 +7,7 @@
 (require 'mugu-org-workflow)
 (require 'mugu-menu)
 (require 'ivy)
+(require 'mugu-lisp-libs)
 
 (defun mugu-orgi-switch-to-buffer-other-window (orig-fun &rest args)
   "Ugly but the original implementation popped frame when side window was open.
@@ -15,6 +16,34 @@ what it was intended to do.  Since it also unbound `display-buffer-alist' it was
 not possible to fix it otherwise.
 ORIG-FUN and ARGS are not read."
   (apply #'switch-to-buffer-other-window args))
+
+(defun mugu-orgi-insert-checkbox ()
+  "Insert a checkbox."
+  (interactive)
+  (newline-without-break-of-line)
+  (insert "- [ ] ")
+  (evil-insert-state))
+
+(defun mugu-orgi-insert-list-item ()
+  "Focus on entry at point by expanding it while hiding other."
+  (interactive)
+  (newline-without-break-of-line)
+  (insert "- ")
+  (evil-insert-state))
+
+(defun mugu-orgi-focus-headline ()
+  "Focus on entry at point by expanding it while hiding other."
+  (interactive)
+  (cl-letf (((symbol-function 'message) (lambda (&rest args) nil)))
+    (save-excursion
+      (org-overview))
+    (org-cycle)))
+
+(defun mugu-orgi-goto-focus-headline (headline)
+  "Go to HEADLINE and focus on it."
+  (interactive)
+  (mugu-orgu-action-headline-goto headline)
+  (mugu-orgi-focus-headline))
 
 (defun mugu-orgi--annotate-headline-for-ivy (headline)
   "Return a cons cell where car is an outline of HEADLINE and cdr is the HEADLINE."
@@ -60,52 +89,62 @@ headline action : %s" headline-p headline-action)
        (interactive)
        (mugu-orgi-counsel-headlines (mugu-orgu-list-headlines ,headline-p)
                                     ,headline-action))))
+(mugu-orgi-make-headline-query mugu-orgi-goto-leaf-headline
+                               #'mugu-orgw-leaf-headline-p #'mugu-orgi-goto-focus-headline)
 (mugu-orgi-make-headline-query mugu-orgi-refile-refilable-task
                                #'mugu-orgw-refilable-headline-p #'mugu-orgu-action-headline-refile)
 (mugu-orgi-make-headline-query mugu-orgi-goto-refilable-task
-                               #'mugu-orgw-refilable-headline-p #'mugu-orgu-action-headline-goto)
+                               #'mugu-orgw-refilable-headline-p #'mugu-orgi-goto-focus-headline)
 (mugu-orgi-make-headline-query mugu-orgi-goto-active-task
-                               #'mugu-orgw-active-headline-p #'mugu-orgu-action-headline-goto)
+                               #'mugu-orgw-active-headline-p #'mugu-orgi-goto-focus-headline)
 (mugu-orgi-make-headline-query mugu-orgi-goto-project-task
-                               #'mugu-orgw-project-headline-p #'mugu-orgu-action-headline-goto)
+                               #'mugu-orgw-project-headline-p #'mugu-orgi-goto-focus-headline)
 (mugu-orgi-make-headline-query mugu-orgi-goto-top-project-task
-                               #'mugu-orgw-top-project-headline-p #'mugu-orgu-action-headline-goto)
+                               #'mugu-orgw-top-project-headline-p #'mugu-orgi-goto-focus-headline)
 (mugu-orgi-make-headline-query mugu-orgi-goto-leaf-project-task
-                               #'mugu-orgw-leaf-project-headline-p #'mugu-orgu-action-headline-goto)
+                               #'mugu-orgw-leaf-project-headline-p #'mugu-orgi-goto-focus-headline)
 (mugu-orgi-make-headline-query mugu-orgi-goto-stuck-project-task
-                               #'mugu-orgw-stuck-project-headline-p #'mugu-orgu-action-headline-goto)
+                               #'mugu-orgw-stuck-project-headline-p #'mugu-orgi-goto-focus-headline)
 (mugu-orgi-make-headline-query mugu-orgi-goto-next-task
-                               #'mugu-orgw-next-headline-p #'mugu-orgu-action-headline-goto)
+                               #'mugu-orgw-next-headline-p #'mugu-orgi-goto-focus-headline)
+(mugu-orgi-make-headline-query mugu-orgi-goto-wait-task
+                               #'mugu-orgw-wait-headline-p #'mugu-orgi-goto-focus-headline)
 (mugu-orgi-make-headline-query mugu-orgi-goto-todo-task
-                               #'mugu-orgw-todo-headline-p #'mugu-orgu-action-headline-goto)
+                               #'mugu-orgw-todo-headline-p #'mugu-orgi-goto-focus-headline)
+(mugu-orgi-make-headline-query mugu-orgi-goto-any-todo
+                               #'mugu-orgw-leaf-todos-headline-p #'mugu-orgi-goto-focus-headline)
 (mugu-orgi-make-headline-query mugu-orgi-goto-any-task
-                               #'mugu-orgw-task-headline-p #'mugu-orgu-action-headline-goto)
+                               #'mugu-orgw-task-headline-p #'mugu-orgi-goto-focus-headline)
+(mugu-orgi-make-headline-query mugu-orgi-goto-global-capture-headline
+                               #'mugu-orgw-global-capture-headline-p #'mugu-orgi-goto-focus-headline)
+
 (mugu-orgi-make-headline-query mugu-orgi-goto-inbox-headline
-                               #'mugu-orgw-inbox-headline-p #'mugu-orgu-action-headline-goto)
+                               #'mugu-orgw-inbox-headline-p #'mugu-orgi-goto-focus-headline)
 
 (defsubst mugu-orgi-goto-agenda-file ()
   "."
   (interactive)
   (mugu-orgi-counsel-agenda-files #'find-file))
-
 (defsubst mugu-orgi-refile-refilable-headline () "."
   (interactive)
   (mugu-orgi-counsel-headlines #'mugu-orgw-list-refilable-headlines #'mugu-orgu-action-headline-refile))
-;;;###autoload (autoload 'mugu-orgi-menu-global "mugu-org-interface.el" nil t)
 
+;;;###autoload (autoload 'mugu-orgi-menu-global "mugu-org-interface.el" nil t)
 (defmenu mugu-orgi-menu-global (:color blue :hint nil)
   "Org mode external interface"
   ("aa" (mugu-orgw-agenda-global) "global agenda" :column "Agenda")
-  ("ct" (mugu-orgw-capture-todo #'mugu-orgi-goto-inbox-headline) "capture todo task" :column "Capture")
+  ("ct" (mugu-orgw-capture-todo #'mugu-orgi-goto-global-capture-headline) "capture todo task" :column "Capture")
+  ("ca" (mugu-orgw-capture-todo #'mugu-orgi-goto-active-task) "capture todo to active task")
+  ("cp" (mugu-orgw-capture-todo #'mugu-orgi-goto-project-task) "capture todo to project")
+  ("ci" (mugu-orgw-capture-todo #'mugu-orgi-goto-inbox-headline) "capture todo to inbox")
   ("cn" (mugu-orgw-capture-note (mugu-orgi-counsel-agenda-files)) "capture note")
   ("rr" (mugu-orgi-refile-refilable-task) "refile refilable" :column "Refile")
   ("gfa" (mugu-orgi-goto-agenda-file) "goto agenda files" :column "Goto File")
   ("gff" (switch-to-buffer (mugu-orgu-get-last-buffer-name)) "goto last visited")
-  ("ga" (mugu-orgi-goto-active-task) "goto active" :column "Goto Task")
-  ("gt" (mugu-orgi-goto-todo-task) "goto todo")
-  ("gg" (mugu-orgi-goto-any-task) "goto any")
-  ("gr" (mugu-orgi-goto-refilable-task) "goto refilable")
-  ("gn" (mugu-orgi-goto-next-task) "goto next")
+  ("ga" (mugu-orgi-goto-any-task) "goto task (any)" :column "Goto Task")
+  ("gt" (mugu-orgi-goto-any-todo) "goto task (leaf")
+  ("gg" (mugu-orgi-goto-leaf-headline) "goto any leaf headline")
+  ("gw" (mugu-orgi-goto-wait-task) "goto wait")
   ("gpp" (mugu-orgi-goto-project-task) "goto any project" :column "Goto Project")
   ("gpt" (mugu-orgi-goto-top-project-task) "goto a top project")
   ("gpl" (mugu-orgi-goto-leaf-project-task) "goto a leaf project")
@@ -198,6 +237,7 @@ headline action : %s" headline-p headline-action)
   ("a" org-archive-subtree "archive subtree")
   ("/" org-sparse-tree "search" :color blue :column "Search")
   ("q" mugu-orgi-menu-org-major-mode "Return to org menu" :color blue :column nil))
+
 (defmenu mugu-orgi-submenu-goto
   (:color blue :hint nil :inherit (mugu-orgi-menu-hjkl-hydra/heads))
   "Submenu gathering bindings for goto query."
@@ -222,12 +262,17 @@ headline action : %s" headline-p headline-action)
   ("r" org-refile "refile subtree" :column "Misc")
   ("t" org-todo "change TODO status")
   ("c" org-ctrl-c-ctrl-c "ctrl-c²")
-  ("f" org-fill-paragraph "fill paragraph")
-  ("f" evil-scroll-line-to-center "recenter view")
-  ("a" org-attach "attach interface" :column "Insert")
-  ("l" org-insert-link "insert link")
-  ("n" org-add-note "insert note")
-  ("u" org-set-tags-command "update tags")
+  ("f" (mugu-orgi-focus-headline) "focus")
+  ("ii" org-insert-todo-heading "todo" :column "insert")
+  ("is" org-insert-todo-subheading "sub-todo")
+  ("ip" org-insert-heading "plain heading")
+  ("ic" mugu-orgi-insert-checkbox "checkbox")
+  ("il" mugu-orgi-insert-list-item "item")
+  ;; ("a" org-attach "attach interface" :column "Insert")
+  ;; ("*" org-insert-heading "insert heading")
+  ;; ("l" org-insert-link "insert link")
+  ;; ("n" org-add-note "insert note")
+  ("u" org-set-tags-command "update tags" :column "metadata")
   ("p" (org-priority) "set priority")
   ("P" org-set-property "set property")
   ("RET" org-insert-heading "insert" :column "Terminate")
@@ -247,15 +292,6 @@ headline action : %s" headline-p headline-action)
   (setq org-agenda-restore-windows-after-quit 't)
   (setq org-agenda-inhibit-startup t)
   (setq org-agenda-dim-blocked-tasks nil)
-  ;; (setq org-agenda-ignore-drawer-properties '(effort appt category))
-  (define-key org-read-date-minibuffer-local-map (kbd "M-l")
-    (lambda () (interactive) (org-eval-in-calendar '(calendar-forward-day 1))))
-  (define-key org-read-date-minibuffer-local-map (kbd "M-h")
-    (lambda () (interactive) (org-eval-in-calendar '(calendar-backward-day 1))))
-  (define-key org-read-date-minibuffer-local-map (kbd "M-j")
-    (lambda () (interactive) (org-eval-in-calendar '(calendar-forward-week 1))))
-  (define-key org-read-date-minibuffer-local-map (kbd "M-k")
-    (lambda () (interactive) (org-eval-in-calendar '(calendar-backward-week 1))))
   (add-to-list 'display-buffer-alist
                '("CAPTURE*"
                  (display-buffer-in-side-window display-buffer-same-window display-buffer-use-some-window)
@@ -275,8 +311,8 @@ headline action : %s" headline-p headline-action)
                  (display-buffer-in-side-window)
                  (side . left)
                  (inhibit-switch-frame . t)
-                 (inhibit-same-window . t))
-               )
+                 (inhibit-same-window . t)))
+  (set-face-attribute 'org-todo nil :foreground "#ff3333" :background nil)
   (advice-add #'org-switch-to-buffer-other-window :around #'mugu-orgi-switch-to-buffer-other-window))
 
 (defun mugu-orgi-activate-menus ()
@@ -284,6 +320,26 @@ headline action : %s" headline-p headline-action)
   (add-hook 'org-agenda-mode-hook #'mugu-orgi-menu-agenda-major-mode)
   (mugu-menu-register-mode-menu 'org-agenda-mode 'mugu-orgi-menu-agenda-major-mode)
   (mugu-menu-register-mode-menu 'org-mode 'mugu-orgi-menu-org-major-mode))
+
+(defun mugu-orgi-configure-keys ()
+  "Gather keys binding in one place."
+  ;; (setq org-agenda-ignore-drawer-properties '(effort appt category))
+  (define-key org-read-date-minibuffer-local-map (kbd "M-l")
+    (lambda () (interactive) (org-eval-in-calendar '(calendar-forward-day 1))))
+  (define-key org-read-date-minibuffer-local-map (kbd "M-h")
+    (lambda () (interactive) (org-eval-in-calendar '(calendar-backward-day 1))))
+  (define-key org-read-date-minibuffer-local-map (kbd "M-j")
+    (lambda () (interactive) (org-eval-in-calendar '(calendar-forward-week 1))))
+  (define-key org-read-date-minibuffer-local-map (kbd "M-k")
+    (lambda () (interactive) (org-eval-in-calendar '(calendar-backward-week 1))))
+  (general-def org-mode-map
+    "M-j" 'org-move-subtree-down
+    "M-k" 'org-move-subtree-up
+    "M-h" 'org-do-promote
+    "M-l" 'org-do-demote
+    "M-g" 'org-promote-subtree
+    "M-m" 'org-demote-subtree))
+
 
 (provide 'mugu-org-interface)
 ;;; mugu-org-interface ends here

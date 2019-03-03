@@ -57,7 +57,7 @@
 
   (use-package mugu-lisp-utils
     :defer
-    :straight (:local-repo)
+    :straight nil
     :functions mugu-menu-register-mode-menu
     :commands mugu-lisp-main-menu
     :init

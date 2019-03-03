@@ -6,7 +6,7 @@
 
 (use-package mugu-bookmark-utils
   :defer t
-  :straight (:local-repo)
+  :straight nil
   :commands
   mugu-bookmark-register-dir
   mugu-bookmark-load-file

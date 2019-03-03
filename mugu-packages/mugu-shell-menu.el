@@ -16,13 +16,15 @@
   "
                                 -- SHELL MENU --
   -> Current Dir : %s(mugu-directory-pwd-file)
+  -> Mugu Dir : %s(mugu-directory-pwd)
 "
+  ("d" (mugu-shell-change-directory (mugu-directory-pwd)) "find dir" :column "1-find")
   ("cd" (mugu-shell-change-directory 'read-directory-name "directory:") "find dir" :column "1-find")
-  ("cr" (mugu-shell-change-directory 'mugu-counsel-read-recursive-dir) "find dir recursively")
+  ("cr" (mugu-shell-change-directory 'mugu-counsel-find-dir-recursive) "find dir recursively")
   ("cm" (mugu-shell-change-directory 'mugu-counsel-read-bookmark-dir) "find dir from bookmark")
   ("md" (mugu-shell-change-directory 'mugu-counsel-read-bookmark-dir) "find dir from bookmark")
   ("ff" (insert (read-file-name "select file:  ")) "find file")
-  ("fr" (insert (mugu-counsel-read-recursive-file)) "find file recursively")
+  ("fr" (insert (mugu-counsel-find-file-recursive)) "find file recursively")
   ("t" comint-truncate-buffer "trucate shell" :column "2-command")
   ("a" counsel-shell-history "again command")
   ("C-r" counsel-shell-history "again command"))

@@ -3,6 +3,9 @@
 ;;; Commentary:
 
 ;;; Code:
+(require 'use-package)
+
+
 (use-package key-chord
   :demand
   :config (progn
@@ -18,10 +21,11 @@
   :diminish
   :config
   (evil-mode +1)
-  (setq evil-want-C-i-jump nil)
+  (setq evil-want-C-i-jump nil))
 
-;;; motion
-  )
+(use-package evil-surround
+  :config
+  (global-evil-surround-mode 1))
 
 ;; super escape
 ;; to improve
@@ -35,6 +39,12 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
         (setq deactivate-mark  t)
       (when (get-buffer "*Completions*") (delete-windows-on "*Completions*"))
       (abort-recursive-edit)))
+
+(use-package evil-mc
+  :defer 4
+  :diminish
+  :config
+  (global-evil-mc-mode))
 
 (provide 'mugu-evil)
 ;;; mugu-evil ends here

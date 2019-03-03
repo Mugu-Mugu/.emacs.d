@@ -48,8 +48,9 @@
 (use-package mugu-shell-menu
   :defer t
   :after shell
-  :straight (:local-repo)
-  :config
+  :straight nil
+  :commands (mugu-menu-shell-main/body)
+  :init
   (mugu-menu-register-mode-menu 'shell-mode 'mugu-menu-shell-main/body))
 
 (use-package term

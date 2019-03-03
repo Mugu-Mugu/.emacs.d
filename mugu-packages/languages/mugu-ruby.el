@@ -3,58 +3,58 @@
 ;;; Commentary:
 
 ;;; Code:
+(require 'use-package)
+(require 'mugu-hydra)
+(require 'mugu-menu)
 
-(use-package robe
+(use-package rvm
+  :defer)
+
+(use-package rspec-mode
   :defer
+  :diminish
+  :after ruby-mode
   :config
-  (require 'mugu-menu)
-  ;; (defhydra mugu-rs-main-hydra
-  ;;    (:color blue :hint nil)
-  ;;    "
-  ;;                                 -- rust menu --
-  ;; "
-  ;;    ("cb" cargo-process-build "cargo build" :column "2-cargo")
-  ;;    ("ct" cargo-process-test "cargo test")
-  ;;    ("cr" cargo-process-run "cargo run")
-  ;;    ("g" racer-find-definition "goto def of symbol at point" :column "1-xref")
-  ;;    ("f" racer-describe "display documentation at point")
-  ;;    ("F" rust-format-buffer "reformat region or buffer"))
+  (setq rspec-use-rvm t)
+  (setq compilation-scroll-output t))
 
-  ;; (defalias 'mugu-rs-main-menu 'mugu-rs-main-hydra/body)
-
-  ;; (mugu-menu-register-mode-menu 'rust-mode 'mugu-rs-main-menu)
-  )
-
-
-;; (use-package racer
-;;   :after rust-mode
-;;   :ensure
-;;   :config
-;;   (setq racer-cmd "~/.cargo/bin/racer") ;; Rustup binaries PATH
-;;   (setq racer-rust-src-path "~/.cargo/rust/src") ;; Rust source code PATH
-;;   (add-hook 'rust-mode-hook #'racer-mode)
-;;   ;; (add-hook 'racer-mode-hook #'eldoc-mode)
-;;   ;; fixme : too slow now (at least on windows), remove when racer no longer spawn a process on each request
-;;   (setq eldoc-documentation-function nil)
-;;   (setq company-idle-delay 1.0)
-;;   (setq company-tooltip-idle-delay 1.0)
-;;   (setq company-quickhelp-delay 1.0)
-;;   (add-hook 'racer-mode-hook #'company-mode))
-
-;; (use-package flycheck-rust
-;;   :after rust-mode
-;;   :ensure
-;;   :config
-;;   (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
-
-(use-package enh-ruby-mode
-  :mode (("Appraisals\\'" . enh-ruby-mode)
-         ("\\(Rake\\|Thor\\|Guard\\|Gem\\|Cap\\|Vagrant\\|Berks\\|Pod\\|Puppet\\)file\\'" . enh-ruby-mode)
-         ("\\.\\(rb\\|rabl\\|ru\\|builder\\|rake\\|thor\\|gemspec\\|jbuilder\\)\\'" . enh-ruby-mode))
-  :interpreter "ruby"
-  :custom
-  (enh-ruby-deep-indent-paren nil)
-  (enh-ruby-hanging-paren-deep-indent-level 2))
+(use-package ruby-mode
+  :hook
+  (ruby-mode . lsp)
+  (ruby-mode . flycheck-mode)
+  :mode ("\\.rb\\'" . ruby-mode)
+  :init
+  :commands mugu-ruby-menu
+  :config
+  (mugu-menu-register-mode-menu 'ruby-mode 'mugu-ruby-menu)
+  (advice-add 'lsp-ui-flycheck-enable :after #'mugu-ruby-force-rubocop)
+  (defmenu mugu-ruby-menu
+    (:color blue :hint nil :inherit (mugu-lsp-menu-hydra/heads))
+    "menu for ruby mode"
+    ("tt" rspec-verify "verify test" :column "rspec")
+    ("tr" rspec-rerun "rerun test")
+    ("tg" mugu-ruby-toggle-spec-and-target "switch spec/file")
+    ("tm" mugu-ruby-verify-method "verify method")
+    ("ts" rspec-verify-single "verify example")
+    ("ta" rspec-verify-all "verify project"))
+  (defun mugu-ruby-force-rubocop (&rest args)
+    "Args."
+    (setq-local flycheck-checker 'ruby-rubocop))
+  (defun mugu-ruby-toggle-spec-and-target ()
+    "Try to toggle method spec and implem."
+    (interactive)
+    (let ((buffer-name (buffer-name)))
+      (ignore-errors (rspec-toggle-spec-and-target-find-example))
+      (when (eq buffer-name (buffer-name))
+        (rspec-toggle-spec-and-target))))
+  (defun mugu-ruby-verify-method ()
+    "Try to verify current method."
+    (interactive)
+    (if (rspec-spec-file-p (buffer-file-name))
+        (ignore-errors (save-excursion (rspec-toggle-spec-and-target-find-example)
+                                       (rspec-verify-method)
+                                       (rspec-toggle-spec-and-target-find-example)))
+      (rspec-verify-method))))
 
 (provide 'mugu-ruby)
 ;;; mugu-ruby ends here

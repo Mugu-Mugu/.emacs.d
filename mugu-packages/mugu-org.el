@@ -9,7 +9,7 @@
 
 
 (use-package org-agenda
-  :straight (:local-repo)
+  :straight nil
   :defer t
   :functions mugu-org-menu/agenda-menu mugu-menu-register-mode-menu
   :after org
@@ -25,21 +25,22 @@
   :defer t)
 
 (use-package org-indent
-  :straight (:local-repo)
+  :straight nil
   :defer t
   :after org
   :delight org-indent-mode)
 
 (use-package mugu-org-interface
-  :straight (:local-repo)
+  :straight nil
   :defer t
   :after org
   :config
   (mugu-orgi-set-configuration)
-  (mugu-orgi-activate-menus))
+  (mugu-orgi-activate-menus)
+  (mugu-orgi-configure-keys))
 
 (use-package mugu-org-workflow
-  :straight (:local-repo)
+  :straight nil
   :defer t
   :after org
   :config

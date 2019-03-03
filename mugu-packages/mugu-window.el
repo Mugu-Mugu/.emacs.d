@@ -2,6 +2,7 @@
 (require 'mugu-menu)
 (require 'hydra)
 (require 'winner)
+(require 'use-package)
 
 (winner-mode +1)
 ;; configure boring buffer disposition
@@ -95,7 +96,7 @@ If SIDE is non-nil only get windows on that side."
   ("v" split-window-right "split window vertically" :color blue)
   ("d" delete-window "delete current window")
   ("D" mugu/delete-others-windows "delete *all* other windows")
-  ("f" follow-mode "toogle follow mode")
+  ("f" zoom "focus")
   ("u" winner-undo "undo window conf" :column "3-Undo/Redo")
   ("r" winner-redo "redo window conf")
   ("b" balance-windows "balance window height" :column "4-Sizing")
@@ -106,6 +107,16 @@ If SIDE is non-nil only get windows on that side."
   ("SPC" mugu-menu-main-menu "return to main menu" :color blue))
 
 (defalias 'mugu-window-menu  'mugu-window-hydra/body )
-(mugu-menu-register-permanent-menu '("z" mugu-window-menu "windows menu" :color blue))
+
+;; (use-package golden-ratio
+;;   :defer 5
+;;   :config
+;;   (setq golden-ratio-auto-scale t)
+;;   (golden-ratio-mode 1))
+
+(use-package zoom
+  :defer 5
+  :custom
+  (zoom-size '(0.618 . 0.618)))
 
 (provide 'mugu-window)

@@ -3,18 +3,11 @@
 ;;; Commentary:
 (require 'mugu-core)
 (require 'evil)
+(require 'general)
 
 ;;; Code:
 (use-package avy
   :defer
-  :bind
-  (:map evil-normal-state-map
-        ("s" . avy-goto-char-2)
-        ("S" . avy-goto-line)
-        ("t" . evil-mugu-motion-t)
-        ("T" . evil-mugu-motion-T)
-        ("f" . evil-mugu-motion-f)
-        ("F" . evil-mugu-motion-F))
   :config
   (require 'mugu-motion-utils)
   (setq avy-case-fold-search t)
@@ -23,17 +16,13 @@
   (setq avy-style 'at-full)
   (setq avy-keys (number-sequence ?a ?z))
   (setq avy-timeout-seconds 0.3)
-  (evil-define-key 'motion evil-motion-state-map
-    "s" 'avy-goto-char-2
-    "S" 'avy-goto-line
-    "t" 'evil-mugu-motion-t
-    "T" 'evil-mugu-motion-T
-    "f" 'evil-mugu-motion-f
-    "F" 'evil-mugu-motion-F))
+  (general-def 'motion
+    "F" 'evil-avy-goto-line
+    "f" 'evil-avy-goto-char-2))
 
 (use-package mugu-motion-utils
   :defer
-  :straight (:local-repo))
+  :straight nil)
 
 (use-package ace-window
   :defer

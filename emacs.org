@@ -1,145 +1,342 @@
-* [#A] Inbox                                                         :refile:
-* BACKLOG
-*** [#C] Bugs                                                         :inbox:
-***** ACTIVE super star refactoring
-- [X] Just a problem of dependency and initialisation
-- [X] performance is 10 times slower
-- [X] implemented poc
-- [X] find file recursive
-- [X] integrate file
-- [X] find dir recursive
-- [X] integrate dir
-- [ ] limit selection to 5000
-- [ ] improve dynamic prompt
-***** TODO [#E] windows zz error
-***** DONE org popup issue is back
-CLOSED: [2019-01-03 Thu 11:17]
-***** DONE project root missing
-CLOSED: [2019-01-05 Sat 14:48]
-***** TODO window config save & restore
-***** TODO bug company ret
-*** [#D] Enhancement                                                  :inbox:
-***** TODO [#C] Outline mode in elisp
-***** TODO Git
-******* NEXT Better diff
+* emacs
+** [#B] Short Tasks                                                  :quicky:
+*** DONE improve logic of org todo sort
+much better and cleaner implementation
+CLOSED: [2019-03-03 dim. 20:53]
+should get all todos from parent
+apply todo score on each
+with a coeff based on level
+*** NEXT guake
+*** NEXT improve ivy hydra behaviour
+- autoload is broken
+- passive and active keymap?
+*** ACTIVE perspective change buffer order?
+*** NEXT ivy remove ^ in some default prompt
+*** DONE [#A] fix star bug
+CLOSED: [2019-03-02 sam. 18:14]
+*** DONE [#A] f and t in emacs shoud be bedirectional because of avy
+CLOSED: [2019-02-09 sam. 15:56]
+*** DONE [#A] variety
+CLOSED: [2019-02-07 jeu. 07:03]
+
+*** DONE [#A] makes expand works from visual
+CLOSED: [2019-02-10 dim. 09:18]
+just doesn't work in emacs mode due to lispy but does work otherwise
+*** DONE telephone line
+CLOSED: [2019-03-03 dim. 17:29]
+**** DONE Improve default color theme for evil state
+CLOSED: [2019-03-03 dim. 17:24]
+**** DONE Replace modified status by *
+CLOSED: [2019-03-03 dim. 01:59]
+**** DONE define segment
+CLOSED: [2019-03-03 dim. 17:25]
+**** DONE inactive?
+CLOSED: [2019-03-03 dim. 17:25]
+**** DONE fucking bug prevent to propertize
+CLOSED: [2019-03-03 dim. 17:25]
+*** DONE emacs 26
+CLOSED: [2019-03-03 dim. 17:29]
+*** DONE pixel mode
+CLOSED: [2019-03-03 dim. 17:42]
+*** DONE refix org mode font
+CLOSED: [2019-03-03 dim. 17:47]
+*** DONE projectile normal behaviour
+CLOSED: [2019-03-01 ven. 22:46]
+*** DONE task priority should take into account priority of the top level parent
+CLOSED: [2019-02-16 sam. 00:26]
+*** DONE multiple cursor
+CLOSED: [2019-02-17 dim. 10:16]
+base installed but must be tweaked after some use
+*** DONE org mode focus on headline
+CLOSED: [2019-02-17 dim. 11:10]
+*** DONE escape minibuffer faster
+CLOSED: [2019-02-16 sam. 00:35]
+- esc need to be pressed 3 times?
+- c-g is faster but somewhat hard to press
+*** DONE make a headline command to search all headline
+CLOSED: [2019-02-15 ven. 07:05]
+including non task
+- do i need to go to a todo only task?
+- do i need to go to a refilable task?
+- do i need to go to a next task?
+- probably not as the sort garranteed i go to the most usefull first
+- [X] gt => to task (only leaf, like current gg)
+- [X] ga => to any task (all level)
+- [X] gg => to anything
+- [X] gw => to waiting
+*** DONE alt jkl org mode also in insert mode
+CLOSED: [2019-02-09 sam. 14:18]
+*** DONE Gnome extensions to consider
+CLOSED: [2019-02-09 sam. 14:16]
+- [X] gnome activities configuration
+- [X] drop down terminal
+- [X] auto move window
+*** DONE disable zoom
+CLOSED: [2019-02-09 sam. 13:54]
+auto resize is good but it creates many window I have to kill after
+*** DONE Capture to active task
+CLOSED: [2019-02-02 sam. 18:35]
+*** DONE List waiting task
+CLOSED: [2019-02-02 sam. 21:54]
+*** DONE Capture to project
+CLOSED: [2019-02-02 sam. 18:51]
+*** DONE alt jklh movement
+CLOSED: [2019-02-03 dim. 09:47]
+- for org
+*** DONE capture to everything current active / inbox / project?
+CLOSED: [2019-02-02 sam. 22:13]
+*** DONE breadcrumbs todo prefix
+CLOSED: [2019-02-02 sam. 22:20]
+*** DONE golden ration
+CLOSED: [2019-02-03 dim. 10:27]
+*** DONE Sort order should consider todo state of parents
+CLOSED: [2019-02-07 jeu. 10:48]
+an active project should have child with more prioritary
+- 100 coeff
+- todo neutral
+- wait -1
+- active +2
+- next +1
+*** DONE try tetradacyle for firefox
+CLOSED: [2019-02-08 ven. 17:43]
+*** DONE colored paranthesis
+CLOSED: [2019-02-09 sam. 16:02]
+*** DONE bind on demand zoom goolden ratio
+much better now
+CLOSED: [2019-02-09 sam. 16:08]
+*** DONE evil surroud
+CLOSED: [2019-02-09 sam. 23:51]
+*** DONE expand region
+CLOSED: [2019-02-09 sam. 23:56]
+*** DONE org file should have only 1 entry point
+CLOSED: [2019-02-15 ven. 06:27]
+- [X] org file should start with a single root headline
+- [X] outline breadcrumbs should omit filename as a root node already exist
+*** DONE minibuffer easier escape
+CLOSED: [2019-02-17 dim. 11:30]
+*** DONE better insert in org mode
+CLOSED: [2019-02-17 dim. 21:34]
+could be improvable, i/a sematics
+*** DONE fix shell menu
+CLOSED: [2019-02-17 dim. 22:06]
+- [X] not bound
+*** CANCELLED org mode hiearchy todo improvement
+CLOSED: [2019-02-28 jeu. 22:07]
+what problem am i trying to solve there?
+- notion of todo order
+- when setting leaf, set parent to same level?
+can not be automatic, should be on demand
+*** CANCELLED Improve local search headline
+useless because of global search and focus?
+CLOSED: [2019-02-17 dim. 11:29]
+- goto child list item
+- goto sibling task
+- goto all from root task
+*** CANCELLED expand region word line paraph entire? in some it doesnt work like this
+not precse enough
+CLOSED: [2019-02-17 dim. 11:29]
+*** CANCELLED zoom should not balance ediff
+CLOSED: [2019-02-09 sam. 13:54]
+*** CANCELLED investigate dash doc
+useless as there is no integration wihin emacs
+it opens html file
+CLOSED: [2019-02-09 sam. 14:50]
+*** CANCELLED insert checkbox cmd
+actually very hard to do it properly
+would require some heavy hacking
+CLOSED: [2019-02-03 dim. 10:06]
+*** TODO try imenu origamijk
+*** TODO [#A] flychceck in telephone-line should be greyed when inactive
+** [#A] Inbox                                                       :refile:
+** BACKLOG
+*** [#C] Bugs                                                       :inbox:
+**** DONE [#E] windows zz error
+CLOSED: [2019-02-02 sam. 17:50]
+**** DONE org popup issue is back
+CLOSED: [2019-01-03 jeu. 11:17]
+**** DONE project root missing
+CLOSED: [2019-01-05 sam. 14:48]
+**** CANCELLED solargraph issue
+CLOSED: [2019-02-06 mer. 10:42]
+*** [#D] Enhancement                                                :inbox:
+**** Better configuration logic
+***** Etat des lieux
+- use-package with light configuration
+  powerline / emacs libs
+- global framework
+  flycheck
+- wrapping with multiple package integration
+  org mode / shell / workspace : persp & projectile
+- lazy integration
+  fast loading for evrything
+***** Package
+- feature
+  - realize an objective
+  - may use direct package without any configuration or a collection of packages without common initialization
+  - may use a collection of packages that requires a common configuration initialisation and lazy thing
+  - manage the lazy loading
+- libs
+  - no configuration logic, just direct require
+  - no automatic actions, just function
+- example
+**** NEXT [#D] configure google this
+**** NEXT refactor mode
+**** NEXT configure ediff/smerge/emerge for magit
+**** TODO [#C] Global outshine rather than origami
+**** TODO [#A] mobile synchro
+- view todo during train
+- create new todo during train
+**** TODO Git
+***** NEXT Better diff
 - [ ] in merge view, it displays a 2 way diff while we need a 3 way diff
 - [ ] in diff view, it displays a 3 way diff while we need a 2 way diff
 - [ ] in merge view, it's not possible to take A or B contribution in one key press
-******* TODO buffer local commands
+***** TODO buffer local commands
 - To be able to look for history of a file
 - To be able to compare this file vs any other version
-******* TODO [#F] blame wrapper
-***** TODO Directory history
-***** TODO Ivy occur wrapper
-***** TODO Emacs.d management
-- navigate to emacs source from everywhere either by perspective or by custom entry in mugu menu
-- make dependencies explicit
-***** TODO [#D] Term mode
-******* NEXT Some bugs with ctrl-c
-***** TODO Refactoring tools
-******* NEXT [#B] Elisp
-***** TODO Better customization
-******* NEXT Counsel support
-- list customizations variables with counsel
-- list modified variables with counsel
-******* TODO Custom file should be temporary
-Value setted inside should be moved back into their configuration package
-***** DONE Melpa to Straight
-***** DONE Folding
-CLOSED: [2019-01-05 Sat 03:30]
-******* DONE Origami
-CLOSED: [2019-01-04 Fri 13:48]
-******* DONE Outline
-CLOSED: [2019-01-04 Fri 13:48]
-******* DONE Integration
-CLOSED: [2019-01-05 Sat 03:30]
+***** TODO [#F] blame wrapper
+***** TODO Forge
+**** TODO [#E] Directory history
+**** TODO Ivy occur wrapper
+**** TODO Wgrep wrapper
+**** TODO [#D] Term mode
+***** NEXT Some bugs with ctrl-c
+**** TODO window management wrapper
+**** TODO capture idea?
+**** TODO Folding
+***** DONE Origami
+CLOSED: [2019-01-04 ven. 13:48]
+***** DONE Outline
+CLOSED: [2019-01-04 ven. 13:48]
+***** DONE Integration
+CLOSED: [2019-01-05 sam. 03:30]
 - [X] define local commands
 - [X] define global commands
 - [X] detect if fold present at point
 - [X] define navi commands
 - [X] improve navi fold commands
 - [X] configure initialisation
-******* DONE Outline new style in elisp
+***** DONE Outline new style in elisp
 changed the lispy outline commad + different header
-CLOSED: [2019-01-05 Sat 07:55]
-***** TODO window management wrapper
-***** TODO alt jklh movement
-- for org
-- for ivy
-***** TODO insert checkbox cmd
-***** TODO captured issues should be queriable or inserted first
-Those issues may not be complete at capture time and should be easily selectable so they may be finalized
+CLOSED: [2019-01-05 sam. 07:55]
+***** NEXT [#C] Multi fold level management
+**** DONE [#A] configure sx
+CLOSED: [2019-02-10 dim. 14:38]
+**** DONE [#A] Remove perspective, better wrap/integration of projectile
+CLOSED: [2019-01-16 mer. 07:34]
+- [X] override project root computation
+- [X] give means to switch the project (and the project root easily)
+- [X] search from root project
+- [X] directory control
+- [X] buffer switch
+**** DONE [#B] Universal fzf filtering
+CLOSED: [2019-02-14 jeu. 22:47]
+**** DONE ruby rspec integration
+CLOSED: [2019-02-02 sam. 22:00]
+- launch test current buffer
+- launch test project
+
+**** DONE Melpa to Straight
+**** CANCELLED [#B] projectile windows configuration
+CLOSED: [2019-02-10 dim. 15:32]
+restore projectile original design. Buffer switch automatic but with a manually tracked mugu-directory.
+looks very hard because perspective is broken and unmaintained
+**** TODO view histoy of a file
+**** TODO javascript prettifyer
+**** NEXT [#B] language with a fixed menu and a remap that bind feature
 *** Projects
-***** TODO [#A] Org Mode
-******* Context
-******* Inbox                                                        :refile:
-******* Bugs
-********* DONE Prevent the frame popup for capture
-********* DONE Implement selector for todo and any task
-********* DONE prevent the frame popup for org todo
-********* DONE file is broken in outline in task queries
-******* DONE capture to headline marked with a tag
-CLOSED: [2019-01-05 Sat 13:55]
+**** TODO [#A] Org Mode
+***** Context
+***** Bugs
+****** DONE Prevent the frame popup for capture
+****** DONE Implement selector for todo and any task
+****** DONE prevent the frame popup for org todo
+****** DONE file is broken in outline in task queries
+***** DONE capture to headline marked with a tag
+CLOSED: [2019-01-05 sam. 13:55]
 - bug base headline to query headlines with exact :bugs: tag
 - todo base headline to query headlines with exact :inbox-bugs: tag
 - quickie :quicky: with exact tag to :inbox:
 - enhancement :enhancement:
 - metro :train:
-******* NEXT [#E] Implement headline counsel action
-******* TODO Workflow enhancement
-- is next really usefull?
-- when selecting all task, local task priority takes over. Is priority global or should it be local and guided by headline order?
-- relative priority concept
-******* TODO [#E] implement narrowing for org mode
-******* DONE Recursive sort
-CLOSED: [2019-01-03 Thu 07:23]
+***** TODO [#E] Implement headline counsel action
+***** NEXT implement narrowing for org mode
+***** DONE Recursive sort
+CLOSED: [2019-01-03 jeu. 07:23]
 very important because a sorted tree is paramount to visualize data and org mode doesnt provide a way to organize data aside of agenda
-******* DONE Implement sorting strategy
-******* DONE Je veux pouvoir enregistrer une action future depuis n'importe où
-******* DONE Use case: deadline, scheduling
-******* DONE Query for active tasks
-******* DONE Use case: visualising task
-******* DONE Use case: complex task
-********* DONE Select both
-********* DONE Select only project task
-********* DONE Select only leaf task
-********* DONE Configure stuck project
-********* DONE What next task should be done?
-******* DONE Je veux pouvoir reclasser rapidement une action
-******* DONE implement agenda with new feature
-******* DONE Enable local task selection
-******* DONE Substitute old implementation
-******* DONE set property
-CLOSED: [2019-01-03 Thu 08:36]
-******* DONE focus after goto
-CLOSED: [2019-01-05 Sat 13:59]
-***** TODO [#F] Wiew
+***** DONE Implement sorting strategy
+***** DONE Je veux pouvoir enregistrer une action future depuis n'importe où
+***** DONE Use case: deadline, scheduling
+***** DONE Query for active tasks
+***** DONE Use case: visualising task
+***** DONE Use case: complex task
+****** DONE Select both
+****** DONE Select only project task
+****** DONE Select only leaf task
+****** DONE Configure stuck project
+****** DONE What next task should be done?
+***** DONE Je veux pouvoir reclasser rapidement une action
+***** DONE implement agenda with new feature
+***** DONE Enable local task selection
+***** DONE Substitute old implementation
+***** DONE set property
+CLOSED: [2019-01-03 jeu. 08:36]
+***** DONE focus after goto
+CLOSED: [2019-01-05 sam. 13:59]
+***** TODO can improve insertion in org mode
+- [ ] checkbox comprehenstion
+- [ ] append/insert comprehension
+***** TODO agenda integration
+**** TODO [#F] Wiew
 *** [#E] Future package
-***** NEXT wgrep
-***** TODO historian
-***** DONE general
-CLOSED: [2019-01-06 Sun 00:09]
-***** TODO expand region
-***** TODO sublim minimap
+**** DONE wgrep
+CLOSED: [2019-03-03 dim. 17:46]
+**** TODO historian
+**** DONE general
+CLOSED: [2019-01-06 dim. 00:09]
+**** TODO sublim minimap
+**** TODO Slack in emacs!
+*** [#F] Maybe
+**** TODO store good practice / ideas ?
+**** TODO [#E] ivy save/set view
+**** TODO Better customization
+***** NEXT Counsel support
+- list customizations variables with counsel
+- list modified variables with counsel
+***** TODO Custom file should be temporary
+Value setted inside should be moved back into their configuration package
 *** [#F] Language
-***** NEXT [#C] Ruby on Rails
-***** TODO [#E] Python
-******* NEXT Fix the indentation issue  (O index)
-******* TODO Completion
-******* TODO Autoindent
-******* TODO Better linter (less false positive)
-* Review
+**** DONE [#B] Ruby on Rails
+CLOSED: [2019-02-09 sam. 17:05]
+***** DONE code lint
+CLOSED: [2019-01-16 mer. 07:37]
+***** DONE basic completion
+CLOSED: [2019-01-16 mer. 07:39]
+***** DONE advanced fuzzy completion
+CLOSED: [2019-02-09 sam. 17:05]
+limited support
+***** DONE rails support (projectile?)
+CLOSED: [2019-02-09 sam. 17:05]
+***** DONE rspec
+CLOSED: [2019-01-28 lun. 07:15]
+**** DONE [#E] Python
+CLOSED: [2019-02-09 sam. 17:05]
+***** DONE Fix the indentation issue  (O index)
+CLOSED: [2019-02-09 sam. 17:05]
+***** DONE Completion
+CLOSED: [2019-02-09 sam. 17:05]
+***** DONE Autoindent
+CLOSED: [2019-02-09 sam. 17:05]
+***** DONE Better linter (less false positive)
+CLOSED: [2019-02-09 sam. 17:05]
+** Review
 *** TODO [#F] Emacs backlog
-SCHEDULED: <2018-01-14 Sun .+1w/2w>
+SCHEDULED: <2018-01-14 dim. .+1w>
 :LOGBOOK:
-- State "DONE"       from "TODO"       [2018-01-07 Sun 15:37]
-- State "DONE"       from "TODO"       [2018-01-07 Sun 15:36]
-:END:
+nil:END:
 :PROPERTIES:
-:STYLE:    habit
-:LAST_REPEAT: [2018-01-07 Sun 15:37]
-:END:
-* 2018
+nil:END:
+** 2018
 *** 2018-01 January
-***** 2018-01-07 Sunday
-******* [2018-01-07 Sun 16:14]  at last, the org workflow has been outlined and is ready to use
+**** 2018-01-07 Sunday
+***** [2018-01-07 dim. 16:14]  at last, the org workflow has been outlined and is ready to use

@@ -30,6 +30,18 @@ If SENTINEL is not nil, it's called when CMD expires."
           cands
         (list "no match")))))
 
+(defun mugu-counsel-fzf-matcher (regex candidates)
+  "Matcher using fzf.
+REGEX CANDIDATES."
+  (with-temp-file mugu-counsel-temp-file
+    (insert (mapconcat 'identity candidates "\n")))
+  (mugu-counsel-fzf-filter-get-candidates ivy-text))
+
+(defun call-with-fzf-matcher (func)
+  "Call FUNC with a ivy matcher set to `mugu-counsel-fzf-matcher'."
+  (cl-letf (((symbol-function 'ivy-state-matcher) (lambda (_) #'mugu-counsel-fzf-matcher)))
+    (funcall func)))
+
 (defun mugu-counsel-async-external-cmd (cmd)
   "Interactivly select result from external CMD with fzf in a ivy session.
 No action is applied but the selected string is returned.

@@ -11,8 +11,7 @@
   (:map company-active-map
         ("M-j" . company-select-next)
         ("M-k" . company-select-previous)
-        ("M-j" . company-select-next)
-        ("M-k" . company-select-previous)
+        ("M-i" . company-select-previous)
         ("<tab>" . company-complete-selection)
         ("<return>" . company-return-exit)
         ("SPC" . mugu-company-space-exit))

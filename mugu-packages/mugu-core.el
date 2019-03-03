@@ -73,6 +73,7 @@
   (declare (indent defun))
   `(eval-after-load ,feature
      '(progn ,@body)))
+(menu-bar-mode -1)
 
 (global-hl-line-mode t)
 (set-face-background 'hl-line "#3e4446")
@@ -92,11 +93,23 @@
   (global-whitespace-mode 1))
 
 
+ (defun mugu-scroll-lines (increment)
+  "Scroll by INCREMENT lines.
+if INCREMENP is negative, it scrolls up."
+  (interactive)
+  (let ((scroll-preserve-screen-position 1))
+    (scroll-up increment)
+    ;; (forward-line increment)
+    ))
+
+
 ;;; transparency
 (set-frame-parameter (selected-frame) 'alpha '(90 90))
 (add-to-list 'default-frame-alist '(alpha 90 90))
 
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
+
+
 
 (provide 'mugu-core)
 ;;; mugu-core ends here

@@ -42,6 +42,10 @@
 (require 'org-habit)
 
 ;; * Headlines predicate
+(defun mugu-orgw-leaf-headline-p (headline)
+  "Predicate determining if HEADLINE is leaf."
+  (not (mugu-orgu-headline-get-childs headline)))
+
 (defun mugu-orgw-refilable-headline-p (headline)
   "Predicate determining if HEADLINE is refilable."
   (-contains? (mugu-orgu-get-tags headline 'inherit 'inherit-only)
@@ -50,13 +54,24 @@
 (defun mugu-orgw-inbox-headline-p (headline)
   "Predicate determining if HEADLINE is a inbox."
   (-intersection (mugu-orgu-get-tags headline)
-                 '("inbox" "refile")))
+                 '("quicky" "refile")))
+
+(defun mugu-orgw-global-capture-headline-p (headline)
+  "Predicate determining if HEADLINE is a global capture targer.
+Either a inbox, a project or an active task."
+  (or (mugu-orgw-inbox-headline-p headline)
+      (mugu-orgw-active-headline-p headline)
+      (mugu-orgw-project-headline-p headline)))
 
 (defun mugu-orgw-active-headline-p (headline)
   "Predicate determining if HEADLINE is active.
 Only leaf headline are considered."
   (and (equal (org-element-property :todo-keyword headline) "ACTIVE")
        (not (mugu-orgu-headline-has-child-with-todo-keywords headline '("ACTIVE")))))
+
+(defun mugu-orgw-wait-headline-p (headline)
+  "Predicate determining if HEADLINE is waiting."
+  (equal (org-element-property :todo-keyword headline) "WAIT"))
 
 (defun mugu-orgw-todo-headline-p (headline)
   "Predicate determining if HEADLINE is active.
@@ -91,7 +106,16 @@ Such a headline is a project with no child project."
 
 (defun mugu-orgw-task-headline-p (headline)
   "Predicate determining if HEADLINE is a task."
-  (equal 'todo (org-element-property :todo-type headline)))
+  (org-element-property :todo-type headline))
+
+(defun mugu-orgw-todos-headline-p (headline)
+  "Predicate determining if HEADLINE is a task."
+  (eq 'todo (org-element-property :todo-type headline)))
+
+(defun mugu-orgw-leaf-todos-headline-p (headline)
+  "Predicate determining if HEADLINE is a task."
+  (and (mugu-orgw-todos-headline-p headline)
+       (-none? 'mugu-orgw-todos-headline-p (mugu-orgu-headline-get-childs headline))))
 
 (defun mugu-orgw-stuck-project-headline-p (headline)
   "Predicate determining if HEADLINE is a stuck project.
@@ -99,25 +123,46 @@ Such a headline is a project with no active or next child."
   (and (mugu-orgw-project-headline-p headline)
        (not (mugu-orgu-headline-has-child-with-todo-keywords headline '("ACTIVE" "NEXT")))))
 
-(defun mugu-orgw-sort-get-score-headline (&optional headline)
+(defun mugu-orgw-todo-rank (todo-keyword)
+  "Return an integer mapping a TODO-KEYWORD to its sort rank."
+  (pcase todo-keyword
+    ("ACTIVE" 10)
+    ("NEXT" 5)
+    ("TODO" 1)
+    ("WAIT" -1)
+    ("DONE" -5)
+    ("CANCELLED" -10)
+    (_ 0)))
+
+(defun mugu-orgw-get-todo-score (quicky-bonus headline &optional print-message)
+  "Return the aggregated todo score of the HEADLINE.
+It takes into account todo lineage.
+If QUICKY-BONUS is not nil, the headline is ranked one level higher.
+If PRINT-MESSAGE is true, print message instead."
+  (interactive (list nil (mugu-orgu-element-at-point) 'print))
+  (let* ((start-index (if quicky-bonus 5 4))
+         (result (-sum
+                  (--map-indexed
+                   (* (expt 10 (max 0 (- start-index it-index))) (mugu-orgw-todo-rank (org-element-property :todo-keyword it)))
+                   (mugu-orgu-lineage-todos headline)))))
+    (if print-message
+        (message "Todo Score: %s" result)
+      result)))
+
+(defun mugu-orgw-sort-get-score-headline (headline &optional print-message)
   "Return a integer value representing the sorting priority of a given entry.
 Consider HEADLINE if it is provided otherwise look for element at point.
 Sorted by Todo types where active one are more prioritary and then by priority
-property."
-  (interactive)
-  (let* ((headline (or headline (org-element-at-point)))
-         (priority (mugu-orgu-get-priority headline))
-         (todo (org-element-property :todo-keyword headline))
-         (todo-score (pcase todo
-                       ("ACTIVE" 6)
-                       ("NEXT" 5)
-                       ("WAIT" 4)
-                       ("TODO" 3)
-                       ("DONE" 2)
-                       ("CANCELLED" 1)
-                       (_ 7)))
-         (final-score (- (* todo-score 1000) priority)))
-    final-score))
+property.
+If PRINT-MESSAGE is true, print message instead."
+  (interactive (list (mugu-orgu-element-at-point) 'print))
+  (let* ((priority-score (- 100 (mugu-orgu-get-priority headline)))
+         (quicky-bonus (mugu-orgu-has-tag? headline "quicky" 'inherit))
+         (todo-score (mugu-orgw-get-todo-score quicky-bonus headline))
+         (final-score (+ todo-score priority-score)))
+    (if print-message
+        (message "Score headline : %s" final-score)
+      final-score)))
 
 (defun mugu-orgw-sort-cmp-headlines (hl-left hl-right)
   "Relation order between HL-LEFT and HL-RIGHT based on sorting priority."
@@ -173,7 +218,7 @@ each project file."
                                    ("@travail" . nil)
                                    ("fast_todo" . nil)
                                    ("need_review" . nil)
-                                   ("inbox" . nil)
+                                   ("quicky" . nil)
                                    ("refile" . nil)
                                    (:endgroup . nil)))
   (setq org-lowest-priority ?F)

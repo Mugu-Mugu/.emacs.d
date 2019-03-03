@@ -44,7 +44,7 @@ When INHERIT and INHERIT-ONLY are both non-nil retrieve only tags from parents."
   "Predicate indicating if HEADLINE contain TAG.
 When INHERIT is non-nil also fetch tags from its parents (recursively).
 When INHERIT and INHERIT-ONLY are both non-nil retrieve only tags from parents."
-  (-contains? (mugu-orgu-get-tags headline) tag))
+  (-contains? (mugu-orgu-get-tags headline inherit inherit-only) tag))
 
 (defun mugu-orgu-get-priority (headline)
   "Retrieve the priority of the HEADLINE or the inherited one of its parents."
@@ -62,16 +62,22 @@ HEADLINE is a an org-element object generated from any mugu-orgu function."
       (org-narrow-to-element)
       (org-refile))))
 
+(defun mugu-orgu-lineage-todos (headline)
+  "Retrieve the todo keywords of the parent lineage of HEADLINE.
+Todo are given in order of distance to the parent.
+First item for most ancient parent.
+Last item for HEADLINE."
+  (-non-nil
+   (--filter (org-element-property :todo-keyword it)
+             (org-element-lineage headline nil 'with-self))))
+
 (defun mugu-orgu-action-headline-goto (headline)
   "Goto HEADLINE.
 HEADLINE is a an org-element object generated from any mugu-orgu function."
   (let* ((headline-point (org-element-property :begin headline))
          (headline-filename (org-element-property :file headline)))
     (find-file headline-filename)
-    (goto-char headline-point)
-    (org-shifttab 1)
-    (org-reveal)
-    (org-cycle)))
+    (goto-char headline-point)))
 
 (defun mugu-orgu-make-skip-function (select-headline-p)
   "Build a skip function selecting only headlines satisfying SELECT-HEADLINE-P.
@@ -101,11 +107,12 @@ equivalent one generated from SELECT-HEADLINE-P."
 
 (defun mugu-orgu-get-outline (headline)
   "Return a string describing the outline of HEADLINE.
-Format is 'file > parent > parent2 > headline'."
-  (mapconcat 'identity
-             (-flatten (list (file-name-base (org-element-property :file headline))
-                             (-filter 'identity (mugu-orgu--get-parent-titles headline))))
-             " > "))
+Format is '[ todo-keyword ] file > parent > parent2 > headline'."
+  (s-concat (format "[ %s ] " (or (org-element-property :todo-keyword headline)
+                                  "NONE"))
+            (mapconcat 'identity
+                       (-flatten (-filter 'identity (mugu-orgu--get-parent-titles headline)))
+                       " > ")))
 
 (defun mugu-orgu--select-and-decorate-headline (select-headline-p)
   "Build a headline decorator function when SELECT-HEADLINE-P is fullfilled.
@@ -121,6 +128,7 @@ property if performance indicates."
   "Return a list of headlines matching SELECT-HEADLINE-P in the current subtree.
 SELECT-HEADLINE-P is a predicate function taking a single argument: the
 org-element object related to a candidate headline."
+
   (save-restriction
     (org-narrow-to-subtree)
     (org-element-map (org-element-parse-buffer 'headline 'visible-only) 'headline
@@ -148,7 +156,10 @@ aggreagation of all parents headline description."
 (defun mugu-orgu-headline-has-child-with-todo-keywords (headline todo-keywords)
   "Predicate indicating if given HEADLINE has any child with TODO-KEYWORDS."
   (org-element-map (org-element-contents headline) 'headline
-    (lambda (hl) (-contains? todo-keywords (org-element-property :todo-keyword hl)))
+    (lambda (hl)
+      (message "%s" (org-element-property :raw-value hl))
+      (when (eq (org-element-property :raw-value hl) "Late Truck") (message "mugus"))
+      (-contains? todo-keywords (org-element-property :todo-keyword hl)))
     nil t))
 
 (defun mugu-orgu-headline-get-childs (headline)
@@ -221,6 +232,23 @@ The cache is actually made for all agenda files."
       (lambda (&rest args)
         (apply wrapped-fun args)))))
 
+(defmacro with-cached-org-element (&rest body)
+  "Evaluate BODY as if `org-element-at-point' was global."
+  `(lexical-let*
+       ((get-file-headlines (lambda (file)
+                              (save-window-excursion
+                                (find-file file)
+                                (org-element-map (org-element-parse-buffer 'headline) 'headline
+                                  (lambda (hl) (cons (format "%s%s" file (org-element-property :begin hl))
+                                                     hl))))))
+        (all-file-headlines-alist (-mapcat get-file-headlines (org-agenda-files)))
+        (headlines-map (ht<-alist all-file-headlines-alist)))
+     (cl-labels ((org-element-at-point () (ht-get headlines-map (format "%s%s" (buffer-file-name) (point)))))
+       (progn ,@body))))
+
+(defun mugu-orgu-element-at-point ()
+  "Return element at point with full content and lineage."
+  (with-cached-org-element (org-element-at-point)))
 
 (defun mugu-orgu-sort-subtree (cmp-fun &optional recursive)
   "Sort the childs of headline at point according to order defined in CMP-FUN.

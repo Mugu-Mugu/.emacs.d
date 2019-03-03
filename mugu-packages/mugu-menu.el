@@ -65,25 +65,36 @@ specific column"
   (hydra--head-set-property head :column "7-Submenu")
   (mugu-hydra-add-head 'mugu-menu-main-hydra head))
 
-(defun mugu-hydra-switch-buffer ()
-  (interactive)
-  (ivy-switch-buffer))
 
-(defhydra mugu-menu-main-hydra (:color blue :hint nil)
+(defun mugu-menu-select-method (&rest methods)
+  "Return the first method of METHODS that is defined."
+  (-first-item
+   (-non-nil
+    (--map (when (fboundp it) it)
+           methods))))
+
+(defun mugu-menu-switch-buffer ()
+  "Switch to buffer using the most appropriate method."
+  (interactive)
+  (call-interactively (mugu-menu-select-method 'mugu-persp-switch-buffer
+                                               'ivy-switch-buffer
+                                               'switch-to-buffer)))
+
+ (defhydra mugu-menu-main-hydra (:color blue :hint nil)
   "
-                                -- MAIN MENU --
+                               -- MAIN MENU --
 
   -> File    Dir : %s(mugu-directory-pwd-file)
   -> Current Dir : %s(mugu-directory-pwd)
 "
-  ("b" mugu-hydra-switch-buffer "previous buffer" :column "1-Change File")
+  ("b"  mugu-menu-switch-buffer "previous buffer" :column "1-Change File")
   ("ff" (with-mugu-dir (counsel-find-file)) "file current dir")
   ("fr" (with-mugu-dir (find-file (mugu-counsel-find-file-recursive))) "file recursively")
   ("fa" (with-mugu-dir (find-file (mugu-counsel-find-anything-recursive))) "file recursively")
   ("fl" counsel-recentf "file recently used")
   ("fb" (find-file (mugu-counsel-read-bookmark-file)) "file bookmarked")
   ("d" mugu-directory-with-current-file-path "cd to current file" :color red :column "2-Change Dir")
-  ("cd" (with-mugu-dir (mugu-directory-cd (read-directory-name "Change dir: "))) "change dir" :color red)
+  ("cd" (with-mugu-dir (call-with-fzf-matcher #'mugu-directory-cd (read-directory-name "Change dir: "))) "change dir" :color red)
   ("cr" (with-mugu-dir (mugu-directory-cd (mugu-counsel-find-dir-recursive))) "change dir recursively" :color red)
   ("cm" (mugu-directory-cd (mugu-counsel-read-bookmark-dir)) "change dir from bookmark" :color red)
   ("mm" counsel-bookmark "go/register bookmark" :column "3-Bookmark")
@@ -93,20 +104,24 @@ specific column"
   ("ss" counsel-grep-or-swiper "swiper" :column "3-Search")
   ("sr" counsel-rg "rgrep")
   ("sg" counsel-git-grep "git grep")
+  ("sx" sx-search "git grep")
   ("y" counsel-yank-pop "yank ring" :column "4-Misc")
   ("u" counsel-unicode-char "insert unicode")
+  ("j" (mugu-scroll-lines 3) "scroll down" :color red)
+  ("k" (mugu-scroll-lines -3) "scroll up" :color red)
   ("x" counsel-M-x "execute" :column "5-Execute")
   ("r" ivy-resume "resume last interactive session")
   (":" eval-expression "eval expression")
   ("SPC" mugu-menu-call-mode-menu "major mode" :column "6-Submenu")
   ("w" mugu-workspace-hydra-menu/body "workspace")
-  ("p" mugu-project-hydra-menu/body "project")
+  ("p" mugu-project-menu "project")
   ("h" mugu-menu-help-hydra/body "help")
   ("!" mugu-lint-menu/body "linting")
   ("o" mugu-orgi-menu-global "orgmode")
+  ("z" mugu-window-menu "window")
   ("q" nil "cancel hydra" :color blue :column nil))
 
-(defhydra mugu-menu-help-hydra (:color teal
+(defhydra mugu-menu-help-hydra (:color blue
                                        :hint nil)
   "
                                 -- HELP MENU --
@@ -123,7 +138,8 @@ specific column"
   ("av" apropos-variable "variables")
   ("ar" apropos-value "value")
   ("al" apropos-library "feature")
-  ("ad" apropos-documentation "documentation"))
+  ("ad" apropos-documentation "documentation")
+  ("q" nil "quit" :column nil))
 
 (defalias 'mugu-menu-main-menu 'mugu-menu-main-hydra/body)
 (defalias 'mugu-menu-help-menu 'mugu-menu-help-hydra/body)

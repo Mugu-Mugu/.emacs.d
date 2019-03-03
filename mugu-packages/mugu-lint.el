@@ -1,10 +1,19 @@
 (require 'hydra)
 
+
 (use-package flycheck
   :diminish flycheck-mode
   :defer
   :commands flycheck-list-errors
   :init
+  (defun mugu-lint-previous-error ()
+    "Really go to previous error."
+    (let ((point-before (point))
+          (increment 1))
+      (flycheck-previous-error)
+      (while (equal (point) point-before)
+        (flycheck-previous-error (incf increment)))))
+
   (defhydra mugu-lint-menu
                (:color pink :hint nil :idle 0.1
                        :body-pre (flycheck-list-errors)
@@ -13,7 +22,7 @@
                               -- Flycheck Zone --
 "
                ("j" flycheck-next-error "↓ error" :column "1-Errors")
-               ("k" flycheck-previous-error "↑ error")
+               ("k" (mugu-lint-previous-error) "↑ error")
                ("y" flycheck-copy-errors-as-kill "Copy errors")
                ("v" flycheck-buffer "Recheck buffer" :column "2-Buffer Management")
                ("p" flycheck-clear "Ignore errors")
