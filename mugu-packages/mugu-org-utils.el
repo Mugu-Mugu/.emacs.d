@@ -62,14 +62,14 @@ HEADLINE is a an org-element object generated from any mugu-orgu function."
       (org-narrow-to-element)
       (org-refile))))
 
-(defun mugu-orgu-lineage-todos (headline)
+(defun mugu-orgu-lineage-todos (headline &optional with-self)
   "Retrieve the todo keywords of the parent lineage of HEADLINE.
 Todo are given in order of distance to the parent.
-First item for most ancient parent.
-Last item for HEADLINE."
+First item for most recent parent.
+If WITH-SELF is non-nil, the first item is HEADLINE."
   (-non-nil
    (--filter (org-element-property :todo-keyword it)
-             (org-element-lineage headline nil 'with-self))))
+             (org-element-lineage headline nil with-self))))
 
 (defun mugu-orgu-action-headline-goto (headline)
   "Goto HEADLINE.

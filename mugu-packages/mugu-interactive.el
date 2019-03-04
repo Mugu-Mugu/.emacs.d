@@ -16,6 +16,15 @@
   (setq ivy-count-format "(%d/%d) ")
   (setq ivy-height 20)
   (setq ivy-wrap t)
+  (setq ivy-initial-inputs-alist '((org-refile . "^ ")
+                                   (org-agenda-refile . "^ ")
+                                   (org-capture-refile . "^ ")
+                                   (counsel-M-x . "^ ")
+                                   (counsel-describe-function . "^ ")
+                                   (counsel-describe-variable . "^ ")
+                                   (counsel-org-capture . "^ ")
+                                   (Man-completion-table . "^ ")
+                                   (woman . "^ ")))
   (defun ivy-yank-action (x)
     (kill-new x))
   (defun ivy-copy-to-buffer-action (x)
@@ -23,6 +32,8 @@
       (if (file-exists-p x)
           (insert (expand-file-name x))
         (insert x))))
+  (general-def ivy-minibuffer-map
+    "<escape>" 'minibuffer-keyboard-quit)
   (ivy-set-actions
    t
    '(("p" ivy-copy-to-buffer-action "insert")
@@ -34,14 +45,17 @@
 (use-package ivy-hydra
   :after ivy
   :commands soo-ivy/body
+  :init
+  (after 'key-chord
+    (key-chord-define ivy-minibuffer-map "jk" 'soo-ivy/body))
+  (after 'evil
+    (evil-set-initial-state 'grep-mode 'normal))
   :bind
   (:map ivy-minibuffer-map
         ("C-o" . soo-ivy/body)
         ("M-j" . ivy-next-line)
         ("M-k" . ivy-previous-line))
   :config
-  (general-def ivy-minibuffer-map
-    "<escape>" 'minibuffer-keyboard-quit)
   (require 'ivy)
   (defhydra soo-ivy (:hint nil :color amaranth)
     "
@@ -85,14 +99,7 @@
     ("C" ivy-toggle-case-fold)
     ("o" ivy-occur :exit t))
 
-  (general-def ivy-minibuffer-map
-    "<escape>" 'minibuffer-keyboard-quit)
-
-  (after 'evil
-    (evil-set-initial-state 'grep-mode 'normal))
-
-  (after 'key-chord
-    (key-chord-define ivy-minibuffer-map "jk" 'soo-ivy/body)))
+  )
 
 (use-package counsel
   :after ivy

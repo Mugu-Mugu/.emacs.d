@@ -1,24 +1,38 @@
-* emacs
+* TODO emacs
 ** [#B] Short Tasks                                                  :quicky:
+*** DONE improve ivy hydra behaviour
+CLOSED: [2019-03-03 dim. 22:49]
+- autoload is broken
+- passive and active keymap?
+*** DONE guake
+CLOSED: [2019-03-03 dim. 23:46]
+*** DONE ivy remove ^ in some default prompt
+CLOSED: [2019-03-03 dim. 23:02]
+*** ACTIVE fix perspective
+- [ ] problem during buffer switch
+- [ ] cant switch if there is no buffer
+*** TODO try imenu origami
+*** TODO colored segment for git & project
+*** TODO ivy improve keybinding
+C-W to remove last word
+C-Y to paste
+some permanent hydra for some usefull ivy keybinds such as complete/take current/print action etc...
+*** DONE refix org mode
+CLOSED: [2019-03-03 dim. 22:44]
 *** DONE improve logic of org todo sort
 much better and cleaner implementation
 CLOSED: [2019-03-03 dim. 20:53]
 should get all todos from parent
 apply todo score on each
 with a coeff based on level
-*** NEXT guake
-*** NEXT improve ivy hydra behaviour
-- autoload is broken
-- passive and active keymap?
-*** ACTIVE perspective change buffer order?
-*** NEXT ivy remove ^ in some default prompt
+*** DONE perspective change buffer order?
+CLOSED: [2019-03-03 dim. 21:42]
 *** DONE [#A] fix star bug
 CLOSED: [2019-03-02 sam. 18:14]
 *** DONE [#A] f and t in emacs shoud be bedirectional because of avy
 CLOSED: [2019-02-09 sam. 15:56]
 *** DONE [#A] variety
 CLOSED: [2019-02-07 jeu. 07:03]
-
 *** DONE [#A] makes expand works from visual
 CLOSED: [2019-02-10 dim. 09:18]
 just doesn't work in emacs mode due to lispy but does work otherwise
@@ -145,8 +159,6 @@ CLOSED: [2019-02-09 sam. 14:50]
 actually very hard to do it properly
 would require some heavy hacking
 CLOSED: [2019-02-03 dim. 10:06]
-*** TODO try imenu origamijk
-*** TODO [#A] flychceck in telephone-line should be greyed when inactive
 ** [#A] Inbox                                                       :refile:
 ** BACKLOG
 *** [#C] Bugs                                                       :inbox:
@@ -305,6 +317,7 @@ CLOSED: [2019-01-06 dim. 00:09]
 - list modified variables with counsel
 ***** TODO Custom file should be temporary
 Value setted inside should be moved back into their configuration package
+**** TODO [#A] flychceck in telephone-line should be greyed when inactive
 *** [#F] Language
 **** DONE [#B] Ruby on Rails
 CLOSED: [2019-02-09 sam. 17:05]
