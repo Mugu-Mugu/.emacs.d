@@ -19,21 +19,18 @@
   (add-to-list 'projectile-globally-ignored-directories ".cache")
   (add-to-list 'projectile-globally-ignored-directories "node_modules")
   (setq projectile-project-search-path '("~/work/"))
-  (setq projectile-switch-project-action (lambda ()
-                                           (message "%s default directory (buffer name %s)" default-directory (buffer-name (current-buffer)))
-                                           (cd default-directory)
-                                           (message "%s root dir" (projectile-project-root))))
   (projectile-mode 1))
 
 (use-package persp-projectile
   :after mugu-project-utils
+  :disabled
   :defer)
 
 (use-package perspective
   :defer
   :after mugu-project-utils
+  :disabled
   :config
-  (message "loaded")
   (persp-mode)
   (persp-make-variable-persp-local 'mugu-directory)
   (customize-set-value 'persp-show-modestring nil))
@@ -41,7 +38,9 @@
 (use-package mugu-project-utils
   :straight nil
   :defer
-  :commands (persp-switch mugu-project-menu))
+  :commands (persp-switch mugu-project-menu)
+  :config
+  (mugu-project-activate))
 
 (provide 'mugu-project)
 ;;; mugu-project ends here
