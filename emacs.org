@@ -1,4 +1,4 @@
-* TODO emacs
+* emacs
 ** [#B] Short Tasks                                                  :quicky:
 *** DONE improve ivy hydra behaviour
 CLOSED: [2019-03-03 dim. 22:49]
@@ -159,6 +159,10 @@ CLOSED: [2019-02-09 sam. 14:50]
 actually very hard to do it properly
 would require some heavy hacking
 CLOSED: [2019-02-03 dim. 10:06]
+*** TODO stuck project should be listed in gg view so they have a chance to be picked
+*** TODO Evil improvements
+- Text object? (symbol, object)
+- words boundary with snake/kebabe/camel?
 ** [#A] Inbox                                                       :refile:
 ** BACKLOG
 *** [#C] Bugs                                                       :inbox:

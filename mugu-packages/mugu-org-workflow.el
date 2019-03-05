@@ -126,18 +126,18 @@ Such a headline is a project with no active or next child."
 (defun mugu-orgw-todo-rank (todo-keyword)
   "Return an integer mapping a TODO-KEYWORD to its sort rank."
   (pcase todo-keyword
-    ("ACTIVE" 3)
+    ("ACTIVE" 4)
     ("NEXT" 2)
     ("TODO" 1)
     ("WAIT" -1)
     ("DONE" -100)
     ("CANCELLED" -200)
-    (_ -10)))
+    (_ -100)))
 
 (defun mugu-orgw-lineage-todo-rank (todo-keyword)
   "Return an integer mapping a parent TODO-KEYWORD to its lineage sort rank."
   (pcase todo-keyword
-    ("ACTIVE" 5)
+    ("ACTIVE" 2)
     ("NEXT" 1)
     ("TODO" 0)
     ("WAIT" -10)
@@ -167,11 +167,11 @@ If PRINT-MESSAGE is true, print message instead."
   (interactive (list (mugu-orgu-element-at-point) 'print))
   (let* ((priority-score (- 100 (mugu-orgu-get-priority headline)))
          (quicky-bonus (if (mugu-orgu-has-tag? headline "quicky" 'inherit)
-                           (if (org-element-property :todo-type headline) 10000 40000)
+                           (if (org-element-property :todo-type headline) 1000 40000000)
                          0))
          (todo-score (* 1000 (mugu-orgw-todo-rank (org-element-property :todo-keyword headline))))
-         (todo-lineage-score (* 10000 (mugu-orgw-get-lineage-todo-score headline)))
-         (final-score (max 0 (+ todo-score todo-lineage-score quicky-bonus priority-score))))
+         (todo-lineage-score (* 1000 (mugu-orgw-get-lineage-todo-score headline)))
+         (final-score (+ todo-score todo-lineage-score quicky-bonus priority-score)))
     (if print-message
         (message "Score headline : %s [todo %s, lineage %s, priority %s]" final-score todo-score todo-lineage-score priority-score)
       final-score)))
