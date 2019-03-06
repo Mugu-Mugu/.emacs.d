@@ -151,6 +151,9 @@
     ("--graph" "--color" "--decorate" "--follow" "-n256")))
  '(magit-prefer-remote-upstream t)
  '(mark-ring-max 100)
+ '(minimap-display-semantic-overlays nil)
+ '(minimap-mode t)
+ '(minimap-window-location (quote right))
  '(nrepl-message-colors
    (quote
     ("#CC9393" "#DFAF8F" "#F0DFAF" "#7F9F7F" "#BFEBBF" "#93E0E3" "#94BFF3" "#DC8CC3")))
