@@ -76,7 +76,7 @@ specific column"
 (defun mugu-menu-switch-buffer ()
   "Switch to buffer using the most appropriate method."
   (interactive)
-  (call-interactively (mugu-menu-select-method ;; 'mugu-persp-switch-buffer
+  (call-interactively (mugu-menu-select-method 'mugu-project-switch-buffer-global
                                                'ivy-switch-buffer
                                                'switch-to-buffer)))
 

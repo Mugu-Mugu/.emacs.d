@@ -9,8 +9,11 @@
 (require 'mugu-menu)
 (require 'projectile)
 (require 'dash)
+(require 'ht)
 
 ;; * Code
+(defvar mugu-project-wconf-map (ht-create) "Gather windows configuration for each project.")
+
 (defun mugu-project-switch-buffer ()
   "Interactively switch to a buffer in current project."
   (let ((buffers-in-project (-map 'buffer-name
@@ -64,24 +67,42 @@ If PROJECT is nil, current project is used if any."
       (persp-remove-buffer new-buffer)
       (persp-switch-last))))
 
+(defun mugu-project-switch-buffer-global ()
+  "Switch to another buffer changing project and wconf if nessecary."
+  (interactive)
+  (let* (target-project
+         (new-buffer (save-window-excursion
+                       (winner-mode -1)
+                       (call-interactively 'ivy-switch-buffer)
+                       (setq target-project (projectile-project-name))
+                       (winner-mode 1)
+                       (current-buffer))))
+    (when target-project
+      (projectile-switch-project-by-name target-project))
+    (switch-to-buffer new-buffer)))
 
-(defun mugu-project-switch ()
+(defun mugu-project-save-wconf ()
   "Save current windows configuration."
-  )
+  (when (projectile-project-name)
+    (ht-set mugu-project-wconf-map (projectile-project-name) (current-window-configuration))))
+
+(defun mugu-project-restore-wconf ()
+  "Restore project windows configuration or clear it if new after switch."
+  (if (ht-contains? mugu-project-wconf-map (projectile-project-name))
+      (set-window-configuration (ht-get mugu-project-wconf-map (projectile-project-name)))
+    (delete-other-windows)))
 
 (defun mugu-project-after-switch ()
-  "."
-  (let ((new-project-buffer (-first-item (projectile-project-buffers))))
-    (message "%s" (projectile-project-buffers))
-    (message "new project buffer is %s" new-project-buffer)
-    (if (bufferp new-project-buffer)
-        (switch-to-buffer new-project-buffer)
-      (projectile-find-file)))
-  )
+  "Prompt for file if current buffer is not part of the project."
+  (mugu-project-restore-wconf)
+  (unless (projectile-project-buffer-p (current-buffer) default-directory)
+    (projectile-find-file)))
 
 (defun mugu-project-activate ()
   "Configure perspective and projectile in a coherent feature."
-  (setq projectile-switch-project-action #'mugu-project-after-switch))
+  (add-hook 'projectile-before-switch-project-hook 'mugu-project-save-wconf)
+  (setq projectile-switch-project-action 'mugu-project-after-switch))
+
 
 (provide 'mugu-project-utils)
 ;;; mugu-project-utils ends here
