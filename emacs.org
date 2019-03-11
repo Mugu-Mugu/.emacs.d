@@ -1,5 +1,46 @@
 * emacs
 ** [#B] Short Tasks                                                  :quicky:
+*** DONE try helm
+CLOSED: [2019-03-07 jeu. 23:22]
+*** TODO change architecture
+**** conf/mugu-conf-* : for config and glue code to bind package together in a coherent feature
+- exemple : mugu-conf-lang => mugu-conf-python => mugu-conf-ruby etc...
+- no logic, limited customization
+- responsible of lazy loading and dependency management
+
+**** src/mugu-* : personnal packages
+- either simple wrapper
+- or complete original feature
+- dont care about dependencies, it just requires right away needed features
+
+**** keybinds :
+- centralized : coherency, lazy load?
+- modular : modular, ease of maintenance, lazy loading, possibility of conflicts and shadowing
+*** TODO ivy order free by default
+*** TODO counsel fzf instead of custom implementation
+*** TODO ivy improve keybinding
+C-W to remove last word
+C-Y to paste
+some permanent hydra for some usefull ivy keybinds such as complete/take current/print action etc...
+*** TODO stuck project should be listed in gg view so they have a chance to be picked
+*** TODO Evil improvements
+- Text object? (symbol, object)
+- words boundary with snake/kebabe/camel?
+*** TODO configure multi cursor wrapper
+*** TODO configure wgrep wrapper
+*** DONE [#A] fix star bug
+CLOSED: [2019-03-02 sam. 18:14]
+*** DONE [#A] f and t in emacs shoud be bedirectional because of avy
+CLOSED: [2019-02-09 sam. 15:56]
+*** DONE [#A] variety
+CLOSED: [2019-02-07 jeu. 07:03]
+*** DONE [#A] makes expand works from visual
+CLOSED: [2019-02-10 dim. 09:18]
+just doesn't work in emacs mode due to lispy but does work otherwise
+*** DONE fix ruby boot
+CLOSED: [2019-03-07 jeu. 22:53]
+*** DONE lsp flycheck inactive why?
+CLOSED: [2019-03-07 jeu. 23:10]
 *** DONE improve ivy hydra behaviour
 CLOSED: [2019-03-03 dim. 22:49]
 - autoload is broken
@@ -7,16 +48,13 @@ CLOSED: [2019-03-03 dim. 22:49]
 *** DONE guake
 CLOSED: [2019-03-03 dim. 23:46]
 *** DONE ivy remove ^ in some default prompt
-CLOSED: [2019-03-03 dim. 23:02]
-*** ACTIVE fix perspective
-- [ ] problem during buffer switch
-- [ ] cant switch if there is no buffer
-*** TODO try imenu origami
-*** TODO colored segment for git & project
-*** TODO ivy improve keybinding
-C-W to remove last word
-C-Y to paste
-some permanent hydra for some usefull ivy keybinds such as complete/take current/print action etc...
+CLOSED: [2019-03-03 dim. 23:02
+*** DONE fix perspective (removed :) )
+CLOSED: [2019-03-06 mer. 20:32]
+- [X] problem during buffer switch
+- [X] cant switch if there is no buffer
+*** DONE colored segment for git & project
+CLOSED: [2019-03-06 mer. 22:16]
 *** DONE refix org mode
 CLOSED: [2019-03-03 dim. 22:44]
 *** DONE improve logic of org todo sort
@@ -27,15 +65,6 @@ apply todo score on each
 with a coeff based on level
 *** DONE perspective change buffer order?
 CLOSED: [2019-03-03 dim. 21:42]
-*** DONE [#A] fix star bug
-CLOSED: [2019-03-02 sam. 18:14]
-*** DONE [#A] f and t in emacs shoud be bedirectional because of avy
-CLOSED: [2019-02-09 sam. 15:56]
-*** DONE [#A] variety
-CLOSED: [2019-02-07 jeu. 07:03]
-*** DONE [#A] makes expand works from visual
-CLOSED: [2019-02-10 dim. 09:18]
-just doesn't work in emacs mode due to lispy but does work otherwise
 *** DONE telephone line
 CLOSED: [2019-03-03 dim. 17:29]
 **** DONE Improve default color theme for evil state
@@ -134,6 +163,8 @@ could be improvable, i/a sematics
 *** DONE fix shell menu
 CLOSED: [2019-02-17 dim. 22:06]
 - [X] not bound
+*** DONE c-o normal should not swith buffer
+CLOSED: [2019-03-07 jeu. 23:11]
 *** CANCELLED org mode hiearchy todo improvement
 CLOSED: [2019-02-28 jeu. 22:07]
 what problem am i trying to solve there?
@@ -159,11 +190,13 @@ CLOSED: [2019-02-09 sam. 14:50]
 actually very hard to do it properly
 would require some heavy hacking
 CLOSED: [2019-02-03 dim. 10:06]
-*** TODO stuck project should be listed in gg view so they have a chance to be picked
-*** TODO Evil improvements
-- Text object? (symbol, object)
-- words boundary with snake/kebabe/camel?
+*** TODO rename kill-buffer, delete-file etc.. to a consistent name-scheme
+*** TODO ensure system package
+*** TODO remap next and previous match to recenterjk
+*** TODO counsel git log
+*** TODO lispyville more operator
 ** [#A] Inbox                                                       :refile:
+*** TODO [#A] Seriously try helm and replace ivy
 ** BACKLOG
 *** [#C] Bugs                                                       :inbox:
 **** DONE [#E] windows zz error
@@ -195,10 +228,19 @@ CLOSED: [2019-02-06 mer. 10:42]
   - no configuration logic, just direct require
   - no automatic actions, just function
 - example
+**** Helm vs ivy :
+***** For helm
+- multi action
+- multi source (big + for an agenda like)
+- much more actions
+- not enough
+***** For ivy
+- much better find_file/find_dir (but how often do i use it now with the improved projectile persp)
+- simpler to configure?
+- more extensions?
 **** NEXT [#D] configure google this
 **** NEXT refactor mode
 **** NEXT configure ediff/smerge/emerge for magit
-**** TODO [#C] Global outshine rather than origami
 **** TODO [#A] mobile synchro
 - view todo during train
 - create new todo during train
@@ -235,7 +277,7 @@ CLOSED: [2019-01-05 sam. 03:30]
 ***** DONE Outline new style in elisp
 changed the lispy outline commad + different header
 CLOSED: [2019-01-05 sam. 07:55]
-***** NEXT [#C] Multi fold level management
+***** NEXT [#C] Better folding wrapper
 **** DONE [#A] configure sx
 CLOSED: [2019-02-10 dim. 14:38]
 **** DONE [#A] Remove perspective, better wrap/integration of projectile
@@ -260,6 +302,7 @@ looks very hard because perspective is broken and unmaintained
 **** TODO view histoy of a file
 **** TODO javascript prettifyer
 **** NEXT [#B] language with a fixed menu and a remap that bind feature
+**** TODO try imenu origami
 *** Projects
 **** TODO [#A] Org Mode
 ***** Context

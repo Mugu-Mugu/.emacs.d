@@ -53,7 +53,7 @@ auto-save-list/
 elpa/
 eshell/
 *.eld
-site-lisp/*
+src/site-lisp/*
 Server/*
 /smex-items
 /helm-doc.org

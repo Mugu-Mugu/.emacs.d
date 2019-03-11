@@ -3,26 +3,20 @@
 ;;; Commentary:
 
 ;;; Code:
-(require 'use-package)
 
 ;; * begin:
-(use-package all-the-icons :defer)
-(use-package font-lock+ :defer)
-(use-package beacon
-  :defer 3
-  :delight
-  :config
-  (setq beacon-color "darkorange")
-  (beacon-mode))
-(use-package minimap
-  :defer 3
-  :delight
-  :config (minimap-mode))
+(defun mugu-cosmetics-frame-params ()
+  "Return the frame params I like."
+  '((fullscreen . maximized)
+    (horizontal-scroll-bars . nil)
+    (vertical-scroll-bars . nil)
+    (tool-bar-lines . nil)
+    (menu-bar-lines . nil)
+    (font . "DejaVu Sans Mono-9:bold")
+    (alpha . (95 . 65))))
 
-(use-package mugu-cosmetics-utils
-  :straight nil
-  :config
-  (mugu-cosmetics-activate))
+(defun mugu-cosmetics-activate ()
+  "Activate various cosmetics feature.")
 
 (provide 'mugu-cosmetics)
 ;;; mugu-cosmetics ends here
