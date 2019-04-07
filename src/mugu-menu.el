@@ -56,7 +56,7 @@ If no menu has been registered for the registered for this mode"
 (defun mugu-menu-register-mode-menu (mode-symbol menu-function)
   "Bind a menu MENU-FUNCTION to the mode MODE-SYMBOL.
 This menu may be called at user request for the bound mode"
-  (add-to-list 'mugu-menu-mode-menus `(,mode-symbol . ,menu-function) nil 'eq))
+  (add-to-list 'mugu-menu-mode-menus `(,mode-symbol . ,menu-function) 'append 'eq))
 
 (defun mugu-menu-register-permanent-menu (head)
   "Add given HEAD to the main menu.

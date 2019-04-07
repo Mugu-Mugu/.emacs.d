@@ -11,6 +11,7 @@
   :commands lsp
   :custom
   (lsp-prefer-flymake nil)
+  (lsp-auto-guess-root t)
   :config
   (require 'lsp-ui))
 
@@ -23,7 +24,9 @@
 
 (use-package company-lsp
   :after (company lsp-mode)
-  :commands company-lsp)
+  :commands company-lsp
+  :custom
+  (company-lsp-cache-candidates nil))
 
 (use-package mugu-lsp
   :straight nil

@@ -18,7 +18,8 @@
   :config
   (mugu-sx-configure-bindings))
 
-(use-package google-this :defer)
+(use-package google-this
+  :defer)
 
 (provide 'mugu-conf-search)
 ;;; mugu-conf-search ends here

@@ -1,8 +1,53 @@
-* emacs
+* ACTIVE emacs
+** [#A] Inbox                                                        :refile:
+*** CANCELLED [#A] Seriously try helm and replace ivy
+CLOSED: [2019-03-11 lun. 13:28]
 ** [#B] Short Tasks                                                  :quicky:
+*** NEXT [#A] Commit change and go in a small commit workflow
+*** TODO remap next and previous match to recenterjk
+*** TODO counsel git log
+*** TODO auth github
+*** TODO [#F] stuck project should be listed in gg view so they have a chance to be picked
+*** DONE [#A] configure google this
+CLOSED: [2019-03-24 dim. 08:49]
+*** DONE [#A] Git messenger
+CLOSED: [2019-03-24 dim. 09:04]
+*** DONE [#A] Git timemachine
+CLOSED: [2019-03-23 sam. 23:14]
+*** DONE [#A] Yasnippet
+CLOSED: [2019-03-23 sam. 18:54]
+*** DONE [#A] warning invalid face bold
+CLOSED: [2019-03-20 mer. 23:01]
+*** DONE [#A] fix star bug
+CLOSED: [2019-03-02 sam. 18:14]
+*** DONE [#A] f and t in emacs shoud be bedirectional because of avy
+CLOSED: [2019-02-09 sam. 15:56]
+*** DONE [#A] variety
+CLOSED: [2019-02-07 jeu. 07:03]
+*** DONE [#A] makes expand works from visual
+CLOSED: [2019-02-10 dim. 09:18]
+just doesn't work in emacs mode due to lispy but does work otherwise
+*** DONE configure wgrep wrapper
+CLOSED: [2019-03-21 jeu. 08:40]
+- [X] passive menu in read only mode
+  - [X] switch to edit mode
+  - [X] start in normal evil state
+- [X] passive menu in wgrep mode
+*** DONE Wgrep wrapper => automatic hook, or native binding instead of hydra?
+CLOSED: [2019-03-23 sam. 10:42]
+*** DONE rename kill-buffer, delete-file etc.. to a consistent name-scheme
+CLOSED: [2019-03-23 sam. 12:00]
+- [X] rename should kill and print new buffer
+*** DONE lispyville more operator
+CLOSED: [2019-03-23 sam. 12:05]
+*** DONE better face for avy jump
+CLOSED: [2019-03-23 sam. 12:05]
+*** DONE ivy hydra passive menu bug
+CLOSED: [2019-03-23 sam. 12:06]
+- very annoying that it disables number
 *** DONE try helm
-CLOSED: [2019-03-07 jeu. 23:22]
-*** TODO change architecture
+*** DONE change architecture
+CLOSED: [2019-03-11 lun. 12:37]
 **** conf/mugu-conf-* : for config and glue code to bind package together in a coherent feature
 - exemple : mugu-conf-lang => mugu-conf-python => mugu-conf-ruby etc...
 - no logic, limited customization
@@ -16,27 +61,17 @@ CLOSED: [2019-03-07 jeu. 23:22]
 **** keybinds :
 - centralized : coherency, lazy load?
 - modular : modular, ease of maintenance, lazy loading, possibility of conflicts and shadowing
-*** TODO ivy order free by default
-*** TODO counsel fzf instead of custom implementation
-*** TODO ivy improve keybinding
+*** DONE ivy order free by default
+CLOSED: [2019-03-11 lun. 12:37]
+*** DONE counsel fzf instead of custom implementation
+CLOSED: [2019-03-11 lun. 12:37]
+*** DONE ivy improve keybinding
+CLOSED: [2019-03-11 lun. 21:54]
 C-W to remove last word
 C-Y to paste
 some permanent hydra for some usefull ivy keybinds such as complete/take current/print action etc...
-*** TODO stuck project should be listed in gg view so they have a chance to be picked
-*** TODO Evil improvements
-- Text object? (symbol, object)
-- words boundary with snake/kebabe/camel?
-*** TODO configure multi cursor wrapper
-*** TODO configure wgrep wrapper
-*** DONE [#A] fix star bug
-CLOSED: [2019-03-02 sam. 18:14]
-*** DONE [#A] f and t in emacs shoud be bedirectional because of avy
-CLOSED: [2019-02-09 sam. 15:56]
-*** DONE [#A] variety
-CLOSED: [2019-02-07 jeu. 07:03]
-*** DONE [#A] makes expand works from visual
-CLOSED: [2019-02-10 dim. 09:18]
-just doesn't work in emacs mode due to lispy but does work otherwise
+*** DONE configure multi cursor wrapper
+CLOSED: [2019-03-12 mar. 21:40]
 *** DONE fix ruby boot
 CLOSED: [2019-03-07 jeu. 22:53]
 *** DONE lsp flycheck inactive why?
@@ -48,7 +83,6 @@ CLOSED: [2019-03-03 dim. 22:49]
 *** DONE guake
 CLOSED: [2019-03-03 dim. 23:46]
 *** DONE ivy remove ^ in some default prompt
-CLOSED: [2019-03-03 dim. 23:02
 *** DONE fix perspective (removed :) )
 CLOSED: [2019-03-06 mer. 20:32]
 - [X] problem during buffer switch
@@ -190,24 +224,77 @@ CLOSED: [2019-02-09 sam. 14:50]
 actually very hard to do it properly
 would require some heavy hacking
 CLOSED: [2019-02-03 dim. 10:06]
-*** TODO rename kill-buffer, delete-file etc.. to a consistent name-scheme
-*** TODO ensure system package
-*** TODO remap next and previous match to recenterjk
-*** TODO counsel git log
-*** TODO lispyville more operator
-** [#A] Inbox                                                       :refile:
-*** TODO [#A] Seriously try helm and replace ivy
 ** BACKLOG
-*** [#C] Bugs                                                       :inbox:
-**** DONE [#E] windows zz error
-CLOSED: [2019-02-02 sam. 17:50]
+*** [#C] Bugs                                                         :inbox:
 **** DONE org popup issue is back
 CLOSED: [2019-01-03 jeu. 11:17]
 **** DONE project root missing
 CLOSED: [2019-01-05 sam. 14:48]
+**** DONE [#E] windows zz error
+CLOSED: [2019-02-02 sam. 17:50]
 **** CANCELLED solargraph issue
 CLOSED: [2019-02-06 mer. 10:42]
-*** [#D] Enhancement                                                :inbox:
+*** [#D] Enhancement                                                  :inbox:
+**** NEXT [#B] language with a fixed menu and a remap that bind feature
+**** NEXT refactor mode
+**** NEXT configure ediff/smerge/emerge for magit
+**** TODO [#A] mobile synchro
+- view todo during train
+- create new todo during train
+**** TODO Git
+***** NEXT Better diff
+- [ ] in merge view, it displays a 2 way diff while we need a 3 way diff
+- [ ] in diff view, it displays a 3 way diff while we need a 2 way diff
+- [ ] in merge view, it's not possible to take A or B contribution in one key press
+***** TODO buffer local commands
+- To be able to look for history of a file
+- To be able to compare this file vs any other version
+***** TODO Forge
+***** TODO [#F] blame wrapper
+**** TODO [#D] Term mode
+***** NEXT Some bugs with ctrl-c
+**** TODO window management wrapper
+**** TODO capture idea?
+**** TODO Folding
+***** NEXT [#C] Better folding wrapper
+***** DONE Origami
+CLOSED: [2019-01-04 ven. 13:48]
+***** DONE Outline
+CLOSED: [2019-01-04 ven. 13:48]
+***** DONE Integration
+CLOSED: [2019-01-05 sam. 03:30]
+- [X] define local commands
+- [X] define global commands
+- [X] detect if fold present at point
+- [X] define navi commands
+- [X] improve navi fold commands
+- [X] configure initialisation
+***** DONE Outline new style in elisp
+changed the lispy outline commad + different header
+CLOSED: [2019-01-05 sam. 07:55]
+**** TODO view histoy of a file
+**** TODO javascript prettifyer
+**** TODO try imenu origami
+**** TODO Evil improvements
+- Text object? (symbol, object)
+- words boundary with snake/kebabe/camel?
+**** TODO ensure system package
+**** TODO [#E] Directory history
+**** DONE [#A] configure sx
+CLOSED: [2019-02-10 dim. 14:38]
+**** DONE [#A] Remove perspective, better wrap/integration of projectile
+CLOSED: [2019-01-16 mer. 07:34]
+- [X] override project root computation
+- [X] give means to switch the project (and the project root easily)
+- [X] search from root project
+- [X] directory control
+- [X] buffer switch
+**** DONE [#B] Universal fzf filtering
+CLOSED: [2019-02-14 jeu. 22:47]
+**** DONE Ivy occur wrapper
+CLOSED: [2019-03-23 sam. 12:07]
+**** DONE Wgrep wrapper
+CLOSED: [2019-03-23 sam. 12:07]
 **** Better configuration logic
 ***** Etat des lieux
 - use-package with light configuration
@@ -238,57 +325,6 @@ CLOSED: [2019-02-06 mer. 10:42]
 - much better find_file/find_dir (but how often do i use it now with the improved projectile persp)
 - simpler to configure?
 - more extensions?
-**** NEXT [#D] configure google this
-**** NEXT refactor mode
-**** NEXT configure ediff/smerge/emerge for magit
-**** TODO [#A] mobile synchro
-- view todo during train
-- create new todo during train
-**** TODO Git
-***** NEXT Better diff
-- [ ] in merge view, it displays a 2 way diff while we need a 3 way diff
-- [ ] in diff view, it displays a 3 way diff while we need a 2 way diff
-- [ ] in merge view, it's not possible to take A or B contribution in one key press
-***** TODO buffer local commands
-- To be able to look for history of a file
-- To be able to compare this file vs any other version
-***** TODO [#F] blame wrapper
-***** TODO Forge
-**** TODO [#E] Directory history
-**** TODO Ivy occur wrapper
-**** TODO Wgrep wrapper
-**** TODO [#D] Term mode
-***** NEXT Some bugs with ctrl-c
-**** TODO window management wrapper
-**** TODO capture idea?
-**** TODO Folding
-***** DONE Origami
-CLOSED: [2019-01-04 ven. 13:48]
-***** DONE Outline
-CLOSED: [2019-01-04 ven. 13:48]
-***** DONE Integration
-CLOSED: [2019-01-05 sam. 03:30]
-- [X] define local commands
-- [X] define global commands
-- [X] detect if fold present at point
-- [X] define navi commands
-- [X] improve navi fold commands
-- [X] configure initialisation
-***** DONE Outline new style in elisp
-changed the lispy outline commad + different header
-CLOSED: [2019-01-05 sam. 07:55]
-***** NEXT [#C] Better folding wrapper
-**** DONE [#A] configure sx
-CLOSED: [2019-02-10 dim. 14:38]
-**** DONE [#A] Remove perspective, better wrap/integration of projectile
-CLOSED: [2019-01-16 mer. 07:34]
-- [X] override project root computation
-- [X] give means to switch the project (and the project root easily)
-- [X] search from root project
-- [X] directory control
-- [X] buffer switch
-**** DONE [#B] Universal fzf filtering
-CLOSED: [2019-02-14 jeu. 22:47]
 **** DONE ruby rspec integration
 CLOSED: [2019-02-02 sam. 22:00]
 - launch test current buffer
@@ -299,12 +335,14 @@ CLOSED: [2019-02-02 sam. 22:00]
 CLOSED: [2019-02-10 dim. 15:32]
 restore projectile original design. Buffer switch automatic but with a manually tracked mugu-directory.
 looks very hard because perspective is broken and unmaintained
-**** TODO view histoy of a file
-**** TODO javascript prettifyer
-**** NEXT [#B] language with a fixed menu and a remap that bind feature
-**** TODO try imenu origami
 *** Projects
 **** TODO [#A] Org Mode
+***** NEXT implement narrowing for org mode
+***** TODO can improve insertion in org mode
+- [ ] checkbox comprehenstion
+- [ ] append/insert comprehension
+***** TODO agenda integration
+***** TODO [#E] Implement headline counsel action
 ***** Context
 ***** Bugs
 ****** DONE Prevent the frame popup for capture
@@ -318,8 +356,6 @@ CLOSED: [2019-01-05 sam. 13:55]
 - quickie :quicky: with exact tag to :inbox:
 - enhancement :enhancement:
 - metro :train:
-***** TODO [#E] Implement headline counsel action
-***** NEXT implement narrowing for org mode
 ***** DONE Recursive sort
 CLOSED: [2019-01-03 jeu. 07:23]
 very important because a sorted tree is paramount to visualize data and org mode doesnt provide a way to organize data aside of agenda
@@ -342,29 +378,32 @@ very important because a sorted tree is paramount to visualize data and org mode
 CLOSED: [2019-01-03 jeu. 08:36]
 ***** DONE focus after goto
 CLOSED: [2019-01-05 sam. 13:59]
-***** TODO can improve insertion in org mode
-- [ ] checkbox comprehenstion
-- [ ] append/insert comprehension
-***** TODO agenda integration
 **** TODO [#F] Wiew
 *** [#E] Future package
+**** TODO prescient vs historian
+- for better completion
 **** DONE wgrep
 CLOSED: [2019-03-03 dim. 17:46]
-**** TODO historian
 **** DONE general
 CLOSED: [2019-01-06 dim. 00:09]
-**** TODO sublim minimap
-**** TODO Slack in emacs!
+**** TODO Copy as format
+**** TODO Slack
 *** [#F] Maybe
-**** TODO store good practice / ideas ?
+**** TODO [#A] flychceck in telephone-line should be greyed when inactive
 **** TODO [#E] ivy save/set view
+**** TODO store good practice / ideas ?
 **** TODO Better customization
 ***** NEXT Counsel support
 - list customizations variables with counsel
 - list modified variables with counsel
 ***** TODO Custom file should be temporary
 Value setted inside should be moved back into their configuration package
-**** TODO [#A] flychceck in telephone-line should be greyed when inactive
+**** TODO Possibility to have a menu without the number bound
+**** TODO remap insert state to emacs state for certain mode
+- in magit motion state can be usefull to manipulate text but insert is utterly uselessjk
+**** TODO Create notion of workspace
+- which owns a windows configuration
+- and has some private variable associated
 *** [#F] Language
 **** DONE [#B] Ruby on Rails
 CLOSED: [2019-02-09 sam. 17:05]

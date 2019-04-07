@@ -80,7 +80,8 @@ That is: bind SPC SPC for the mode and autoload the menu on first buffer enterin
   "Activate autoloding of magit menu."
   (mugu-magit-register-menu-mode 'magit-revision-mode 'mugu-magit-default-menu/body)
   (mugu-magit-register-menu-mode 'magit-log-mode 'mugu-magit-default-menu/body)
-  (mugu-magit-register-menu-mode 'magit-status-mode 'mugu-magit-status-menu/body))
+  (mugu-magit-register-menu-mode 'magit-status-mode 'mugu-magit-status-menu/body)
+  (mugu-magit-register-menu-mode 'magit-diff-mode 'mugu-magit-status-menu/body))
 
 (provide 'mugu-magit)
 ;;; mugu-magit ends here

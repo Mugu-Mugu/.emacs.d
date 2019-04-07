@@ -21,14 +21,28 @@
 (use-package company-flx
   :diminish
   :after company
-  :config (company-flx-mode 1))
+  :custom
+  (company-flx-limit 250)
+  :config
+  (company-flx-mode 1))
 
 (use-package company-quickhelp
   :diminish
   :after company
-  :config (progn
-            (company-quickhelp-mode 1)
-            (setq company-quickhelp-delay 0.3)))
+  :config
+  (company-quickhelp-mode 1)
+  (setq company-quickhelp-delay 0))
+
+(use-package yasnippet
+  :after company
+  :delight yas-minor-mode
+  :config
+  (yas-global-mode)
+  (general-def "M-&" #'yas-expand)
+  (general-def "M-é" #'yas-insert-snippet))
+
+(use-package yasnippet-snippets
+  :after yasnippet)
 
 (provide 'mugu-conf-completion)
 ;;; mugu-conf-completion ends here

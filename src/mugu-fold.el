@@ -13,6 +13,7 @@
   :delight outline-minor-mode)
 
 (use-package outshine
+  :disabled
   :defer t
   :delight outshine-mode
   :hook  ((emacs-lisp-mode) . outshine-mode))
@@ -31,9 +32,8 @@ OUTLINE-CMD is called when on a header outline, otherwse ORIGAMI-CMD is called."
   `(defun ,(intern (format "mugu-fold-%s" cmd-name)) ()
      ,(format "Do %s if on a outline headline, else do %s" outline-cmd origami-cmd)
      (interactive)
-     (require 'outshine)
      (require 'origami)
-     (cond ((outline-on-heading-p) (call-interactively ,outline-cmd))
+     (cond ;; ((outline-on-heading-p) (call-interactively ,outline-cmd))
            ((mugu-fold-line-with-fold?) (call-interactively ,origami-cmd))
            ((or (bound-and-true-p origami-mode)
                 (bound-and-true-p outshine-mode))
@@ -47,7 +47,7 @@ OUTLINE-CMD is called when on a header outline, otherwse ORIGAMI-CMD is called."
 
 ;;*
 (defmenu mugu-fold-menu
-  (:color red :hint nil :body-pre (and (require 'outshine) (require 'origami)))
+  (:color red :hint nil :body-pre (require 'origami))
   "Bindings for general folding (code and outline)."
   ("o" (mugu-fold-open-recursive) "open recursively" :column "Folding at point")
   ("c" (mugu-fold-close-recursive) "close recursively")
@@ -59,14 +59,11 @@ OUTLINE-CMD is called when on a header outline, otherwse ORIGAMI-CMD is called."
   ("zo" origami-reset "open all recursively" :column "Folding Global")
   ("zc" origami-close-all-nodes "close all recursively")
   ("za" origami-toggle-all-nodes "toogle all")
-  ("io" (outline-show-all) "open all recursively" :column "Outline")
-  ("ic" (outline-hide-body) "close all recursively")
-  ("ia" (outshine-cycle-buffer) "toogle all")
-  ("ii" (counsel-outline) "jump to")
-  ("h" (outline-previous-heading) "↑ outline" :column "Navigation")
+  ;; ("ii" (counsel-outline) "jump to")
+  ;; ("h" (outline-previous-heading) "↑ outline" :column "Navigation")
   ("j" (mugu-fold-next-fold) "↓ fold")
   ("k" (mugu-fold-prev-fold) "↑ fold")
-  ("l" (outline-next-heading) "↓ outline")
+  ;; ("l" (outline-next-heading) "↓ outline")
   ("zz" (recenter) "recenter view")
   ("q" nil "exit" :color blue :column nil))
 

@@ -167,7 +167,8 @@ If PRINT-MESSAGE is true, print message instead."
   (interactive (list (mugu-orgu-element-at-point) 'print))
   (let* ((priority-score (- 100 (mugu-orgu-get-priority headline)))
          (quicky-bonus (if (mugu-orgu-has-tag? headline "quicky" 'inherit)
-                           (if (org-element-property :todo-type headline) 2000 40000000)
+                           (if (org-element-property :todo-type headline) 2000
+                             (if (equal "quicky" (org-element-property :tag headline)) 40000000 0))
                          0))
          (todo-score (* 1000 (mugu-orgw-todo-rank (org-element-property :todo-keyword headline))))
          (todo-lineage-score (* 1000 (mugu-orgw-get-lineage-todo-score headline)))

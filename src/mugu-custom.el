@@ -130,9 +130,9 @@
  '(global-evil-surround-mode t)
  '(global-flycheck-mode t)
  '(global-hl-line-mode t)
- '(global-semantic-decoration-mode t)
- '(global-semantic-highlight-func-mode t)
- '(global-semantic-idle-summary-mode t)
+ '(global-semantic-decoration-mode nil)
+ '(global-semantic-highlight-func-mode nil)
+ '(global-semantic-idle-summary-mode nil)
  '(helm-autoresize-max-height 70)
  '(helm-autoresize-min-height 20)
  '(helm-autoresize-mode t)
@@ -225,7 +225,7 @@
  '(safe-local-variable-values
    (quote
     ((bug-reference-bug-regexp . "#\\(?2:[[:digit:]]+\\)"))))
- '(semantic-mode t)
+ '(semantic-mode nil)
  '(show-paren-mode t)
  '(show-paren-style (quote expression))
  '(straight-check-for-modifications (quote (find-when-checking)))
@@ -288,7 +288,6 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(dired-directory ((t (:inherit font-lock-function-name-face :weight bold))))
  '(flycheck-info ((t (:underline nil))))
  '(flycheck-warning ((t (:underline nil))))
  '(helm-swoop-target-line-block-face ((t (:inherit helm-swoop-target-line-face))))
@@ -305,6 +304,5 @@
  '(org-level-5 ((t (:inherit outline-6))))
  '(org-level-6 ((t (:inherit outline-8))))
  '(org-level-7 ((t (:inherit outline-7))))
- '(persp-selected-face ((t (:foreground "royal blue" :weight bold))))
  '(tooltip ((t (:inherit default :background "lightyellow" :foreground "black"))))
  '(variable-pitch ((t (:height 1.0 :family "Courier")))))

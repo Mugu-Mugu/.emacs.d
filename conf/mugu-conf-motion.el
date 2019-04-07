@@ -9,6 +9,7 @@
 (use-package avy
   :defer
   :config
+  (set-face-attribute 'avy-goto-char-timer-face nil :inherit 'lazy-highlight)
   (setq avy-case-fold-search t)
   (setq avy-all-windows t)
   (setq avy-background t)

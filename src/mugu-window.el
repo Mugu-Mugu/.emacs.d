@@ -111,6 +111,7 @@ If SIDE is non-nil only get windows on that side."
 ;;   (golden-ratio-mode 1))
 
 (use-package zoom
+  :disabled
   :defer 5
   :custom
   (zoom-size '(0.618 . 0.618)))

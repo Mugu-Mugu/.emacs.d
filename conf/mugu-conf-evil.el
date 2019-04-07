@@ -36,10 +36,5 @@
   (global-evil-surround-mode 1)
   (evil-define-key 'visual evil-surround-mode-map "s" 'evil-surround-region))
 
-(use-package evil-mc
-  :diminish
-  :config
-  (global-evil-mc-mode))
-
 (provide 'mugu-conf-evil)
 ;;; mugu-conf-evil ends here

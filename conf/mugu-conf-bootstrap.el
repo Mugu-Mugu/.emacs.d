@@ -38,7 +38,8 @@ DIR is expected to be under `user-emacs-directory'."
   (require 'use-package)
 
   (setq straight-use-package-by-default t)
-  (setq use-package-verbose t))
+  (setq use-package-verbose t)
+  (setq straight-recipes-gnu-elpa-use-mirror t))
 
 (defun mugu-bootstrap-activate ()
   "Start the boot sequence."

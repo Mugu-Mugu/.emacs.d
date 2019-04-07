@@ -4,6 +4,7 @@
 
 ;;; Code:
 (require 'mugu-cosmetics)
+(require 'mugu-misc)
 
 ;; * begin:
 (defun mugu-vanilla--gc ()
@@ -16,7 +17,10 @@ Loading it in init would trigger prematuraly the Emacs Lisp configuration."
   (kill-buffer "*scratch*"))
 
 (defsubst mugu-vanilla-set-startup-settings ()
-  "."
+  "Some hack for faster boot.
+Scratch is in Emacs Lisp mode and trigger a lot of package configuration at
+startup which is not needed nor required.  To prevent this, we kill it before it
+had chance to be loaded."
   (setq initial-frame-alist (mugu-cosmetics-frame-params))
   (setq initial-scratch-message nil)
   (setq initial-major-mode 'fundamental-mode)
@@ -54,7 +58,7 @@ Loading it in init would trigger prematuraly the Emacs Lisp configuration."
 (defsubst mugu-vanilla-set-perf-settings ()
   "."
   (setq-default bidi-display-reordering nil)
-  (setq gc-cons-threshold 5000000000)
+  (setq gc-cons-threshold 8000000)
   (add-hook 'focus-out-hook #'mugu-vanilla--gc))
 
 (defsubst mugu-vanilla-set-other-settings ()

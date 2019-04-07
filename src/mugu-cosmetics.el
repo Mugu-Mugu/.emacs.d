@@ -13,7 +13,7 @@
     (tool-bar-lines . nil)
     (menu-bar-lines . nil)
     (font . "DejaVu Sans Mono-9:bold")
-    (alpha . (95 . 65))))
+    (alpha . (95 . 95))))
 
 (defun mugu-cosmetics-activate ()
   "Activate various cosmetics feature.")

@@ -139,9 +139,9 @@
  '(lispy-safe-copy t)
  '(lispy-safe-delete t)
  '(lispy-safe-paste t)
- '(lsp-prefer-flymake nil t nil "Customized with use-package lsp-mode")
+ '(lsp-prefer-flymake nil nil nil "Customized with use-package lsp-mode")
  '(lsp-ui-flycheck-live-reporting t)
- '(lsp-ui-sideline-delay 0.5)
+ '(lsp-ui-sideline-delay 1.0)
  '(lsp-ui-sideline-enable t)
  '(magit-completing-read-function (quote ivy-completing-read))
  '(magit-dispatch-arguments nil)
@@ -260,7 +260,6 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(dired-directory ((t (:inherit font-lock-function-name-face :weight bold))))
  '(flycheck-info ((t (:underline nil))))
  '(flycheck-warning ((t (:underline nil))))
  '(helm-swoop-target-line-block-face ((t (:inherit helm-swoop-target-line-face))))
