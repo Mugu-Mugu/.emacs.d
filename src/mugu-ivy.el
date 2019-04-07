@@ -30,6 +30,7 @@
         ivy-count-format "(%d/%d) "
         ivy-height 20
         ivy-wrap t
+        ivy-re-builders-alist '((t . ivy--regex-ignore-order))
         ivy-preferred-re-builders '((ivy--regex-ignore-order . "order")
                                     (ivy--regex-plus . "ivy")
                                     (ivy--regex-fuzzy . "fuzzy"))
@@ -90,6 +91,7 @@ Selected action : %s(ivy-action-name) %s(if ivy-calling \"auto called\" \"\")
   ("M-i" ivy-insert-current "insert current")
   ("M-j" ivy-next-line "↓ next")
   ("M-k" ivy-previous-line "↑ prev")
+  ("C-w" backward-kill-word "")
   ("M-r" ivy-restrict-to-matches "restrict" :column "Matches")
   ("M-y" ivy-kill-ring-save "yank all")
   ("C-o" mugu-ivy-active-menu "open hydra" :color blue)
