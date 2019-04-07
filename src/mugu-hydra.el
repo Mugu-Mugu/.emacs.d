@@ -21,6 +21,16 @@ HEADS are already available and are not recorded"
 ;; record additional parameters on hydra invocation
 (advice-add 'defhydra :after #'mugu-hydra--record-call)
 (general-unbind 'hydra-base-map "-")
+(general-unbind 'hydra-base-map "1")
+(general-unbind 'hydra-base-map "2")
+(general-unbind 'hydra-base-map "3")
+(general-unbind 'hydra-base-map "4")
+(general-unbind 'hydra-base-map "5")
+(general-unbind 'hydra-base-map "6")
+(general-unbind 'hydra-base-map "7")
+(general-unbind 'hydra-base-map "8")
+(general-unbind 'hydra-base-map "9")
+(general-unbind 'hydra-base-map "0")
 
 (defun mugu-hydra--list-head-binding (hydra-heads)
   "Return a list of used binding for each heads in HYDRA-HEADS."
