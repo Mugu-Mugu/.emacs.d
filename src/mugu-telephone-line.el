@@ -26,11 +26,10 @@ It should have form (status . number) where status can be error/warning/info."
                    ('finished (if flycheck-current-errors
                                   (s-trim (mapconcat 'mugu-modeline-get-flycheck-results
                                                      (flycheck-count-errors flycheck-current-errors) " "))
-                                (propertize "✔" 'face '(:foreground "green" :weight "bold"))))
+                                (propertize "✔" 'face '(:foreground "green") 'weight 'extra-bold)))
                    ('running "*")
-                   (_ (propertize "x" 'face '(:foreground "red"
-                                                          :weight "bold")
-
+                   (_ (propertize "x" 'face '(:foreground "red")
+                                  'weight 'extra-bold
                                   'mouse-face '(:box 1)
                                   'help-echo (pcase flycheck-last-status-change
                                                ('no-checker "No Checker")
