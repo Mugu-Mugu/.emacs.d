@@ -36,42 +36,39 @@
 (require 'mugu-org-utils)
 (require 'dash)
 (require 'ht)
+(require 'noflet)
 (require 'org)
 (require 'org-agenda)
 (require 'org-capture)
 (require 'org-habit)
 
 ;; * Headlines predicate
-(defun mugu-orgw-leaf-headline-p (headline)
-  "Predicate determining if HEADLINE is leaf."
-  (not (mugu-orgu-headline-get-childs headline)))
-
 (defun mugu-orgw-refilable-headline-p (headline)
   "Predicate determining if HEADLINE is refilable."
-  (-contains? (mugu-orgu-get-tags headline 'inherit 'inherit-only)
-              "refile"))
+  (and (mugu-orgw-task-headline-p headline)
+       (-contains? (mugu-orgu-get-tags headline 'inherit 'inherit-only)
+                   "refile")))
+
+(defun mugu-orgw-inbox-for-capture-headline-p (headline)
+  "Predicate determining if HEADLINE is a inbox made for refile purpose."
+  (-contains? (mugu-orgu-get-tags headline) "refile"))
 
 (defun mugu-orgw-inbox-headline-p (headline)
   "Predicate determining if HEADLINE is a inbox."
-  (-intersection (mugu-orgu-get-tags headline)
-                 '("quicky" "refile")))
-
-(defun mugu-orgw-global-capture-headline-p (headline)
-  "Predicate determining if HEADLINE is a global capture targer.
-Either a inbox, a project or an active task."
-  (or (mugu-orgw-inbox-headline-p headline)
-      (mugu-orgw-active-headline-p headline)
-      (mugu-orgw-project-headline-p headline)))
+  (-contains? (mugu-orgu-get-tags headline) "inbox"))
 
 (defun mugu-orgw-active-headline-p (headline)
-  "Predicate determining if HEADLINE is active.
-Only leaf headline are considered."
-  (and (equal (org-element-property :todo-keyword headline) "ACTIVE")
-       (not (mugu-orgu-headline-has-child-with-todo-keywords headline '("ACTIVE")))))
+  "Predicate determining if HEADLINE is active."
+  (eq 'todo (org-element-property :todo-type headline)))
 
 (defun mugu-orgw-wait-headline-p (headline)
   "Predicate determining if HEADLINE is waiting."
   (equal (org-element-property :todo-keyword headline) "WAIT"))
+
+(defun mugu-orgw-wait-or-snoozed-headline-p (headline)
+  "Predicate determining if HEADLINE is waiting."
+  (or (equal (org-element-property :todo-keyword headline) "WAIT")
+      (> (mugu-orgw--last-active headline) (float-time))))
 
 (defun mugu-orgw-todo-headline-p (headline)
   "Predicate determining if HEADLINE is active.
@@ -79,55 +76,53 @@ Only leaf headline are considered."
   (and (equal (org-element-property :todo-keyword headline) "TODO")
        (not (mugu-orgu-headline-has-child-with-todo-keywords headline '("NEXT" "ACTIVE" "TODO")))))
 
-(defun mugu-orgw-next-headline-p (headline)
+(defun mugu-orgw-next-task-p (headline)
   "Predicate determining if HEADLINE is a next step.
 Only leaf headline are considered."
-  (and (equal (org-element-property :todo-keyword headline) "NEXT")
-       (not (mugu-orgu-headline-has-child-with-todo-keywords headline '("NEXT" "ACTIVE")))))
+  (and (mugu-orgw-task-headline-p headline)
+       (equal (org-element-property :todo-keyword headline) "NEXT")))
 
 (defun mugu-orgw-project-headline-p (headline)
   "Predicate determining if HEADLINE is a project.
-A project is just a todo headline with a child todo.  This match all project,
-regardless of their nest level."
-  (and (equal (org-element-property :todo-type headline) 'todo)
-       (mugu-orgu-headline-has-child-with-todos headline)))
+A project is just a headline (todo or not) with a tag todo."
+  (-contains? (mugu-orgu-get-tags headline) "project"))
 
-(defun mugu-orgw-top-project-headline-p (headline)
-  "Predicate determining if HEADLINE is a top project.
-Such a headline has no parent which is also a TODO headline."
-  (and (mugu-orgw-project-headline-p headline)
-       (not (mugu-orgu-headline-has-parent-with-todos? headline))))
-
-(defun mugu-orgw-leaf-project-headline-p (headline)
-  "Predicate determining if HEADLINE is a leaf project.
-Such a headline is a project with no child project."
-  (and (mugu-orgw-project-headline-p headline)
-       (--none? (mugu-orgw-project-headline-p it) (mugu-orgu-headline-get-childs headline))))
+(defun mugu-orgw-project-active-headline-p (headline)
+  "Predicate determining if HEADLINE is a project.
+A project is just a headline (todo or not) with a tag todo."
+  (and (mugu-orgw-active-headline-p headline)
+       (mugu-orgw-project-headline-p headline)))
 
 (defun mugu-orgw-task-headline-p (headline)
-  "Predicate determining if HEADLINE is a task."
-  (org-element-property :todo-type headline))
+  "Predicate determining if HEADLINE is a task.
+A task is either:
+- a top level todo HEADLINE
+- or a child todo HEADLINE of a project.
+It can't be both a task and a project (project takes priority)."
+  (let ((parent-headline (mugu-orgu-parent-todo-headline headline)))
+    (and (mugu-orgu-todo-headline-p headline)
+         (not (mugu-orgw-project-headline-p headline))
+         (or (not parent-headline) (mugu-orgw-project-headline-p parent-headline)))))
+
+(defun mugu-orgw-next-task-headline-p (headline)
+  "Predicate determining if HEADLINE is a next task."
+  (and (mugu-orgw-task-headline-p headline)
+       (equal "NEXT" (org-element-property :todo-keyword headline))))
 
 (defun mugu-orgw-todos-headline-p (headline)
   "Predicate determining if HEADLINE is a task."
   (eq 'todo (org-element-property :todo-type headline)))
 
-(defun mugu-orgw-leaf-todos-headline-p (headline)
-  "Predicate determining if HEADLINE is a task."
-  (and (mugu-orgw-todos-headline-p headline)
-       (-none? 'mugu-orgw-todos-headline-p (mugu-orgu-headline-get-childs headline))))
-
 (defun mugu-orgw-stuck-project-headline-p (headline)
   "Predicate determining if HEADLINE is a stuck project.
-Such a headline is a project with no active or next child."
+Such a headline is a project with no next child."
   (and (mugu-orgw-project-headline-p headline)
-       (not (mugu-orgu-headline-has-child-with-todo-keywords headline '("ACTIVE" "NEXT")))))
+       (not (mugu-orgu-headline-has-child-with-todo-keywords headline '("NEXT")))))
 
-(defun mugu-orgw-todo-rank (todo-keyword)
+(defun mugu-orgw--score-todo (headline)
   "Return an integer mapping a TODO-KEYWORD to its sort rank."
-  (pcase todo-keyword
-    ("ACTIVE" 4)
-    ("NEXT" 2)
+  (pcase (org-element-property :todo-keyword headline)
+    ("NEXT" 1000)
     ("TODO" 1)
     ("WAIT" -1)
     ("DONE" -100)
@@ -158,35 +153,48 @@ If PRINT-MESSAGE is true, print message instead."
         (message "Lineage todo score: %s" result)
       result)))
 
-(defun mugu-orgw-sort-get-score-headline (headline &optional print-message)
-  "Return a integer value representing the sorting priority of a given entry.
-Consider HEADLINE if it is provided otherwise look for element at point.
-Sorted by Todo types where active one are more prioritary and then by priority
-property.
-If PRINT-MESSAGE is true, print message instead."
-  (interactive (list (mugu-orgu-element-at-point) 'print))
-  (let* ((priority-score (- 100 (mugu-orgu-get-priority headline)))
-         (quicky-bonus (if (mugu-orgu-has-tag? headline "quicky" 'inherit)
-                           (if (org-element-property :todo-type headline) 2000
-                             (if (equal "quicky" (org-element-property :tag headline)) 40000000 0))
-                         0))
-         (todo-score (* 1000 (mugu-orgw-todo-rank (org-element-property :todo-keyword headline))))
-         (todo-lineage-score (* 1000 (mugu-orgw-get-lineage-todo-score headline)))
-         (final-score (+ todo-score todo-lineage-score quicky-bonus priority-score)))
-    (if print-message
-        (message "Score headline : %s [todo %s, lineage %s, priority %s]" final-score todo-score todo-lineage-score priority-score)
-      final-score)))
+(defun mugu-orgw--last-active (headline)
+  "Return the last active data of HEADLINE if present.
+If not present return nil."
+  (string-to-number (or (org-element-property :LAST-ACTIVE headline) "0")))
+
+(defun mugu-orgw--score-last-active (now headline)
+  "Return a penalty score for HEADLINE dependant on last active field.
+Penalty is computed relative to NOW."
+  (if (< (mugu-orgw--last-active headline) now)
+      (- (mugu-orgw--last-active headline) now)
+    (- (+ now (mugu-orgw--last-active headline)))))
+
+(defun mugu-orgw--score-priority (headline)
+  "Return a penalty score for HEADLINE dependant on last active field.
+Penalty is computed relative to NOW."
+  (- (or (org-element-property :priority headline) 100)))
+
+(defun mugu-orgw--sort-cmp-score (score-fun hl-left hl-right)
+  "Relation order between HL-LEFT and HL-RIGHT based on SCORE-FUN.
+SCORE-FUN should be a function taking a headline in parameter and returning a
+integer which correspond to the score.  The higher the score the more prioritary
+the corresponding headline."
+  (let ((score-left (funcall score-fun hl-left))
+        (score-right (funcall score-fun hl-right)))
+    (cond ((> score-left score-right) 'sup)
+          ((< score-left score-right) 'inf)
+          ((< score-left score-right) nil))))
 
 (defun mugu-orgw-sort-cmp-headlines (hl-left hl-right)
   "Relation order between HL-LEFT and HL-RIGHT based on sorting priority."
-  (> (mugu-orgw-sort-get-score-headline hl-left)
-     (mugu-orgw-sort-get-score-headline hl-right)))
+  (let ((score-last-active (apply-partially #'mugu-orgw--score-last-active (float-time))))
+    (eq 'sup (or (mugu-orgw--sort-cmp-score #'mugu-orgw--score-todo hl-left hl-right)
+                 (mugu-orgw--sort-cmp-score score-last-active hl-left hl-right)
+                 (mugu-orgw--sort-cmp-score #'mugu-orgw--score-priority hl-left hl-right)))))
 
 (defun mugu-orgw-capture-todo (find-loc-find)
-  "Capture a todo headline and store it in the headline selected by FIND-LOC-FIND."
-  (let ((org-capture-templates `(("x" "capture a task todo"
-                                  entry (function ,find-loc-find) "* TODO %i %?"))))
-    (org-capture nil "x")))
+  "Capture a todo headline and store it in the headline selected by FIND-LOC-FIND.
+The hack with noflet is to prevent fucking orgmode to sabotage the windows configuration."
+  (noflet ((delete-other-windows (&optional _window) (set-window-configuration (org-capture-get :return-to-wconf))))
+    (let ((org-capture-templates `(("x" "capture a task todo"
+                                    entry (function ,find-loc-find) "* TODO %i %?"))))
+      (org-capture nil "x"))))
 
 (defun mugu-orgw-capture-note (file)
   "Build a capture template for a note type headline and store it into FILE."
@@ -194,28 +202,125 @@ If PRINT-MESSAGE is true, print message instead."
                                   entry (file+datetree ,file) "* %U %i %?"))))
     (org-capture nil "x")))
 
-(defun mugu-orgw-agenda-global ()
-  "Display a global org agenda view."
+(defun mugu-orgw-agenda-future-overview ()
+  "Display a global org agenda view about upcoming events.."
   (let ((org-agenda-custom-commands
          `(("o"
-            "Global overview of all projects"
-            ((todo ""
-                   ((org-agenda-overriding-header "ALL tasks in progress or due today")
-                    (org-agenda-prefix-format "%-10c | %b")
-                    (org-agenda-skip-function (mugu-orgu-make-skip-function
-                                               #'mugu-orgw-active-headline-p))))
-             (agenda ""
+            "Global overview for future activities"
+            ((agenda ""
                      ((org-agenda-overriding-header "Global agenda")
                       (org-agenda-prefix-format " %-10c | %-12s | %b")
                       (org-agenda-show-all-dates t)
                       (org-agenda-ndays 14)))
              (todo ""
-                   ((org-agenda-overriding-header "Next actions ready")
+                   ((org-agenda-overriding-header "Stuck projects")
+                    (org-agenda-prefix-format "%-10c | %b")
+                    (org-agenda-skip-function (mugu-orgu-make-skip-function
+                                               #'mugu-orgw-stuck-project-headline-p))))
+             (todo ""
+                   ((org-agenda-overriding-header "Tasks to refile")
+                    (org-agenda-skip-function (mugu-orgu-make-skip-function
+                                               #'mugu-orgw-refilable-headline-p))
+                    (org-agenda-prefix-format "%-10c | %b")))
+             (todo ""
+                   ((org-agenda-overriding-header "Next tasks")
                     (org-agenda-skip-function (mugu-orgu-make-skip-function
                                                #'mugu-orgw-next-headline-p))
                     (org-agenda-prefix-format "%-10c | %b"))))))))
 
     (org-agenda nil "o")))
+
+(defun mugu-orgw-agenda-current-overview ()
+  "Display a global org agenda view."
+  (let* ((current-task (mugu-orgw-current-task))
+         (current-project (mugu-orgw-current-project))
+         (current-task-p (apply-partially #'mugu-orgu-headline-equals-p current-task))
+         (current-project-p (apply-partially #'mugu-orgu-headline-equals-p current-project))
+         (task-of-current-project-p (lambda (headline)
+                                      (mugu-orgu-headline-equals-p current-project (mugu-orgu-get-parent headline))))
+         (subtask-of-current-task-p (lambda (headline)
+                                      (mugu-orgu-headline-equals-p current-task (mugu-orgu-get-parent headline))))
+         (org-agenda-custom-commands `(("o"
+                                        "Global overview of current activities"
+                                        ((todo ""
+                                               ((org-agenda-overriding-header "Current project")
+                                                (org-agenda-prefix-format "%-10c | %b")
+                                                (org-agenda-skip-function ,(mugu-orgu-make-skip-function current-project-p))))
+                                         (todo ""
+                                               ((org-agenda-overriding-header "Current task")
+                                                (org-agenda-skip-function ,(mugu-orgu-make-skip-function current-task-p))
+                                                (org-agenda-prefix-format "%-10c | %b")))
+                                         (todo ""
+                                               ((org-agenda-overriding-header "All projects")
+                                                (org-agenda-skip-function ,(mugu-orgu-make-skip-function #'mugu-orgw-project-headline-p))
+                                                (org-agenda-prefix-format "%-10c | %b")))
+                                         (todo ""
+                                               ((org-agenda-overriding-header "Tasks of current project")
+                                                (org-agenda-skip-function ,(mugu-orgu-make-skip-function task-of-current-project-p))
+                                                (org-agenda-prefix-format "%-10c | %b")))
+                                         (todo ""
+                                               ((org-agenda-overriding-header "Subtasks of current task")
+                                                (org-agenda-skip-function ,(mugu-orgu-make-skip-function subtask-of-current-task-p))
+                                                (org-agenda-prefix-format "%-10c | %b"))))))))
+
+    (org-agenda nil "o")))
+
+(defun mugu-orgw--set-timestamp (headline &optional delay)
+  "Insert now as a timestamp in HEADLINE property.
+If DELAY is given, add it to the timestamp."
+  (let* ((delay (or delay 0))
+         (last-active-raw (org-element-property :LAST-ACTIVE headline))
+         (initial-timestamp (or (and last-active-raw (string-to-number last-active-raw))
+                                (float-time)))
+         (new-timestamp (+ delay initial-timestamp)))
+    (mugu-orgu-put-property headline "last-active" (format "%s" new-timestamp))))
+
+(defun mugu-orgw-current-task ()
+  "Retrieve the current active task."
+  (-first-item (-sort #'mugu-orgw-sort-cmp-headlines (mugu-orgu-list-headlines 'mugu-orgw-task-headline-p))))
+
+(defun mugu-orgw-current-project ()
+  "Retrieve the current active project."
+  (-first-item (-sort #'mugu-orgw-sort-cmp-headlines (mugu-orgu-list-headlines 'mugu-orgw-project-headline-p))))
+
+(defun mugu-orgw-list-subtasks (task-headline)
+  "Return a list of subtask for the given TASK-HEADLINE."
+  (or (mugu-orgu-headline-get-childs task-headline #'mugu-orgu-todo-headline-p) (list task-headline)))
+
+(defun mugu-orgw-list-project-tasks (project-headline)
+  "Return a list of subtask for the given PROJECT-HEADLINE."
+  (or (mugu-orgu-headline-get-childs project-headline #'mugu-orgw-task-headline-p) (list project-headline)))
+
+(defun mugu-orgw-reset-timestamp (headline)
+  "Reset the timestamp of HEADLINE to now."
+  (interactive (list (mugu-orgu-element-at-point)))
+  (mugu-orgu-put-property headline "last-active" (float-time)))
+
+(defun mugu-orgw-delete-timestamp (headline)
+  "Reset the timestamp of HEADLINE to now."
+  (interactive (list (mugu-orgu-element-at-point)))
+  (mugu-orgu-delete-property headline "last-active"))
+
+(defun mugu-orgw-set-task-active (headline)
+  "Set task HEADLINE active.
+Change it's status to NEXT and record the time at which it occured."
+  (interactive (list (mugu-orgu-element-at-point)))
+  (mugu-orgu-change-todo-state headline "NEXT")
+  (mugu-orgw-reset-timestamp headline))
+
+(defun mugu-orgw-set-task-done (headline)
+  "Set task HEADLINE as done."
+  (interactive (list (mugu-orgu-element-at-point)))
+  (mugu-orgu-change-todo-state headline "DONE"))
+
+(defun mugu-orgw-set-task-cancel (headline)
+  "Set task HEADLINE as cancel."
+  (interactive (list (mugu-orgu-element-at-point)))
+  (mugu-orgu-change-todo-state headline "CANCEL"))
+
+(defun mugu-orgw-snooze-task (headline delay)
+  "Snooze HEADLINE for DELAY in seconds."
+  (mugu-orgw--set-timestamp headline delay))
 
 (defun mugu-orgw-set-configuration ()
   "Activate the workflow.
@@ -230,6 +335,7 @@ each project file."
                                    ("@transport" . nil)
                                    ("@travail" . nil)
                                    ("fast_todo" . nil)
+                                   ("project" . nil)
                                    ("need_review" . nil)
                                    ("quicky" . nil)
                                    ("refile" . nil)

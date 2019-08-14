@@ -1,3 +1,4 @@
+;; -*- lexical-binding: t -*-
 ;; mugu-org-interface --- Summary
 ;; tbc
 ;;; Commentary:
@@ -9,13 +10,171 @@
 (require 'ivy)
 (require 'mugu-lisp-libs)
 
-(defun mugu-orgi-switch-to-buffer-other-window (orig-fun &rest args)
+;; variables
+(defvar mugu-orgi-last-command nil
+  "Last org interface command invoked.")
+
+(defvar mugu-orgi-headline-actions
+  '(("a" mugu-orgw-set-task-active "active")
+    ("c" mugu-orgw-set-task-cancel "cancel")
+    ("d" mugu-orgw-set-task-done "done")
+    ("s" mugu-orgi-snooze-headline "snooze")
+    ("r" mugu-orgi-retard-headline "retard")
+    ("R" mugu-orgw-delete-timestamp "reset task"))
+  "A list of possible actions for a given headline.
+Each action has the form: hotkey function description")
+
+;; hacks
+(defun mugu-orgi-switch-to-buffer-other-window (_orig-fun &rest args)
   "Ugly but the original implementation popped frame when side window was open.
 This is because of the macro `org-no-popups' which actually did the opposite of
 what it was intended to do.  Since it also unbound `display-buffer-alist' it was
 not possible to fix it otherwise.
 ORIG-FUN and ARGS are not read."
   (apply #'switch-to-buffer-other-window args))
+
+;; utilitites
+(defun mugu-orgi--prepare-headlines-for-ivy (headlines)
+  "Format HEADLINES to ivy expected format of a list of (candidate . object).
+Also sort the collection by urgency."
+  (--map (cons (mugu-orgu-get-outline it) it)
+         (-sort 'mugu-orgw-sort-cmp-headlines headlines)))
+
+(defun mugu-orgi--counsel-headlines (headlines default-action)
+  "Select a headline from HEADLINES and apply it preselected DEFAULT-ACTION.
+DEFAULT-ACTION should accept an org-element headline as single argument.
+Headlines are displayed sorted according to their urgentness."
+  (let* ((action (or default-action 'identity)))
+    (ivy-read "select an headline: "
+              (mugu-orgi--prepare-headlines-for-ivy headlines)
+              :action (lambda (candidate) (funcall action (cdr candidate)))
+              :initial-input ""
+              :caller 'mugu-orgi)))
+
+(defun mugu-orgi-counsel--pick-headlines (headlines)
+  "Select a headline from HEADLINES and return its `org-element' object."
+  (let* ((headline-object nil)
+         (action (lambda (candidate) (setq headline-object candidate))))
+    (mugu-orgi--counsel-headlines headlines action)
+    headline-object))
+
+(defmacro mugu-orgi--make-command (name headlines-query default-action)
+  "Make a org ivy command named NAME.
+It applies only to headlines returned by HEADLINES-QUERY with DEFAULT-ACTION
+upon selection."
+  `(defun ,name ()
+     ,(format "Automatically generated function to select headline.
+headline predicate : %s
+headline action : %s" headlines-query default-action)
+     (interactive)
+     (setq mugu-orgi-last-command ',name)
+     (mugu-orgi--counsel-headlines (funcall ,headlines-query) ,default-action)))
+
+(defun mugu-orgi--to-ivy-persistent-action (headline-action)
+  "Wrap a HEADLINE-ACTION so it can be invoked as a ivy action.
+HEADLINE-ACTION is a function taking a single headline as argument and should
+return the updated headline.
+The last command session is resumed after."
+  (lambda (headline)
+    (funcall headline-action (cdr headline))
+    (funcall mugu-orgi-last-command)))
+
+(defun mugu-orgi--make-query (headlines-predicate)
+  "Make a query returning headlines matching HEADLINES-PREDICATE."
+  (lambda () (mugu-orgu-list-headlines headlines-predicate)))
+;;; Actions
+
+(defun mugu-orgi--action-focus-headline (headline)
+  "Go to HEADLINE and focus on it."
+  (interactive)
+  (mugu-orgu-action-headline-goto headline)
+  (mugu-orgi-focus-headline))
+
+(defun mugu-orgi--action-snooze-headline (headline &optional relative-to-now reversed)
+  "Snooze the HEADLINE by applying a delay to it's active timestamp.
+If RELATIVE-TO-NOW is not nil, the previous headline timestamp is discarded
+and now is used instead.
+If REVERSED is not nil, the chosen delay is substracted instead."
+  (when relative-to-now (mugu-orgw-reset-timestamp headline))
+  (mugu-orgw-snooze-task headline (if reversed
+                                      (- (mugu-orgi--pick-delay))
+                                    (mugu-orgi--pick-delay))))
+
+(defsubst mugu-orgi-snooze-headline (headline)
+  "Snooze the HEADLINE or the task at point if called interractively."
+  (interactive (list (mugu-orgu-element-at-point)))
+  (mugu-orgi--action-snooze-headline headline 'reset))
+
+(defsubst mugu-orgi-retard-headline (headline)
+  "Retard the HEADLINE or the task at point if called interractively."
+  (interactive (list (mugu-orgu-element-at-point)))
+  (mugu-orgi--action-snooze-headline headline nil 'reversed))
+
+
+(defun mugu-orgi--action-refile-headline (target-headline-p headline)
+  "Refile HEADLINE to another headline matching predicate TARGET-HEADLINE-P."
+  (mugu-orgu-action-headline-refile headline
+                                    (mugu-orgi-counsel--pick-headlines (mugu-orgu-list-headlines target-headline-p))))
+;;; Commands
+(mugu-orgi--make-command mugu-orgi-goto-current-task-subtasks
+                         (apply-partially #'mugu-orgw-list-subtasks (mugu-orgw-current-task))
+                         #'mugu-orgi--action-focus-headline)
+(mugu-orgi--make-command mugu-orgi-goto-current-project-tasks
+                         (apply-partially #'mugu-orgw-list-project-tasks (mugu-orgw-current-project))
+                         #'mugu-orgi--action-focus-headline)
+(mugu-orgi--make-command mugu-orgi-refile-to-project
+                         (mugu-orgi--make-query #'mugu-orgw-refilable-headline-p)
+                         (apply-partially #'mugu-orgi--action-refile-headline #'mugu-orgw-project-headline-p))
+(mugu-orgi--make-command mugu-orgi-refile-to-task
+                         (mugu-orgi--make-query #'mugu-orgw-refilable-headline-p)
+                         (apply-partially #'mugu-orgi--action-refile-headline #'mugu-orgw-task-headline-p))
+(mugu-orgi--make-command mugu-orgi-refile-to-inbox
+                         (mugu-orgi--make-query #'mugu-orgw-refilable-headline-p)
+                         (apply-partially #'mugu-orgi--action-refile-headline #'mugu-orgw-inbox-headline-p))
+(mugu-orgi--make-command mugu-orgi-refile-refilable-task
+                         (mugu-orgi--make-query #'mugu-orgw-refilable-headline-p)
+                         #'mugu-orgu-action-headline-refile)
+(mugu-orgi--make-command mugu-orgi-goto-refilable-task
+                         (mugu-orgi--make-query #'mugu-orgw-refilable-headline-p)
+                         #'mugu-orgi--action-focus-headline)
+(mugu-orgi--make-command mugu-orgi-goto-active-task
+                         (mugu-orgi--make-query #'mugu-orgw-active-headline-p)
+                         #'mugu-orgi--action-focus-headline)
+(mugu-orgi--make-command mugu-orgi-goto-project-task
+                         (mugu-orgi--make-query #'mugu-orgw-project-headline-p)
+                         #'mugu-orgi--action-focus-headline)
+(mugu-orgi--make-command mugu-orgi-goto-active-project-task
+                         (mugu-orgi--make-query #'mugu-orgw-project-active-headline-p)
+                         #'mugu-orgi--action-focus-headline)
+(mugu-orgi--make-command mugu-orgi-goto-stuck-project-task
+                         (mugu-orgi--make-query #'mugu-orgw-stuck-project-headline-p)
+                         #'mugu-orgi--action-focus-headline)
+(mugu-orgi--make-command mugu-orgi-goto-wait-task
+                         (mugu-orgi--make-query #'mugu-orgw-wait-headline-p)
+                         #'mugu-orgi--action-focus-headline)
+(mugu-orgi--make-command mugu-orgi-goto-wait-or-snoozed-task
+                         (mugu-orgi--make-query #'mugu-orgw-wait-or-snoozed-headline-p)
+                         #'mugu-orgi--action-focus-headline)
+(mugu-orgi--make-command mugu-orgi-goto-todo-task
+                         (mugu-orgi--make-query #'mugu-orgw-todo-headline-p)
+                         #'mugu-orgi--action-focus-headline)
+(mugu-orgi--make-command mugu-orgi-goto-any-task
+                         (mugu-orgi--make-query #'mugu-orgw-task-headline-p)
+                         #'mugu-orgi--action-focus-headline)
+(mugu-orgi--make-command mugu-orgi-goto-next-task
+                         (mugu-orgi--make-query #'mugu-orgw-next-task-headline-p)
+                         #'mugu-orgi--action-focus-headline)
+(mugu-orgi--make-command mugu-orgi-goto-inbox-headline
+                         (mugu-orgi--make-query #'mugu-orgw-inbox-headline-p)
+                         #'mugu-orgi--action-focus-headline)
+(mugu-orgi--make-command mugu-orgi-goto-inbox-for-capture-headline
+                         (mugu-orgi--make-query #'mugu-orgw-inbox-for-capture-headline-p)
+                         #'mugu-orgi--action-focus-headline)
+
+(defsubst mugu-orgi-goto-agenda-file ()
+  "."
+  (interactive)
+  (mugu-orgi-counsel-agenda-files #'find-file))
 
 (defun mugu-orgi-insert-checkbox ()
   "Insert a checkbox."
@@ -29,37 +188,33 @@ ORIG-FUN and ARGS are not read."
   (interactive)
   (newline-without-break-of-line)
   (insert "- ")
-  (evil-insert-state))
+  (evil-insert--state))
 
 (defun mugu-orgi-focus-headline ()
   "Focus on entry at point by expanding it while hiding other."
   (interactive)
-  (cl-letf (((symbol-function 'message) (lambda (&rest args) nil)))
+  (cl-letf (((symbol-function 'message) (lambda (&rest _args) nil)))
     (save-excursion
       (org-overview))
     (org-cycle)))
 
-(defun mugu-orgi-goto-focus-headline (headline)
-  "Go to HEADLINE and focus on it."
-  (interactive)
-  (mugu-orgu-action-headline-goto headline)
-  (mugu-orgi-focus-headline))
-
-(defun mugu-orgi--annotate-headline-for-ivy (headline)
-  "Return a cons cell where car is an outline of HEADLINE and cdr is the HEADLINE."
-  (cons (mugu-orgu-get-outline headline) headline))
-
-(defun mugu-orgi-counsel-headlines (headlines default-action)
-  "Select a headline from HEADLINES and apply it preselected DEFAULT-ACTION.
-DEFAULT-ACTION should accept an org-element headline as single argument.
-Headlines are displayed sorted according to their urgentness."
-  (let* ((annoted-headlines (--map (mugu-orgi--annotate-headline-for-ivy it)
-                                   (-sort 'mugu-orgw-sort-cmp-headlines headlines)))
-         (action (or default-action 'identity)))
-    (ivy-read "select an headline: "
-              annoted-headlines
-              :action (lambda (candidate) (funcall action (cdr candidate)))
-              :initial-input "")))
+(defun mugu-orgi--pick-delay ()
+  "Choose a delay interactively and return it in seconds."
+  (let ((delay 0)
+        (delay-choices '(("5 minutes" . 300)
+                         ("10 minutes" . 600)
+                         ("20 minutes" . 900)
+                         ("1 hour" . 3600)
+                         ("2 hours" . 7200)
+                         ("4 hours" . 14400)
+                         ("8 hours" . 28800)
+                         ("1 days" . 86400)
+                         ("2 days" . 172800))))
+    (ivy-read "select a delay: "
+              delay-choices
+              :initial-input ""
+              :action (lambda (candidate) (setq delay (cdr candidate))))
+    delay))
 
 (defun mugu-orgi-counsel-agenda-files (&optional default-action)
   "Select an agenda file and apply it DEFAULT-ACTION.
@@ -69,86 +224,28 @@ action is performed."
     (ivy-read "Select an org agenda file : " (org-agenda-files)
               :action action)))
 
-(defmacro mugu-orgi-make-headline-query (name headline-p headline-action)
-  "Build a new command NAME that interactivly select headline and act on it.
-HEADLINE-P should be a function that determine if a candidate headline should be
-selected.  It should accept a single argument: an org-element headline.
-HEADLINE-ACTION should be a function that act upon an org-element item."
-  `(progn
-     (defun ,(intern (format "%s-local" name)) ()
-       ,(format "Automatically generated function to select headline.
-headline predicate : %s
-headline action : %s" headline-p headline-action)
-       (interactive)
-       (mugu-orgi-counsel-headlines (mugu-orgu-list-headlines-local ,headline-p)
-                                    ,headline-action))
-     (defun ,name ()
-       ,(format "Automatically generated function to select headline.
-headline predicate : %s
-headline action : %s" headline-p headline-action)
-       (interactive)
-       (mugu-orgi-counsel-headlines (mugu-orgu-list-headlines ,headline-p)
-                                    ,headline-action))))
-(mugu-orgi-make-headline-query mugu-orgi-goto-leaf-headline
-                               #'mugu-orgw-leaf-headline-p #'mugu-orgi-goto-focus-headline)
-(mugu-orgi-make-headline-query mugu-orgi-refile-refilable-task
-                               #'mugu-orgw-refilable-headline-p #'mugu-orgu-action-headline-refile)
-(mugu-orgi-make-headline-query mugu-orgi-goto-refilable-task
-                               #'mugu-orgw-refilable-headline-p #'mugu-orgi-goto-focus-headline)
-(mugu-orgi-make-headline-query mugu-orgi-goto-active-task
-                               #'mugu-orgw-active-headline-p #'mugu-orgi-goto-focus-headline)
-(mugu-orgi-make-headline-query mugu-orgi-goto-project-task
-                               #'mugu-orgw-project-headline-p #'mugu-orgi-goto-focus-headline)
-(mugu-orgi-make-headline-query mugu-orgi-goto-top-project-task
-                               #'mugu-orgw-top-project-headline-p #'mugu-orgi-goto-focus-headline)
-(mugu-orgi-make-headline-query mugu-orgi-goto-leaf-project-task
-                               #'mugu-orgw-leaf-project-headline-p #'mugu-orgi-goto-focus-headline)
-(mugu-orgi-make-headline-query mugu-orgi-goto-stuck-project-task
-                               #'mugu-orgw-stuck-project-headline-p #'mugu-orgi-goto-focus-headline)
-(mugu-orgi-make-headline-query mugu-orgi-goto-next-task
-                               #'mugu-orgw-next-headline-p #'mugu-orgi-goto-focus-headline)
-(mugu-orgi-make-headline-query mugu-orgi-goto-wait-task
-                               #'mugu-orgw-wait-headline-p #'mugu-orgi-goto-focus-headline)
-(mugu-orgi-make-headline-query mugu-orgi-goto-todo-task
-                               #'mugu-orgw-todo-headline-p #'mugu-orgi-goto-focus-headline)
-(mugu-orgi-make-headline-query mugu-orgi-goto-any-todo
-                               #'mugu-orgw-leaf-todos-headline-p #'mugu-orgi-goto-focus-headline)
-(mugu-orgi-make-headline-query mugu-orgi-goto-any-task
-                               #'mugu-orgw-task-headline-p #'mugu-orgi-goto-focus-headline)
-(mugu-orgi-make-headline-query mugu-orgi-goto-global-capture-headline
-                               #'mugu-orgw-global-capture-headline-p #'mugu-orgi-goto-focus-headline)
-
-(mugu-orgi-make-headline-query mugu-orgi-goto-inbox-headline
-                               #'mugu-orgw-inbox-headline-p #'mugu-orgi-goto-focus-headline)
-
-(defsubst mugu-orgi-goto-agenda-file ()
-  "."
-  (interactive)
-  (mugu-orgi-counsel-agenda-files #'find-file))
-
-(defsubst mugu-orgi-refile-refilable-headline () "."
-  (interactive)
-  (mugu-orgi-counsel-headlines #'mugu-orgw-list-refilable-headlines #'mugu-orgu-action-headline-refile))
-
 (defmenu mugu-orgi-menu-global (:color blue :hint nil)
   "Org mode external interface"
-  ("aa" (mugu-orgw-agenda-global) "global agenda" :column "Agenda")
-  ("ct" (mugu-orgw-capture-todo #'mugu-orgi-goto-global-capture-headline) "capture todo task" :column "Capture")
-  ("ca" (mugu-orgw-capture-todo #'mugu-orgi-goto-active-task) "capture todo to active task")
-  ("cp" (mugu-orgw-capture-todo #'mugu-orgi-goto-project-task) "capture todo to project")
-  ("ci" (mugu-orgw-capture-todo #'mugu-orgi-goto-inbox-headline) "capture todo to inbox")
-  ("cn" (mugu-orgw-capture-note (mugu-orgi-counsel-agenda-files)) "capture note")
-  ("rr" (mugu-orgi-refile-refilable-task) "refile refilable" :column "Refile")
+  ("aa" (mugu-orgw-agenda-future-overview) "global agenda" :column "Agenda")
+  ("ac" (mugu-orgw-agenda-current-overview) "global agenda" :column "Agenda")
+  ("ci" (mugu-orgw-capture-todo #'mugu-orgi-goto-inbox-for-capture-headline) "todo to inbox" :column "Capture")
+  ("cp" (mugu-orgw-capture-todo #'mugu-orgi-goto-current-project) "task to current project")
+  ("ct" (mugu-orgw-capture-todo #'mugu-orgi-goto-current-task) "subtask to current task")
+  ("ri" (mugu-orgi-refile-to-inbox) "to another inbox" :column "Refile")
+  ("rp" (mugu-orgi-refile-to-project) "to a project")
+  ("rt" (mugu-orgi-refile-to-task) "to a task")
   ("gfa" (mugu-orgi-goto-agenda-file) "goto agenda files" :column "Goto File")
   ("gff" (switch-to-buffer (mugu-orgu-get-last-buffer-name)) "goto last visited")
-  ("ga" (mugu-orgi-goto-any-task) "goto task (any)" :column "Goto Task")
-  ("gt" (mugu-orgi-goto-any-todo) "goto task (leaf")
-  ("gg" (mugu-orgi-goto-leaf-headline) "goto any leaf headline")
-  ("gw" (mugu-orgi-goto-wait-task) "goto wait")
-  ("gpp" (mugu-orgi-goto-project-task) "goto any project" :column "Goto Project")
-  ("gpt" (mugu-orgi-goto-top-project-task) "goto a top project")
-  ("gpl" (mugu-orgi-goto-leaf-project-task) "goto a leaf project")
-  ("gps" (mugu-orgi-goto-stuck-project-task) "goto a stuck project"))
+  ("gg" (mugu-orgi-goto-any-task) "goto any task" :column "Goto Task")
+  ("ga" (mugu-orgi-goto-current-task) "goto current active task")
+  ("gw" (mugu-orgi-goto-wait-or-snoozed-task) "goto waiting/snoozed task")
+  ("gr" (mugu-orgi-goto-refilable-task) "goto refilable task")
+  ("gpp" (mugu-orgi-goto-active-project-task) "goto any active project" :column "Goto Project")
+  ("gpc" (mugu-orgi-goto-current-project) "goto current project")
+  ("gps" (mugu-orgi-goto-stuck-project-task) "goto a stuck project")
+  ("gct" (mugu-orgi-goto-current-project-tasks) "goto current tasks" :column "Current Task/Project")
+  ("gcs" (mugu-orgi-goto-current-task-subtasks) "goto current subtasks"))
+
 (defmenu mugu-orgi-menu-agenda-major-mode (:color amaranth :hint nil)
   "Mugu"
   ("l" mugu-org-utils/agenda-forward-block "next block" :column "1-Navigation")
@@ -238,24 +335,11 @@ headline action : %s" headline-p headline-action)
   ("/" org-sparse-tree "search" :color blue :column "Search")
   ("q" mugu-orgi-menu-org-major-mode "Return to org menu" :color blue :column nil))
 
-(defmenu mugu-orgi-submenu-goto
-  (:color blue :hint nil :inherit (mugu-orgi-menu-hjkl-hydra/heads))
-  "Submenu gathering bindings for goto query."
-  ("a" (mugu-orgi-goto-active-task-local) "goto active" :column "Goto Task")
-  ("t" (mugu-orgi-goto-todo-task-local) "goto todo")
-  ("g" (mugu-orgi-goto-any-task-local) "goto any")
-  ("n" (mugu-orgi-goto-next-task-local) "goto next")
-  ("pp" (mugu-orgi-goto-project-task-local) "goto any project" :column "Goto Project")
-  ("pt" (mugu-orgi-goto-top-project-task-local) "goto a top project")
-  ("pl" (mugu-orgi-goto-leaf-project-task-local) "goto a leaf project")
-  ("ps" (mugu-orgi-goto-stuck-project-task-local) "goto a stuck project")
-  ("q" mugu-orgi-menu-org-major-mode "Return to org menu" :color blue :column nil))
-
 (defmenu mugu-orgi-menu-org-major-mode
   (:color blue :hint nil :inherit (mugu-orgi-menu-hjkl-hydra/heads))
   "bindings for ORG mode"
   ("e" (mugu-orgi-submenu-tree-actions) "(expert) tree manipulation" :column "Sub-menus")
-  ("g" (mugu-orgi-submenu-goto) "goto task/project")
+  ("a" (mugu-orgi-submenu-headline-action) "headline actions")
   ("ds" org-schedule "schedule" :column "Timing")
   ("dt" org-time-stamp "insert timestamp")
   ("dd" org-deadline "set deadline")
@@ -276,19 +360,37 @@ headline action : %s" headline-p headline-action)
   ("p" (org-priority) "set priority")
   ("P" org-set-property "set property")
   ("RET" org-insert-heading "insert" :column "Terminate")
-  ("o" org-insert-todo-heading "insert todo")
+  ("o" (mugu-orgi-menu-global) "global org menu")
   ("q" nil "exit"))
+
+(eval
+ `(defmenu mugu-orgi-submenu-headline-action
+   (:color blue :hint nil :inherit (mugu-orgi-menu-hjkl-hydra/heads))
+   ,@(--map (list (concat "a" (-first-item it))
+                  (-second-item it)
+                  (-third-item it)
+                  :column "headline actions")
+            mugu-orgi-headline-actions)))
+
+(defun mugu-orgi--configure-ivy ()
+  "Customize Ivy experience."
+  (ivy-set-actions 'mugu-orgi
+                   (--map (list (-first-item it)
+                                (mugu-orgi--to-ivy-persistent-action (-second-item it))
+                                (-third-item it))
+                          mugu-orgi-headline-actions)))
 
 (defun mugu-orgi-set-configuration ()
   "Set org config value relative to interface."
   (setq org-use-fast-todo-selection t)
-  (setq org-refile-use-outline-path 'file)
-  (setq org-refile-targets (quote ((org-agenda-files :maxlevel . 9))))
+  (setq org-refile-use-outline-path t)
+  (setq org-refile-use-cache nil)
+  (setq org-refile-targets '((org-agenda-files :maxlevel . 9)))
   (setq org-outline-path-complete-in-steps nil)
   (setq org-startup-indented t)
   ;;Use the current window for indirect buffer display
   (setq org-indirect-buffer-display 'current-window)
-  (setq org-agenda-window-setup 'current-window)
+  (setq org-agenda-window-setup 'only-window)
   (setq org-agenda-restore-windows-after-quit 't)
   (setq org-agenda-inhibit-startup t)
   (setq org-agenda-dim-blocked-tasks nil)
@@ -306,14 +408,9 @@ headline action : %s" headline-p headline-action)
                  (slot . 0)
                  (window-height . 2)
                  (inhibit-switch-frame . t)))
-  (add-to-list 'display-buffer-alist
-               '("\\*Org Agenda\\*"
-                 (display-buffer-in-side-window)
-                 (side . left)
-                 (inhibit-switch-frame . t)
-                 (inhibit-same-window . t)))
   (set-face-attribute 'org-todo nil :foreground "#ff3333" :background nil)
-  (advice-add #'org-switch-to-buffer-other-window :around #'mugu-orgi-switch-to-buffer-other-window))
+  (advice-add #'org-switch-to-buffer-other-window :around #'mugu-orgi-switch-to-buffer-other-window)
+  (mugu-orgi--configure-ivy))
 
 (defun mugu-orgi-activate-menus ()
   "Activate org major mode and global menus."
@@ -340,6 +437,13 @@ headline action : %s" headline-p headline-action)
     "M-g" 'org-promote-subtree
     "M-m" 'org-demote-subtree))
 
+(defun mugu-orgi-test-predicate (headline)
+  ".
+HEADLINE."
+  (interactive (list (mugu-orgu-element-at-point)))
+  (if (mugu-orgw-task-headline-p headline)
+      (message "It matches")
+    (message "It does not matches")))
 
 (provide 'mugu-org-interface)
 ;;; mugu-org-interface ends here

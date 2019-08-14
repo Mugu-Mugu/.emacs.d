@@ -1,12 +1,13 @@
 ;;; mugu-conf-keystone --- Summary
 ;; Those packages are hard dependcies to the rest of my configuration.
 ;; They may be customized further in anoter part but they are preloaded now to ensure
-;; initial loading is not dependent on order.
+;; loading is not dependent on order.
 ;;; Commentary:
 
 ;;; Code:
 (require 'use-package)
 
+(use-package lv :demand)
 
 (use-package no-littering :demand)
 

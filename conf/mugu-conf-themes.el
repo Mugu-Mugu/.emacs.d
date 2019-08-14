@@ -7,7 +7,9 @@
 
 ;; NICE THEMES
 (use-package noctilux-theme
-  :demand)
+  :demand
+  :init (load-theme 'noctilux t)
+  )
 
 (use-package zenburn-theme
   :demand t

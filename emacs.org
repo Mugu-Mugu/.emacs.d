@@ -1,12 +1,244 @@
-* ACTIVE emacs
-** [#A] Inbox                                                        :refile:
-*** CANCELLED [#A] Seriously try helm and replace ivy
-CLOSED: [2019-03-11 lun. 13:28]
-** [#B] Short Tasks                                                  :quicky:
-*** NEXT [#A] Commit change and go in a small commit workflow
+* Emacs
+** Serie
+- community
+  - paintball
+** [#A] Inbox                                                        :inbox:refile:
+*** TODO Find fold/outline solution for emacs source code
+*** TODO authorize alt-o in ivy active menu for dispatching
+*** TODO Improve workspace switching for virtual buffer (ie: message is messed up)
+*** TODO Integrate libvterm
+*** DONE Investiguer probleme de pbi
+CLOSED: [2019-08-14 mer. 14:43]
+:PROPERTIES:
+:last-active: 1565784660.5933697
+:END:
+deleted à cause du bugs
+pas reinsérer à cause d'une update de l'order dans la matinée
+** [#B] Short Tasks                                                 :quicky:inbox:
+*** ACTIVE introduire la notion de HOLD dans le workflow
+*** NEXT Rework org mode workflow                                 :project:
+:PROPERTIES:
+:last-active: 1563829256.1121526
+:END:
+**** DONE when I set a story to next, it should remember the time at which it changed
+CLOSED: [2019-07-14 dim. 17:44]
+:PROPERTIES:
+:last-active: 1563118792.8237097
+:END:
+**** DONE when I look at all stories, it must list next stories first sorted by last-modified first
+CLOSED: [2019-07-14 dim. 22:28]
+:PROPERTIES:
+:last-active: 1563118982.740239
+:END:
+**** DONE when I review my backlog, i want to see a list of outstanding project
+CLOSED: [2019-07-21 dim. 17:43]
+:PROPERTIES:
+:last-active: 1563722640.887649
+:END:
+- all project that are not on hold
+- all project that are not finished
+**** DONE when I review my backlog, I want to see a list of task
+CLOSED: [2019-07-22 lun. 23:01]
+a task is either:
+- a top level todo headline
+- or a child todo headline of a project
+**** DONE when I review my backlog, i want to see a list of next task among all projects and standalone tasks
+CLOSED: [2019-07-22 lun. 23:16]
+- all project that are not finished
+**** DONE when I review my backlog, i want to see a list of project that are stuck
+CLOSED: [2019-07-22 lun. 23:41]
+a stuck project is a project without any next task
+**** DONE when I review my backlog, i want to reorder task ranking
+CLOSED: [2019-08-05 lun. 18:44]
+:PROPERTIES:
+:last-active: 1565023735.2547152
+:END:
+**** DONE when I am working, I want to see a list of plannifed task to perform ranked by priority
+CLOSED: [2019-07-26 ven. 16:42]
+**** DONE when I am working, I want to see a list of subtasks of the current active task
+CLOSED: [2019-08-01 jeu. 12:28]
+**** DONE when I am working, I want to be able to register a new task rapidly and without context switching
+CLOSED: [2019-08-01 jeu. 14:13]
+:PROPERTIES:
+:last-active: 1564655356.1699145
+:END:
+**** DONE when I am working, I want to be able to register a new subtask for the current task
+CLOSED: [2019-08-01 jeu. 14:13]
+**** DONE when I am working, I want to be able to register a immediate new subtask for the current task
+CLOSED: [2019-08-01 jeu. 14:13]
+**** DONE when I am working, I want to be able to register a immediate new task for the current task
+CLOSED: [2019-08-01 jeu. 14:13]
+**** DONE Refile tweak
+CLOSED: [2019-08-03 sam. 12:23]
+**** DONE When I am working, I want to set a task active so it becomes the current task
+CLOSED: [2019-08-04 dim. 11:23]
+:PROPERTIES:
+:last-active: 1564909930.8399212
+:END:
+**** DONE bug fetch
+CLOSED: [2019-07-10 mer. 14:31]
+***** DONE discuter lors du standup
+CLOSED: [2019-07-10 mer. 14:31] SCHEDULED: <2019-07-02 mar.>
+***** DONE check bug fetch
+CLOSED: [2019-07-01 lun. 11:44]
+**** DONE Reactiver le dag anaylitics quand push en prod partie back associée
+CLOSED: [2019-07-09 mar. 13:28]
+**** DONE I want to perform a ivy action without leaving the session
+CLOSED: [2019-08-04 dim. 13:01]
+:PROPERTIES:
+:last-active: 1564910632.926887
+:END:
+**** DONE I want to refile/archive a task from anywhere
+CLOSED: [2019-08-07 mer. 14:14]
+**** DONE I want to change the todo state for a task in a ivy session
+CLOSED: [2019-08-04 dim. 12:56]
+:PROPERTIES:
+:last-active: 1564915540.057439
+:END:
+**** DONE I want to refile to inbox different to those meant for capturing
+CLOSED: [2019-08-04 dim. 13:17]
+**** DONE I want to snooze a task to be notified when its time to work on it again
+CLOSED: [2019-08-07 mer. 14:13]
+:PROPERTIES:
+:last-active: 1565170566.418462
+:END:
+Based on last duration:
+- if last_duration is not given, last_duration is assumed to be nil
+  penalty = - now
+- if last_duration is given and in the past, the rank should be higher the closer the last_duration is near now
+  penalty = last-duration - now
+- if last_duration is in the future, it should not appears on top of the list; ideally it should be lower than one without date; among future task, the rank is again determined by proximity to now.
+  penalty = - last-duration - now
+***** DONE Snooze with fixed duration (5 min)
+CLOSED: [2019-08-05 lun. 18:44]
+:PROPERTIES:
+:last-active: 1565019430.5128534
+:END:
+***** DONE Snooze with interractive duration
+CLOSED: [2019-08-07 mer. 14:13]
+several choice :
+- ivy menu
+  with set duration only
+- custom hydra
+  with set duration only
+- standard emacs read
+  any duration but complicated parsing? with format
+- transient
+***** DONE Make Snooze a persistant action
+CLOSED: [2019-08-07 mer. 14:12]
+:PROPERTIES:
+:last-active: 1565170740.4979873
+:END:
+***** DONE Snoozed task should respect chronology
+CLOSED: [2019-08-05 lun. 18:44]
+A task A snoozed before task B should be rated higher because it will be active first in the future
+***** DONE Refactor org interface struture
+CLOSED: [2019-08-07 mer. 14:11]
+:PROPERTIES:
+:last-active: 1565171393.7730703
+:END:
+- To improve how resume is performed
+- To factorize code
+- To normalize similar action name :
+ - headline-select
+ - headline-action
+ - org command
+**** DONE Goto snoozed task or waiting task
+CLOSED: [2019-08-07 mer. 14:40]
+:PROPERTIES:
+:last-active: 1565180094.370592
+:END:
+**** DONE Reverse snooze (deprioritize a story)
+CLOSED: [2019-08-07 mer. 17:53]
+:PROPERTIES:
+:last-active: 1565193201.3445585
+:END:
+- problem: based upon
+**** DONE Enable action from normal org mode
+CLOSED: [2019-08-12 lun. 21:53]
+:PROPERTIES:
+:last-active: 1565639532.4958863
+:END:
+several options :
+- a subhydra
+- a ivy
+***** DONE Extract list of actions into a proper constant
+CLOSED: [2019-08-08 jeu. 22:16]
+:PROPERTIES:
+:last-active: 1565293106.0938973
+:END:
+***** DONE Restore the command action with the new constant
+CLOSED: [2019-08-08 jeu. 21:40]
+:PROPERTIES:
+:last-active: 1565293217.3623528
+:END:
+***** DONE make a dynamic hydra with those actions
+CLOSED: [2019-08-12 lun. 21:52]
+:PROPERTIES:
+:last-active: 1565295384.8277905
+:END:
+**** DONE Repair org agenda
+CLOSED: [2019-08-08 jeu. 19:17]
+:PROPERTIES:
+:last-active: 1565282552.4115036
+:END:
+**** DONE Improve org agenda
+CLOSED: [2019-08-08 jeu. 21:04]
+:PROPERTIES:
+:last-active: 1565282548.8057916
+:END:
+***** DONE Create an agenda view for actions overview:
+CLOSED: [2019-08-08 jeu. 19:43]
+:PROPERTIES:
+:last-active: 1565285782.9993033
+:END:
+- Create block scheduled/deadline task
+- Create block stuck project
+- Create block tasks to refile
+***** DONE Create an agenda view for current context overview
+CLOSED: [2019-08-08 jeu. 21:04]
+:PROPERTIES:
+:last-active: 1565286222.329432
+:END:
+- Create block for current task/project
+- Create block for all available projects
+- Create block for current project task
+- Create block for current task subtasks
+**** DONE Better org agenda window
+CLOSED: [2019-08-08 jeu. 21:04]
+**** CANCELLED Quit after org agenda visit
+Too hard and not that usefull anyway
+CLOSED: [2019-08-08 jeu. 21:21]
+**** TODO Maybe add a universal todo inbox on 'cc'
+**** TODO Investigate org-web
+**** TODO Integration with org-web
+**** DONE Reset timestamp of a task
+CLOSED: [2019-08-08 jeu. 21:19]
+:PROPERTIES:
+:last-active: 1565291962.7655783
+:END:
+**** TODO Add action list subtasks
+**** TODO Add action capture to task
+**** DONE Org refile without view change
+CLOSED: [2019-08-12 lun. 23:01]
+:PROPERTIES:
+:last-active: 1565639606.1993597
+:END:
+**** NEXT Includes current task in listing when displaying current subtasks
+:PROPERTIES:
+:last-active: 1565614932.6157768
+:END:
+this way it becomes the default action
+**** TODO Add action next or change todo in headline action
+*** DONE [#A] Commit change and go in a small commit workflow
+CLOSED: [2019-04-07 dim. 09:52]
+*** TODO Pivotaltracker
 *** TODO remap next and previous match to recenterjk
 *** TODO counsel git log
 *** TODO auth github
+:PROPERTIES:
+:cae:     g
+:END:
 *** TODO [#F] stuck project should be listed in gg view so they have a chance to be picked
 *** DONE [#A] configure google this
 CLOSED: [2019-03-24 dim. 08:49]
@@ -224,8 +456,41 @@ CLOSED: [2019-02-09 sam. 14:50]
 actually very hard to do it properly
 would require some heavy hacking
 CLOSED: [2019-02-03 dim. 10:06]
+*** TODO improve capture: keep current view (do not display destination)
+*** TODO ORG fix short task priority
+*** TODO PROJECT : tolerance for buffers without project
+*** TODO magit, git commit insert without hydra
+*** DONE dump portbase and do test
+CLOSED: [2019-08-04 dim. 12:44]
+:PROPERTIES:
+:last-active: 1564915178.1885347
+:END:
+*** DONE improve python env
+CLOSED: [2019-08-04 dim. 12:56]
+:PROPERTIES:
+:last-active: 1564915041.1186562
+:END:
+- [X] linter
+- [X] formatter
+- [X] ci/cd
+- [X] tests
+*** DONE check set v2
+CLOSED: [2019-08-04 dim. 12:56]
+:PROPERTIES:
+:last-active: 1564912592.4905543
+:END:
+*** DONE import_date in csv export
+CLOSED: [2019-08-04 dim. 12:56]
+:PROPERTIES:
+:last-active: 1564914171.286419
+:END:
+*** DONE [#A] Seriously try helm and replace ivy
+CLOSED: [2019-08-04 dim. 12:56]
+:PROPERTIES:
+:last-active: 1564913841.0296452
+:END:
 ** BACKLOG
-*** [#C] Bugs                                                         :inbox:
+*** [#C] Bugs
 **** DONE org popup issue is back
 CLOSED: [2019-01-03 jeu. 11:17]
 **** DONE project root missing
@@ -234,7 +499,11 @@ CLOSED: [2019-01-05 sam. 14:48]
 CLOSED: [2019-02-02 sam. 17:50]
 **** CANCELLED solargraph issue
 CLOSED: [2019-02-06 mer. 10:42]
-*** [#D] Enhancement                                                  :inbox:
+*** [#D] Enhancement
+**** DONE Webmin ne repond pas
+CLOSED: [2019-07-16 mar. 09:49]
+**** DONE passage set v2
+CLOSED: [2019-07-16 mar. 09:55]
 **** NEXT [#B] language with a fixed menu and a remap that bind feature
 **** NEXT refactor mode
 **** NEXT configure ediff/smerge/emerge for magit

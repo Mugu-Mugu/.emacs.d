@@ -4,16 +4,17 @@
 
 ;;; Code:
 
-(require 'mugu-org-hack)
+;; (require 'mugu-org-hack)
 (require 'mugu-misc)
+(require 'use-package)
 
 (use-package org-agenda
   :after org
   :straight nil
-  :functions mugu-org-menu/agenda-menu mugu-menu-register-mode-menu
+  :functions mugu-orgi-menu-agenda-major-mode mugu-menu-register-mode-menu
   :config
-  (add-hook 'org-agenda-mode-hook #'mugu-org-menu/agenda-menu)
-  (mugu-menu-register-mode-menu 'org-agenda-mode 'mugu-org-menu/agenda-menu)
+  (add-hook 'org-agenda-mode-hook #'mugu-orgi-menu-agenda-major-mode)
+  (mugu-menu-register-mode-menu 'org-agenda-mode #'mugu-orgi-menu-agenda-major-mode)
   :bind
   (:map org-agenda-mode-map
         ("SPC" . mugu-menu-main-menu)))
