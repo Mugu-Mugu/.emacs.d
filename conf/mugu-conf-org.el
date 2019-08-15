@@ -7,6 +7,7 @@
 ;; (require 'mugu-org-hack)
 (require 'mugu-misc)
 (require 'use-package)
+(require 'mugu-org-hack)
 
 (use-package org-agenda
   :after org

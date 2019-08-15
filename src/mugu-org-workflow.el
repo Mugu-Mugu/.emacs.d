@@ -35,6 +35,7 @@
 ;; * Requirement
 (require 'mugu-org-utils)
 (require 'dash)
+(require 's)
 (require 'ht)
 (require 'noflet)
 (require 'org)
@@ -48,6 +49,12 @@
   (and (mugu-orgw-task-headline-p headline)
        (-contains? (mugu-orgu-get-tags headline 'inherit 'inherit-only)
                    "refile")))
+
+(defun mugu-orgw-refilable-to-mobile-headline-p (headline)
+  "Predicate determining if HEADLINE is meant to be done on transport.
+Those that are meant for transport but already affected won't be selected."
+  (and (not (s-contains? "mobile.org" (org-element-property :file headline)))
+       (-contains? (mugu-orgu-get-tags headline) "@transport")))
 
 (defun mugu-orgw-inbox-for-capture-headline-p (headline)
   "Predicate determining if HEADLINE is a inbox made for refile purpose."
@@ -74,7 +81,7 @@
   "Predicate determining if HEADLINE is active.
 Only leaf headline are considered."
   (and (equal (org-element-property :todo-keyword headline) "TODO")
-       (not (mugu-orgu-headline-has-child-with-todo-keywords headline '("NEXT" "ACTIVE" "TODO")))))
+       (not (mugu-orgu-headline-has-child-with-todo-keywords headline '("NEXT" "TODO")))))
 
 (defun mugu-orgw-next-task-p (headline)
   "Predicate determining if HEADLINE is a next step.
@@ -132,7 +139,6 @@ Such a headline is a project with no next child."
 (defun mugu-orgw-lineage-todo-rank (todo-keyword)
   "Return an integer mapping a parent TODO-KEYWORD to its lineage sort rank."
   (pcase todo-keyword
-    ("ACTIVE" 2)
     ("NEXT" 1)
     ("TODO" 0)
     ("WAIT" -10)
@@ -194,6 +200,14 @@ The hack with noflet is to prevent fucking orgmode to sabotage the windows confi
   (noflet ((delete-other-windows (&optional _window) (set-window-configuration (org-capture-get :return-to-wconf))))
     (let ((org-capture-templates `(("x" "capture a task todo"
                                     entry (function ,find-loc-find) "* TODO %i %?"))))
+      (org-capture nil "x"))))
+
+(defun mugu-orgw-capture-to-headline (headline)
+  "Capture a todo and store it in the given HEADLINE as child.
+The hack with noflet is to prevent fucking orgmode to sabotage the windows configuration."
+  (noflet ((delete-other-windows (&optional _window) (set-window-configuration (org-capture-get :return-to-wconf))))
+    (let ((org-capture-templates `(("x" "capture a task todo"
+                                    entry (function ,(lambda () (mugu-orgu-action-headline-goto headline))) "* TODO %i %?"))))
       (org-capture nil "x"))))
 
 (defun mugu-orgw-capture-note (file)
@@ -265,12 +279,15 @@ The hack with noflet is to prevent fucking orgmode to sabotage the windows confi
 
     (org-agenda nil "o")))
 
-(defun mugu-orgw--set-timestamp (headline &optional delay)
+(defun mugu-orgw-set-timestamp (headline &optional delay relative)
   "Insert now as a timestamp in HEADLINE property.
-If DELAY is given, add it to the timestamp."
+If DELAY is given, add it to the timestamp.
+If RELATIVE is defined, the delay is applied to the old value.  Otherwise it's
+applied to now."
+  (message "%s" delay)
   (let* ((delay (or delay 0))
          (last-active-raw (org-element-property :LAST-ACTIVE headline))
-         (initial-timestamp (or (and last-active-raw (string-to-number last-active-raw))
+         (initial-timestamp (or (and relative last-active-raw (string-to-number last-active-raw))
                                 (float-time)))
          (new-timestamp (+ delay initial-timestamp)))
     (mugu-orgu-put-property headline "last-active" (format "%s" new-timestamp))))
@@ -291,11 +308,6 @@ If DELAY is given, add it to the timestamp."
   "Return a list of subtask for the given PROJECT-HEADLINE."
   (or (mugu-orgu-headline-get-childs project-headline #'mugu-orgw-task-headline-p) (list project-headline)))
 
-(defun mugu-orgw-reset-timestamp (headline)
-  "Reset the timestamp of HEADLINE to now."
-  (interactive (list (mugu-orgu-element-at-point)))
-  (mugu-orgu-put-property headline "last-active" (float-time)))
-
 (defun mugu-orgw-delete-timestamp (headline)
   "Reset the timestamp of HEADLINE to now."
   (interactive (list (mugu-orgu-element-at-point)))
@@ -308,27 +320,13 @@ Change it's status to NEXT and record the time at which it occured."
   (mugu-orgu-change-todo-state headline "NEXT")
   (mugu-orgw-reset-timestamp headline))
 
-(defun mugu-orgw-set-task-done (headline)
-  "Set task HEADLINE as done."
-  (interactive (list (mugu-orgu-element-at-point)))
-  (mugu-orgu-change-todo-state headline "DONE"))
-
-(defun mugu-orgw-set-task-cancel (headline)
-  "Set task HEADLINE as cancel."
-  (interactive (list (mugu-orgu-element-at-point)))
-  (mugu-orgu-change-todo-state headline "CANCEL"))
-
-(defun mugu-orgw-snooze-task (headline delay)
-  "Snooze HEADLINE for DELAY in seconds."
-  (mugu-orgw--set-timestamp headline delay))
-
 (defun mugu-orgw-set-configuration ()
   "Activate the workflow.
 Will modify several key variables of Org mode and create dynamic bindings for
 each project file."
   (push 'org-habit org-modules)
   (setq org-todo-keywords
-        (quote ((sequence "TODO(t)" "WAIT(w)" "NEXT(n)" "ACTIVE(a)" "|" "DONE(d)" "CANCELLED(c)"))))
+        (quote ((sequence "TODO(t)" "WAIT(w)" "NEXT(n)"  "|" "DONE(d)" "STOP(s)"))))
   (setq org-habit-show-habits-only-for-today t)
   (setq org-habit-graph-column 80)
   (setq org-tag-persistent-alist '((:startgroup . nil)
@@ -341,8 +339,7 @@ each project file."
                                    ("refile" . nil)
                                    (:endgroup . nil)))
   (setq org-lowest-priority ?F)
-  (setq org-agenda-files `(,(expand-file-name "~/org/")
-                           ,(expand-file-name (concat user-emacs-directory "emacs.org"))))
+  (setq org-agenda-files `(,(expand-file-name "~/org/")))
   (org-mode-restart))
 
 (provide 'mugu-org-workflow)

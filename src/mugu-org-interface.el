@@ -15,14 +15,14 @@
   "Last org interface command invoked.")
 
 (defvar mugu-orgi-headline-actions
-  '(("a" mugu-orgw-set-task-active "active")
-    ("c" mugu-orgw-set-task-cancel "cancel")
-    ("d" mugu-orgw-set-task-done "done")
-    ("s" mugu-orgi-snooze-headline "snooze")
-    ("r" mugu-orgi-retard-headline "retard")
-    ("R" mugu-orgw-delete-timestamp "reset task"))
+  '(("a" mugu-orgw-set-task-active "set Active" 'persistant)
+    ("t" mugu-orgu-change-todo-state "set Todo" 'persistant)
+    ("s" mugu-orgi-snooze-headline "snooze" 'persistant)
+    ("r" mugu-orgi-retard-headline "retard" 'persistant)
+    ("R" mugu-orgw-delete-timestamp "reset task" 'persistant)
+    ("C" mugu-orgw-capture-to-headline "capture to headline"))
   "A list of possible actions for a given headline.
-Each action has the form: hotkey function description")
+Each action has the form: hotkey function description and a optional boolean indicating if the action allows followup action")
 
 ;; hacks
 (defun mugu-orgi-switch-to-buffer-other-window (_orig-fun &rest args)
@@ -70,14 +70,14 @@ headline action : %s" headlines-query default-action)
      (setq mugu-orgi-last-command ',name)
      (mugu-orgi--counsel-headlines (funcall ,headlines-query) ,default-action)))
 
-(defun mugu-orgi--to-ivy-persistent-action (headline-action)
+(defun mugu-orgi--to-ivy-action (headline-action &optional persistant)
   "Wrap a HEADLINE-ACTION so it can be invoked as a ivy action.
 HEADLINE-ACTION is a function taking a single headline as argument and should
 return the updated headline.
-The last command session is resumed after."
+The last command session is resumed after if PERSISTANT is not nil."
   (lambda (headline)
     (funcall headline-action (cdr headline))
-    (funcall mugu-orgi-last-command)))
+    (when persistant (funcall mugu-orgi-last-command))))
 
 (defun mugu-orgi--make-query (headlines-predicate)
   "Make a query returning headlines matching HEADLINES-PREDICATE."
@@ -90,20 +90,21 @@ The last command session is resumed after."
   (mugu-orgu-action-headline-goto headline)
   (mugu-orgi-focus-headline))
 
-(defun mugu-orgi--action-snooze-headline (headline &optional relative-to-now reversed)
+(defun mugu-orgi--action-snooze-headline (headline &optional relative reversed)
   "Snooze the HEADLINE by applying a delay to it's active timestamp.
-If RELATIVE-TO-NOW is not nil, the previous headline timestamp is discarded
+If RELATIVE is not nil, the previous headline timestamp is discarded
 and now is used instead.
 If REVERSED is not nil, the chosen delay is substracted instead."
-  (when relative-to-now (mugu-orgw-reset-timestamp headline))
-  (mugu-orgw-snooze-task headline (if reversed
-                                      (- (mugu-orgi--pick-delay))
-                                    (mugu-orgi--pick-delay))))
+  (mugu-orgw-set-timestamp headline
+                           (if reversed
+                               (- (mugu-orgi--pick-delay))
+                             (mugu-orgi--pick-delay))
+                           relative))
 
 (defsubst mugu-orgi-snooze-headline (headline)
   "Snooze the HEADLINE or the task at point if called interractively."
   (interactive (list (mugu-orgu-element-at-point)))
-  (mugu-orgi--action-snooze-headline headline 'reset))
+  (mugu-orgi--action-snooze-headline headline 'relative))
 
 (defsubst mugu-orgi-retard-headline (headline)
   "Retard the HEADLINE or the task at point if called interractively."
@@ -170,6 +171,19 @@ If REVERSED is not nil, the chosen delay is substracted instead."
 (mugu-orgi--make-command mugu-orgi-goto-inbox-for-capture-headline
                          (mugu-orgi--make-query #'mugu-orgw-inbox-for-capture-headline-p)
                          #'mugu-orgi--action-focus-headline)
+(mugu-orgi--make-command mugu-orgi-goto-refilable-to-mobile-headline
+                         (mugu-orgi--make-query #'mugu-orgw-refilable-to-mobile-headline-p)
+                         #'mugu-orgi--action-focus-headline)
+
+(defsubst mugu-orgi-goto-current-task ()
+  "Goto the current task."
+  (interactive)
+  (mugu-orgu-action-headline-goto (mugu-orgw-current-task)))
+
+(defsubst mugu-orgi-goto-current-project ()
+  "Goto the current project."
+  (interactive)
+  (mugu-orgu-action-headline-goto (mugu-orgw-current-project)))
 
 (defsubst mugu-orgi-goto-agenda-file ()
   "."
@@ -240,6 +254,7 @@ action is performed."
   ("ga" (mugu-orgi-goto-current-task) "goto current active task")
   ("gw" (mugu-orgi-goto-wait-or-snoozed-task) "goto waiting/snoozed task")
   ("gr" (mugu-orgi-goto-refilable-task) "goto refilable task")
+  ("gm" (mugu-orgi-goto-refilable-to-mobile-headline) "goto mobile task")
   ("gpp" (mugu-orgi-goto-active-project-task) "goto any active project" :column "Goto Project")
   ("gpc" (mugu-orgi-goto-current-project) "goto current project")
   ("gps" (mugu-orgi-goto-stuck-project-task) "goto a stuck project")
@@ -376,7 +391,7 @@ action is performed."
   "Customize Ivy experience."
   (ivy-set-actions 'mugu-orgi
                    (--map (list (-first-item it)
-                                (mugu-orgi--to-ivy-persistent-action (-second-item it))
+                                (mugu-orgi--to-ivy-action (-second-item it) (-fourth-item it))
                                 (-third-item it))
                           mugu-orgi-headline-actions)))
 

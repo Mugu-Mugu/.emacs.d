@@ -82,7 +82,7 @@ Property refers to the native `org' one (not `org-element')."
     (goto-char (org-element-property :begin headline))
     (org-delete-property property)))
 
-(defun mugu-orgu-change-todo-state (headline todo-state)
+(defun mugu-orgu-change-todo-state (headline &optional todo-state)
   "Change the HEADLINE TODO-STATE."
   (save-window-excursion
     (find-file (org-element-property :file headline))
@@ -290,11 +290,11 @@ The cache is actually made for all agenda files."
                                 (org-element-map (org-element-parse-buffer 'headline) 'headline
                                   (lambda (hl)
                                     (org-element-put-property hl :file (buffer-file-name))
-                                    (cons (format "%s%s" file (org-element-property :begin hl))
+                                    (cons (format "%s%s" buffer-file-truename (org-element-property :begin hl))
                                           hl))))))
         (all-file-headlines-alist (-mapcat get-file-headlines (org-agenda-files)))
         (headlines-map (ht<-alist all-file-headlines-alist)))
-     (cl-labels ((org-element-at-point () (ht-get headlines-map (format "%s%s" (buffer-file-name) (point)))))
+     (cl-labels ((org-element-at-point () (ht-get headlines-map (format "%s%s" buffer-file-truename (point)))))
        (progn ,@body))))
 
 (defun mugu-orgu-element-at-point ()

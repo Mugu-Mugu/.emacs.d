@@ -18,7 +18,7 @@
   (add-to-list 'projectile-globally-ignored-directories "elpa")
   (add-to-list 'projectile-globally-ignored-directories ".cache")
   (add-to-list 'projectile-globally-ignored-directories "node_modules")
-  (setq projectile-project-search-path '("~/work/"))
+  (when (file-directory-p "~/work") (setq projectile-project-search-path '("~/work/")))
   (projectile-mode 1))
 
 (use-package mugu-project
