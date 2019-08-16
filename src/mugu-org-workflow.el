@@ -225,7 +225,7 @@ The hack with noflet is to prevent fucking orgmode to sabotage the windows confi
                      ((org-agenda-overriding-header "Global agenda")
                       (org-agenda-prefix-format " %-10c | %-12s | %b")
                       (org-agenda-show-all-dates t)
-                      (org-agenda-ndays 14)))
+                      (org-agenda-span 14)))
              (todo ""
                    ((org-agenda-overriding-header "Stuck projects")
                     (org-agenda-prefix-format "%-10c | %b")
@@ -239,7 +239,7 @@ The hack with noflet is to prevent fucking orgmode to sabotage the windows confi
              (todo ""
                    ((org-agenda-overriding-header "Next tasks")
                     (org-agenda-skip-function (mugu-orgu-make-skip-function
-                                               #'mugu-orgw-next-headline-p))
+                                               #'mugu-orgw-next-task-p))
                     (org-agenda-prefix-format "%-10c | %b"))))))))
 
     (org-agenda nil "o")))

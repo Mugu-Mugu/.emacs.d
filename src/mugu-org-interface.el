@@ -412,6 +412,10 @@ action is performed."
   (setq org-agenda-restore-windows-after-quit 't)
   (setq org-agenda-inhibit-startup t)
   (setq org-agenda-dim-blocked-tasks nil)
+  (setq org-agenda-align-tags-to-column -150)
+  (setq org-agenda-tags-column -150)
+  (setq org-tags-column -120)
+
   (add-to-list 'display-buffer-alist
                '("CAPTURE*"
                  (display-buffer-in-side-window display-buffer-same-window display-buffer-use-some-window)
