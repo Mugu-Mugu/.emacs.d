@@ -15,11 +15,14 @@
   "Last org interface command invoked.")
 
 (defvar mugu-orgi-headline-actions
-  '(("a" mugu-orgw-set-task-active "set Active" 'persistant)
+  `(("a" mugu-orgw-set-task-active "set Active" 'persistant)
     ("t" mugu-orgu-change-todo-state "set Todo" 'persistant)
-    ("s" mugu-orgi-snooze-headline "snooze" 'persistant)
-    ("r" mugu-orgi-retard-headline "retard" 'persistant)
-    ("R" mugu-orgw-delete-timestamp "reset task" 'persistant)
+    ("ds" mugu-orgi-snooze-headline "snooze" 'persistant)
+    ("dr" mugu-orgi-retard-headline "retard" 'persistant)
+    ("dR" mugu-orgw-delete-timestamp "reset task" 'persistant)
+    ("rp" ,(apply-partially #'mugu-orgi--action-refile-headline #'mugu-orgw-project-headline-p) "Refile to Project" 'persistant)
+    ("ri" ,(apply-partially #'mugu-orgi--action-refile-headline #'mugu-orgw-inbox-headline-p) "Refile to Inbox" 'persistant)
+    ("rt" ,(apply-partially #'mugu-orgi--action-refile-headline #'mugu-orgw-task-headline-p) "Refile to Task" 'persistant)
     ("C" mugu-orgw-capture-to-headline "capture to headline"))
   "A list of possible actions for a given headline.
 Each action has the form: hotkey function description and a optional boolean indicating if the action allows followup action")
