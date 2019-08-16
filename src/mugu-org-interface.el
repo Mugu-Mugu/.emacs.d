@@ -382,7 +382,7 @@ action is performed."
  `(defmenu mugu-orgi-submenu-headline-action
    (:color blue :hint nil :inherit (mugu-orgi-menu-hjkl-hydra/heads))
    ,@(--map (list (concat "a" (-first-item it))
-                  (-second-item it)
+                  (lambda () (interactive) (funcall (-second-item it) nil))
                   (-third-item it)
                   :column "headline actions")
             mugu-orgi-headline-actions)))

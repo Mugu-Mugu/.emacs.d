@@ -66,28 +66,34 @@ HEADLINE is a an org-element object generated from any mugu-orgu function."
                          (org-element-property :begin target-headline))))
         (org-refile nil nil rfloc)))))
 
+(defmacro mugu-orgu-with-headline (headline &rest body)
+  "Go to HEADLINE and execute BODY.
+If HEADLINE is empty, tries to use the one at point.  This can happens for
+in capture headline."
+  (declare (indent 0) (debug t))
+  `(save-window-excursion
+     (when ,headline
+       (find-file (org-element-property :file ,headline))
+       (goto-char (org-element-property :begin ,headline)))
+     (progn ,@body)))
+
 (defun mugu-orgu-put-property (headline property value)
   "Change in HEADLINE the choosen PROPERTY to a new VALUE.
 Property refers to the native `org' one (not `org-element')."
-  (save-window-excursion
-    (find-file (org-element-property :file headline))
-    (goto-char (org-element-property :begin headline))
+  (mugu-orgu-with-headline
+    headline
     (org-set-property property (format "%s" value))))
 
 (defun mugu-orgu-delete-property (headline property)
   "Delete in HEADLINE the choosen PROPERTY.
 Property refers to the native `org' one (not `org-element')."
-  (save-window-excursion
-    (find-file (org-element-property :file headline))
-    (goto-char (org-element-property :begin headline))
-    (org-delete-property property)))
+  (mugu-orgu-with-headline headline
+                           (org-delete-property property)))
 
 (defun mugu-orgu-change-todo-state (headline &optional todo-state)
   "Change the HEADLINE TODO-STATE."
-  (save-window-excursion
-    (find-file (org-element-property :file headline))
-    (goto-char (org-element-property :begin headline))
-    (org-todo todo-state)))
+  (mugu-orgu-with-headline headline
+                           (org-todo todo-state)))
 
 (defun mugu-orgu-lineage-todos (headline &optional with-self)
   "Retrieve the todo keywords of the parent lineage of HEADLINE.
