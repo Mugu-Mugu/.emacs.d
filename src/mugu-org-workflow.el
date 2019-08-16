@@ -284,7 +284,6 @@ The hack with noflet is to prevent fucking orgmode to sabotage the windows confi
 If DELAY is given, add it to the timestamp.
 If RELATIVE is defined, the delay is applied to the old value.  Otherwise it's
 applied to now."
-  (message "%s" delay)
   (let* ((delay (or delay 0))
          (last-active-raw (org-element-property :LAST-ACTIVE headline))
          (initial-timestamp (or (and relative last-active-raw (string-to-number last-active-raw))
@@ -318,7 +317,7 @@ applied to now."
 Change it's status to NEXT and record the time at which it occured."
   (interactive (list (mugu-orgu-element-at-point)))
   (mugu-orgu-change-todo-state headline "NEXT")
-  (mugu-orgw-reset-timestamp headline))
+  (mugu-orgw-set-timestamp headline))
 
 (defun mugu-orgw-set-configuration ()
   "Activate the workflow.
