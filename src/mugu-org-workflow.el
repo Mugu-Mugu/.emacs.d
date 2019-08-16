@@ -116,10 +116,6 @@ It can't be both a task and a project (project takes priority)."
   (and (mugu-orgw-task-headline-p headline)
        (equal "NEXT" (org-element-property :todo-keyword headline))))
 
-(defun mugu-orgw-todos-headline-p (headline)
-  "Predicate determining if HEADLINE is a task."
-  (eq 'todo (org-element-property :todo-type headline)))
-
 (defun mugu-orgw-stuck-project-headline-p (headline)
   "Predicate determining if HEADLINE is a stuck project.
 Such a headline is a project with no next child."
@@ -127,7 +123,7 @@ Such a headline is a project with no next child."
        (not (mugu-orgu-headline-has-child-with-todo-keywords headline '("NEXT")))))
 
 (defun mugu-orgw--score-todo (headline)
-  "Return an integer mapping a TODO-KEYWORD to its sort rank."
+  "Return an integer mapping the todo status of HEADLINE to its sort rank."
   (pcase (org-element-property :todo-keyword headline)
     ("NEXT" 1000)
     ("TODO" 1)
@@ -135,29 +131,6 @@ Such a headline is a project with no next child."
     ("DONE" -100)
     ("CANCELLED" -200)
     (_ -100)))
-
-(defun mugu-orgw-lineage-todo-rank (todo-keyword)
-  "Return an integer mapping a parent TODO-KEYWORD to its lineage sort rank."
-  (pcase todo-keyword
-    ("NEXT" 1)
-    ("TODO" 0)
-    ("WAIT" -10)
-    ("DONE" 0)
-    ("CANCELLED" 0)
-    (_ 0)))
-
-(defun mugu-orgw-get-lineage-todo-score (headline &optional print-message)
-  "Return the aggregated todo score of the HEADLINE.
-It takes into account todo lineage.
-If PRINT-MESSAGE is true, print message instead."
-  (interactive (list (mugu-orgu-element-at-point) 'print))
-  (let* ((result (-sum
-                  (--map
-                   (mugu-orgw-lineage-todo-rank (org-element-property :todo-keyword it))
-                   (mugu-orgu-lineage-todos headline)))))
-    (if print-message
-        (message "Lineage todo score: %s" result)
-      result)))
 
 (defun mugu-orgw--last-active (headline)
   "Return the last active data of HEADLINE if present.

@@ -98,15 +98,6 @@ Property refers to the native `org' one (not `org-element')."
     headline
     (org-todo todo-state)))
 
-(defun mugu-orgu-lineage-todos (headline &optional with-self)
-  "Retrieve the todo keywords of the parent lineage of HEADLINE.
-Todo are given in order of distance to the parent.
-First item for most recent parent.
-If WITH-SELF is non-nil, the first item is HEADLINE."
-  (-non-nil
-   (--filter (org-element-property :todo-keyword it)
-             (org-element-lineage headline nil with-self))))
-
 (defun mugu-orgu-todo-headline-p (headline)
   "Predicicate for HEADLINE indicating if it's a TODO."
   (and (org-element-property :todo-type headline)
@@ -178,7 +169,6 @@ property if performance indicates."
   "Return a list of headlines matching SELECT-HEADLINE-P in the current subtree.
 SELECT-HEADLINE-P is a predicate function taking a single argument: the
 org-element object related to a candidate headline."
-
   (save-restriction
     (org-narrow-to-subtree)
     (org-element-map (org-element-parse-buffer 'headline 'visible-only) 'headline
@@ -224,19 +214,6 @@ aggreagation of all parents headline description."
               (org-element-put-property headline :file parent-filename)))))
     (--remove-first (eq headline it)
                     (org-element-map headline 'headline select-and-append-filename))))
-
-(defun mugu-orgu-headline-has-child-with-todos (headline)
-  "Predicate indicating if given HEADLINE has any child with any todo keywords."
-  (org-element-map (org-element-contents headline) 'headline
-    (lambda (hl) (org-element-property :todo-keyword hl))
-    nil t))
-
-(defun mugu-orgu-headline-has-parent-with-todos? (headline)
-  "Predicate indicating if given HEADLINE has any parent with any todo keywords."
-  (let ((parent (org-element-property :parent headline)))
-    (when parent
-      (or (org-element-property :todo-type parent)
-          (mugu-orgu-headline-has-parent-with-todos? parent)))))
 
 (defun mugu-orgu-get-last-buffer-name ()
     "Return the name of the last visited org buffer.
