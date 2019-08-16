@@ -22,6 +22,7 @@
 (require 'org-agenda)
 (require 'dash)
 (require 'ht)
+(eval-when-compile (require 'cl))
 
 ;; * Functions
 (defun mugu-orgu-get-tags (headline &optional inherit inherit-only)
@@ -53,19 +54,6 @@ When INHERIT and INHERIT-ONLY are both non-nil retrieve only tags from parents."
               (org-element-property :priority headline)))
         ((mugu-orgu-get-priority (org-element-property :parent headline)))))
 
-(defun mugu-orgu-action-headline-refile (headline target-headline)
-  "Refile HEADLINE to TARGET-HEADLINE.
-HEADLINE is a an org-element object generated from any mugu-orgu function."
-  (save-window-excursion
-    (mugu-orgu-action-headline-goto headline)
-    (save-restriction
-      (org-narrow-to-element)
-      (let ((rfloc (list (org-element-property :raw-value target-headline)
-                         (org-element-property :file target-headline)
-                         nil
-                         (org-element-property :begin target-headline))))
-        (org-refile nil nil rfloc)))))
-
 (defmacro mugu-orgu-with-headline (headline &rest body)
   "Go to HEADLINE and execute BODY.
 If HEADLINE is empty, tries to use the one at point.  This can happens for
@@ -77,6 +65,19 @@ in capture headline."
        (goto-char (org-element-property :begin ,headline)))
      (progn ,@body)))
 
+(defun mugu-orgu-action-headline-refile (headline target-headline)
+  "Refile HEADLINE to TARGET-HEADLINE.
+HEADLINE is a an org-element object generated from any mugu-orgu function."
+  (mugu-orgu-with-headline
+    headline
+    (save-restriction
+      (org-narrow-to-element)
+      (let ((rfloc (list (org-element-property :raw-value target-headline)
+                         (org-element-property :file target-headline)
+                         nil
+                         (org-element-property :begin target-headline))))
+        (org-refile nil nil rfloc)))))
+
 (defun mugu-orgu-put-property (headline property value)
   "Change in HEADLINE the choosen PROPERTY to a new VALUE.
 Property refers to the native `org' one (not `org-element')."
@@ -87,13 +88,15 @@ Property refers to the native `org' one (not `org-element')."
 (defun mugu-orgu-delete-property (headline property)
   "Delete in HEADLINE the choosen PROPERTY.
 Property refers to the native `org' one (not `org-element')."
-  (mugu-orgu-with-headline headline
-                           (org-delete-property property)))
+  (mugu-orgu-with-headline
+    headline
+    (org-delete-property property)))
 
 (defun mugu-orgu-change-todo-state (headline &optional todo-state)
   "Change the HEADLINE TODO-STATE."
-  (mugu-orgu-with-headline headline
-                           (org-todo todo-state)))
+  (mugu-orgu-with-headline
+    headline
+    (org-todo todo-state)))
 
 (defun mugu-orgu-lineage-todos (headline &optional with-self)
   "Retrieve the todo keywords of the parent lineage of HEADLINE.
