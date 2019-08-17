@@ -29,5 +29,17 @@
                                 term-color-cyan
                                 term-color-white]))
 
+(use-package vterm
+  :defer
+  :commands vterm
+  :init
+  (add-to-list 'load-path "/home/david/.emacs.d/straight/build/vterm"))
+
+(use-package mugu-vterm
+  :straight nil
+  :after vterm
+  :config
+  (mugu-vterm-activate))
+
 (provide 'mugu-conf-shell)
 ;;; mugu-conf-shell ends here
