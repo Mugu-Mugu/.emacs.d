@@ -13,6 +13,13 @@
 
 ;; * Code
 (defvar mugu-project-wconf-map (ht-create) "Gather windows configuration for each project.")
+(defvar mugu-project-current-name "emacs.d" "Tracks current project name.")
+
+(defun mugu-project-root-from-name (project-name)
+  "Find the project root from PROJECT-NAME.
+Note that this may fails when several project have the same name."
+  (-first-item
+   (--filter (equal project-name (projectile-project-name it)) projectile-known-projects)))
 
 (defun mugu-project-switch-buffer ()
   "Interactively switch to a buffer in current project."
@@ -23,24 +30,53 @@
               buffers-in-project
               :action 'switch-to-buffer)))
 
+(defun mugu-project-root ()
+  "Return the project of `current-buffer'.
+For non-file buffer, the behavious is special as they dont have a meaningful
+`default-directory'."
+  (if buffer-file-truename
+      (projectile-project-root)
+    (or projectile-project-root (mugu-project-root-from-name mugu-project-current-name))))
+
+(defun mugu-project-name ()
+  "Return the name of the current project."
+  (projectile-project-name (mugu-project-root)))
+
 (defun mugu-project-cd ()
   "Change directory to a child dir of the project."
   (interactive)
   (mugu-counsel-fzf-dir (projectile-project-root))
   (mugu-space-main))
 
+(defun mugu-project-buffer-project (&optional buffer)
+  "Retrieve the project name of BUFFER.
+If BUFFER is not given, use `current-buffer' instead."
+  (let* ((buffer (or buffer (current-buffer)))
+         (buffer-cached-root (buffer-local-value 'projectile-project-root buffer))
+         (buffer-is-file (buffer-local-value 'buffer-file-truename buffer))
+         (buffer-project (or buffer-cached-root (with-current-buffer buffer (mugu-project-root)))))
+    (when (and buffer-is-file (not buffer-cached-root))
+      (with-current-buffer buffer (setq-local projectile-project-root buffer-project)))
+    buffer-project))
+
+(defun mugu-project-set-buffer-project (project-name &optional buffer)
+  "Define PROJECT-NAME for BUFFER.
+If BUFFER is nil, it applies to `current-buffer' instead."
+  (with-current-buffer (or buffer (current-buffer))
+    (setq-local projectile-project-root project-name)))
+
 (defun mugu-project-buffer-in-project-p (buffer &optional project)
   "Predicate determning if BUFFER is in project PROJECT.
 If PROJECT is nil, current project is used if any."
-  (let ((project (or project (projectile-project-root))))
-    (and (buffer-file-name buffer) (f-ancestor-of? project (buffer-file-name buffer)))))
+  (equal (projectile-project-name project) (mugu-project-buffer-project buffer)))
 
 (defmenu mugu-project-menu
-  (:color blue :hint nil :body-pre (unless (projectile-project-root) (call-interactively 'projectile-switch-project)))
+  (:color blue :hint nil :body-pre (unless (mugu-project-root)
+                                     (call-interactively 'projectile-switch-project)))
   "
                               -- PROJECT MENU --
 
-  -> Project Root : %s(projectile-project-root)
+  -> Project Root : %s(mugu-project-root)
   -> Current Dir  : %s(mugu-directory-pwd)
 "
   ("s" projectile-switch-project "switch project" :color red :column "1-Management")
@@ -51,39 +87,39 @@ If PROJECT is nil, current project is used if any."
   ("rg" (counsel-rg "" projectile-project-root) "ripgrep")
   ("d" mugu-project-cd "cd" :color blue :column "Find")
   ("b" (mugu-project-switch-buffer) "buffer" :color blue)
-  ("f" (mugu-counsel-fzf-file (projectile-project-root)) "open file alternative")
+  ("f" (mugu-counsel-fzf-file (mugu-project-root)) "open file alternative")
   ("q" nil "quit menu" :color blue :column nil))
 
-(defun mugu-project-switch-buffer-global ()
+ (defun mugu-project-switch-buffer-global ()
   "Switch to another buffer changing project and wconf if nessecary."
   (interactive)
-  (let* (target-project
-         (new-buffer (save-window-excursion
-                       (winner-mode -1)
-                       (call-interactively 'ivy-switch-buffer)
-                       (setq target-project (projectile-project-name))
-                       (winner-mode 1)
-                       (current-buffer))))
-    (when (and target-project (projectile-project-p target-project))
-      (projectile-switch-project-by-name target-project))
+  (let* ((old-project (mugu-project-buffer-project (current-buffer)))
+         (new-buffer (save-window-excursion (call-interactively 'ivy-switch-buffer)
+                                            (current-buffer)))
+         (new-project (mugu-project-buffer-project new-buffer)))
+    ;; (message "switching to buffer %s from old-project %s to new-project %s" new-buffer old-project new-project)
+    (when (and new-project (projectile-project-p new-project))
+      (projectile-switch-project-by-name new-project))
     (switch-to-buffer new-buffer)))
 
 (defun mugu-project-save-wconf ()
   "Save current windows configuration."
-  (when (projectile-project-name)
-    (ht-set mugu-project-wconf-map (projectile-project-name) (current-window-configuration))))
+  (when (mugu-project-name)
+    (ht-set mugu-project-wconf-map (mugu-project-name) (current-window-configuration))))
 
 (defun mugu-project-restore-wconf ()
   "Restore project windows configuration or clear it if new after switch."
-  (if (ht-contains? mugu-project-wconf-map (projectile-project-name))
-      (set-window-configuration (ht-get mugu-project-wconf-map (projectile-project-name)))
+  (if (ht-contains? mugu-project-wconf-map (mugu-project-name))
+      (set-window-configuration (ht-get mugu-project-wconf-map (mugu-project-name)))
     (delete-other-windows)))
 
 (defun mugu-project-after-switch ()
-  "Prompt for file if current buffer is not part of the project."
+  "Actions after project switch: set current project and open a default buffer."
   (mugu-project-restore-wconf)
+  ;; (message "switching to project %s" projectile-project-name)
+  (setq mugu-project-current-name projectile-project-name)
   (unless (projectile-project-buffer-p (current-buffer) default-directory)
-    (projectile-find-file)))
+    (switch-to-buffer "*Messages*")))
 
 (defun mugu-project-activate ()
   "Configure perspective and projectile in a coherent feature."
