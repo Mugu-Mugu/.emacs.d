@@ -1,8 +1,8 @@
-;; -*- lexical-binding: t -*-
 ;; mugu-org-interface --- Summary
 ;; tbc
 ;;; Commentary:
 ;;; Code:
+;; -*- lexical-binding: t -*-
 
 (require 'mugu-org-utils)
 (require 'mugu-org-workflow)
