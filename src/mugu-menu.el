@@ -8,6 +8,7 @@
 ;;; Code:
 (require 'hydra)
 (require 'mugu-directory)
+(require 'mugu-hydra)
 (require 's)
 (require 'dash)
 
@@ -65,21 +66,6 @@ specific column"
   (require 'mugu-hydra)
   (hydra--head-set-property head :column "7-Submenu")
   (mugu-hydra-add-head 'mugu-menu-main-hydra head))
-
-
-(defun mugu-menu-select-method (&rest methods)
-  "Return the first method of METHODS that is defined."
-  (-first-item
-   (-non-nil
-    (--map (when (fboundp it) it)
-           methods))))
-
-(defun mugu-menu-switch-buffer ()
-  "Switch to buffer using the most appropriate method."
-  (interactive)
-  (call-interactively (mugu-menu-select-method 'mugu-project-switch-buffer
-                                               'ivy-switch-buffer
-                                               'switch-to-buffer)))
 
 (provide 'mugu-menu)
 ;;; mugu-menu ends here

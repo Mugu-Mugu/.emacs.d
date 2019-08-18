@@ -4,6 +4,7 @@
 
 ;;; Code:
 (require 'mugu-menu)
+(require 'mugu-feature)
 (require 'general)
 
 (defun mugu-space-activate-helm-menu ()
@@ -19,7 +20,7 @@
   -> File    Dir : %s(mugu-directory-pwd-file)
   -> Current Dir : %s(mugu-directory-pwd)
 "
-    ("b" mugu-menu-switch-buffer "previous buffer" :column "1-Change File")
+    ("b" mugu-feature-switch-buffer "previous buffer" :column "1-Change File")
     ("ff" (with-mugu-dir (counsel-find-file)) "find files")
     ("fr" (mugu-counsel-fzf-file mugu-directory) "find files recursively")
     ("fa" (mugu-counsel-fzf-any mugu-directory) "find any recursively")
