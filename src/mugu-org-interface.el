@@ -16,17 +16,21 @@
   "Last org interface command invoked.")
 
 (defvar mugu-orgi-headline-actions
-  `(("a" mugu-orgw-set-task-active "set Active" 'persistant)
+  `(("a" mugu-orgw-set-task-active "set Active" 'persistant "Basic actions")
+    ("p" mugu-orgu-set-priority "set Priority" 'persistant)
     ("t" mugu-orgu-change-todo-state "set Todo" 'persistant)
-    ("ds" mugu-orgi-snooze-headline "snooze" 'persistant)
+    ("ds" mugu-orgi-snooze-headline "snooze" 'persistant "Immediate scheduling")
     ("dr" mugu-orgi-retard-headline "retard" 'persistant)
     ("dR" mugu-orgw-delete-timestamp "reset task" 'persistant)
-    ("rp" ,(apply-partially #'mugu-orgi--action-refile-headline #'mugu-orgw-project-headline-p) "Refile to Project" 'persistant)
+    ("rp" ,(apply-partially #'mugu-orgi--action-refile-headline #'mugu-orgw-project-headline-p) "Refile to Project" 'persistant "Refile and capture")
     ("ri" ,(apply-partially #'mugu-orgi--action-refile-headline #'mugu-orgw-inbox-headline-p) "Refile to Inbox" 'persistant)
     ("rt" ,(apply-partially #'mugu-orgi--action-refile-headline #'mugu-orgw-task-headline-p) "Refile to Task" 'persistant)
     ("C" mugu-orgw-capture-to-headline "capture to headline"))
   "A list of possible actions for a given headline.
-Each action has the form: hotkey function description and a optional boolean indicating if the action allows followup action")
+Each action has the form: hotkey function description persistance column.
+Absence of persistance indicates the action interrupts the ivy session upon
+resolution.
+Column indicates where the action should be located on the menu.")
 
 ;; hacks
 (defun mugu-orgi-switch-to-buffer-other-window (_orig-fun &rest args)
@@ -357,7 +361,7 @@ action is performed."
   (:color blue :hint nil :inherit (mugu-orgi-menu-hjkl-hydra/heads))
   "bindings for ORG mode"
   ("e" (mugu-orgi-submenu-tree-actions) "(expert) tree manipulation" :column "Sub-menus")
-  ("a" (mugu-orgi-submenu-headline-action) "headline actions")
+  ("a" (mugu-orgi-submenu-headline-action) "headline actions" :color blue)
   ("ds" org-schedule "schedule" :column "Timing")
   ("dt" org-time-stamp "insert timestamp")
   ("dd" org-deadline "set deadline")
@@ -383,11 +387,12 @@ action is performed."
 
 (eval
  `(defmenu mugu-orgi-submenu-headline-action
-   (:color blue :hint nil :inherit (mugu-orgi-menu-hjkl-hydra/heads))
-   ,@(--map (list (concat "a" (-first-item it))
+    (:color blue :hint nil :after-exit (mugu-orgi-menu-org-major-mode))
+   ,@(--map (list (-first-item it)
                   (lambda () (interactive) (funcall (-second-item it) nil))
                   (-third-item it)
-                  :column "headline actions")
+                  (when (-fifth-item it) :column)
+                  (when (-fifth-item it) (-fifth-item it)))
             mugu-orgi-headline-actions)))
 
 (defun mugu-orgi--configure-ivy ()

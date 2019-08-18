@@ -98,6 +98,12 @@ Property refers to the native `org' one (not `org-element')."
     headline
     (org-todo todo-state)))
 
+(defun mugu-orgu-set-priority (headline)
+  "Change the HEADLINE prirority."
+  (mugu-orgu-with-headline
+    headline
+    (org-priority)))
+
 (defun mugu-orgu-todo-headline-p (headline)
   "Predicicate for HEADLINE indicating if it's a TODO."
   (and (org-element-property :todo-type headline)
