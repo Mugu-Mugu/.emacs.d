@@ -6,7 +6,9 @@
 
 ;;; Code:
 (require 'vterm)
+(require 'ivy)
 (require 'general)
+(require 'mugu-feature)
 
 (defvar mugu-vterm--cursor-pos 0
   "Pos of vterm cursor.")
@@ -41,6 +43,10 @@ synched"
                       "C-w" #'mugu-vterm-send-kill-arg
                       "C-y" #'mugu-vterm-send-yank))
 
+(defun mugu-vterm-buffer-vterm-p (buffer)
+  "Predicate indicating if BUFFER is a vterm."
+  (eq 'vterm-mode (buffer-local-value 'major-mode buffer)))
+
 (defun mugu-vterm-paste ()
   "Paste current kill content at current cursor position."
   (interactive)
@@ -62,6 +68,18 @@ synched"
   "Send ctrl-r."
   (interactive)
   (vterm-send-key "r" nil nil 'ctrl))
+
+(defun mugu-vterm-switch ()
+  "Switch to a vterm buffer.
+If none exists, one will be created."
+  (interactive)
+   (let* ((existing-vterms (-filter #'mugu-vterm-buffer-vterm-p (buffer-list))))
+    (pcase (length existing-vterms)
+      (0 (vterm))
+      (1 (mugu-feature-switch-buffer (-first-item existing-vterms)))
+      (_ (mugu-feature-switch-buffer (get-buffer
+                                      (ivy-read (format "Select a terminal: " )
+                                                (-map #'buffer-name existing-vterms))))))))
 
 (defun mugu-vterm-activate ()
   "Configure vterm integration."

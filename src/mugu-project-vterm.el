@@ -4,15 +4,15 @@
 ;; -*- lexical-binding: t -*-
 
 ;;; Code:
-(require 'mugu-project)
 (require 'vterm)
 (require 'ivy)
+(require 'mugu-vterm)
+(require 'mugu-project)
 
 (defun mugu-pvterm-list-project-vterm (project-name)
   "List vterm owned by PROJECT-NAME."
-  (--filter (and
-             (mugu-project-buffer-in-project-p it project-name)
-             (eq 'vterm-mode (buffer-local-value 'major-mode it)))
+  (--filter (and (mugu-vterm-buffer-vterm-p it)
+                 (mugu-project-buffer-in-project-p it project-name))
             (buffer-list)))
 
 (defun mugu-pvterm-create-or-switch (&optional project-name)
@@ -21,7 +21,6 @@ If PROJECT-NAME is not defined, `mugu-project-name' is used instead."
   (interactive)
   (let* ((project-name (or project-name (mugu-project-name)))
          (existing-vterms (mugu-pvterm-list-project-vterm project-name)))
-    (message "%s" existing-vterms)
     (pcase (length existing-vterms)
       (0 (mugu-pvterm-create project-name))
       (1 (mugu-project-switch-buffer (-first-item existing-vterms)))
