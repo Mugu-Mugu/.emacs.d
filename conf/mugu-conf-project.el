@@ -28,5 +28,10 @@
   :config
   (mugu-project-activate))
 
+(use-package mugu-pvterm
+  :straight nil
+  :defer
+  :commands (mugu-pvterm-create-or-switch))
+
 (provide 'mugu-conf-project)
 ;;; mugu-conf-project ends here
