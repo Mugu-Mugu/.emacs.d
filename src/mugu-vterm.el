@@ -36,12 +36,32 @@ synched"
 
 (defun mugu-vterm--install-keymaps ()
   "Configure all keymaps related to vterm integration."
+  (setq vterm-keymap-exceptions nil)
+  (general-define-key :keymaps 'vterm-mode-map :states 'insert
+                      "C-e" #'vterm--self-insert
+                      "C-f" #'vterm--self-insert
+                      "C-a" #'vterm--self-insert
+                      "C-v" #'vterm--self-insert
+                      "C-b" #'vterm--self-insert
+                      "C-w" #'vterm--self-insert
+                      "C-u" #'vterm--self-insert
+                      "C-d" #'vterm--self-insert
+                      "C-n" #'vterm--self-insert
+                      "C-m" #'vterm--self-insert
+                      "C-p" #'vterm--self-insert
+                      "C-j" #'vterm--self-insert
+                      "C-k" #'vterm--self-insert
+                      "C-r" #'vterm--self-insert
+                      "C-t" #'vterm--self-insert
+                      "C-y" #'vterm--self-insert
+                      "C-g" #'vterm--self-insert
+                      "C-c" #'vterm--self-insert
+                      "C-SPC" #'vterm--self-insert
+                      "ESC" #'vterm--self-insert)
   (general-define-key :keymaps '(vterm-mode-map)
-                      [remap evil-paste-after] #'mugu-vterm-paste)
-  (general-define-key :keymaps '(vterm-mode-map) :states '(insert)
-                      "C-r" #'mugu-vterm-send-reverse-search
-                      "C-w" #'mugu-vterm-send-kill-arg
-                      "C-y" #'mugu-vterm-send-yank))
+                      [remap evil-paste-after] #'mugu-vterm-paste
+                      [remap undo] #'vterm-undo
+                      [remap redo] #'ignore))
 
 (defun mugu-vterm-buffer-vterm-p (buffer)
   "Predicate indicating if BUFFER is a vterm."
@@ -53,21 +73,6 @@ synched"
   (mugu-vterm--move-real-cursor)
   (vterm-yank)
   (mugu-vterm--record-cursor-pos (length (substring-no-properties (current-kill 0)))))
-
-(defun mugu-vterm-send-kill-arg ()
-  "Send ctrl-w."
-  (interactive)
-  (vterm-send-key "w" nil nil 'ctrl))
-
-(defun mugu-vterm-send-yank ()
-  "Send ctrl-y."
-  (interactive)
-  (vterm-send-key "y" nil nil 'ctrl))
-
-(defun mugu-vterm-send-reverse-search ()
-  "Send ctrl-r."
-  (interactive)
-  (vterm-send-key "r" nil nil 'ctrl))
 
 (defun mugu-vterm-switch ()
   "Switch to a vterm buffer.
