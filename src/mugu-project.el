@@ -5,6 +5,7 @@
 ;;; Code:
 
 ;; * begin:
+(require 'mugu-counsel)
 (require 'mugu-directory)
 (require 'mugu-menu)
 (require 'projectile)
@@ -65,6 +66,12 @@ If BUFFER is nil, it applies to `current-buffer' instead."
   (with-current-buffer (or buffer (current-buffer))
     (setq-local projectile-project-root project-name)))
 
+(defun mugu-project-vc ()
+  "Call VC backend for current project."
+  (interactive)
+  (noflet ((projectile-project-root (&optional _dir) (mugu-project-root-from-name mugu-project-current-name)))
+    (projectile-vc)))
+
 (defun mugu-project-buffer-in-project-p (buffer &optional project-name)
   "Predicate determning if BUFFER is in project named PROJECT-NAME.
 If PROJECT-NAME is nil, current project name is used if any.
@@ -84,7 +91,7 @@ Name is used instead of project because of ~ and other shnenanigans."
   ("s" projectile-switch-project "switch project" :color red :column "1-Management")
   ("a" projectile-add-known-project "register new project" :color red)
   ("u" projectile-remove-known-project "unregister project" :color red)
-  ("v" projectile-vc "version control" :column "Other")
+  ("v" mugu-project-vc "version control" :column "Other")
   ("g" counsel-git-grep  "gitgrep")
   ("rg" (counsel-rg "" projectile-project-root) "ripgrep")
   ("d" mugu-project-cd "cd" :color blue :column "Find")
