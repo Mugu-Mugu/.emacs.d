@@ -2,6 +2,7 @@
 ;; TBC
 ;;; Commentary:
 (require 'mugu-menu)
+(require 'elisp-slime-nav)
 
 ;;; Code:
 (defun mugu-lisp-insert-header-footer ()
@@ -9,14 +10,13 @@
   (interactive)
   (save-excursion
     (goto-char (point-min))
-    (insert (format ";;; %s --- Summary\n" (file-name-base)))
-    (insert ";; tbc\n")
+    (insert (format ";;; %s --- #{Summary} -*- lexical-binding: t -*-\n" (file-name-base buffer-file-name)))
     (insert ";;; Commentary:\n")
     (insert "\n;;; Code:\n")
     (insert ";; -*- lexical-binding: t -*-")
     (goto-char (point-max))
-    (insert (format "\n(provide '%s)" (file-name-base)))
-    (insert (format "\n;;; %s ends here" (file-name-base)))
+    (insert (format "\n(provide '%s)" (file-name-base buffer-file-name)))
+    (insert (format "\n;;; %s ends here" (file-name-base buffer-file-name)))
     (save-buffer)))
 
 (defun mugu-lisp-jump-symbol-at-point ()
@@ -30,7 +30,7 @@
 (defun mugu-lisp--insert-package-prefix ()
   "Insert package prefix at point."
   (interactive)
-  (insert (format " %s/" (file-name-base)))
+  (insert (format " %s/" (file-name-base buffer-file-name)))
   (when (fboundp 'evil-insert) (evil-insert 1)))
 
 (defmenu mugu-lisp-main-menu
@@ -46,4 +46,4 @@
   ("g" elisp-slime-nav-find-elisp-thing-at-point "go to symbol" :column "3-Goto"))
 
 (provide 'mugu-lisp)
-;;; mugu-lisp-utils ends here
+;;; mugu-lisp ends here

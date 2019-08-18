@@ -1,5 +1,4 @@
-;; -*- lexical-binding: t -*-
-;;; mugu-org-workflow --- Summary
+;;; mugu-org-workflow --- Summary -*- lexical-binding: t -*-
 ;; A collection of defun and settings to implement my workflow
 ;;; Commentary:
 ;; The workflow is inspired by GTD and bernst carsten one and as such mix

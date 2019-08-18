@@ -1,14 +1,15 @@
-;; mugu-org-interface --- Summary
+;; mugu-org-interface --- Front end to my org configuration  -*- lexical-binding: t -*-
 ;; tbc
 ;;; Commentary:
 ;;; Code:
-;; -*- lexical-binding: t -*-
 
 (require 'mugu-org-utils)
 (require 'mugu-org-workflow)
 (require 'mugu-menu)
 (require 'ivy)
 (require 'mugu-lisp-libs)
+(require 'mugu-misc)
+(require 'evil)
 
 ;; variables
 (defvar mugu-orgi-last-command nil
@@ -205,7 +206,7 @@ If REVERSED is not nil, the chosen delay is substracted instead."
   (interactive)
   (newline-without-break-of-line)
   (insert "- ")
-  (evil-insert--state))
+  (evil-insert-state))
 
 (defun mugu-orgi-focus-headline ()
   "Focus on entry at point by expanding it while hiding other."
@@ -300,7 +301,6 @@ action is performed."
   ("A" org-agenda-append-agenda "append another agenda view")
   ("-" org-agenda-filter-remove-all "filter clear" :column "5-Filtering")
   ("/" org-agenda-filter-by-tag "filter by tag")
-  ("!" org-agenda-filter-by-tag-refine "filter by tag (refined")
   ("=" org-agenda-filter-by-regexp "filter by regexp")
   ("<" org-agenda-filter-by-category "fitler by category")
   ("*" org-agenda-filter-by-top-headline "filter by top headline")
