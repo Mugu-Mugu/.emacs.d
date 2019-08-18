@@ -41,5 +41,11 @@ Run COMMANDS upon creation if defined."
       (vterm-send-string commands t)
       (vterm-send-return))))
 
+(defun mugu-pvterm-activate ()
+  "Activate the integration between project and vterm."
+  (mugu-menu-add-entries 'mugu-project-menu
+                         '("tt" mugu-pvterm-create-or-switch "create or switch to term" :column "Terminal")
+                         '("tc" mugu-pvterm-create "create a term")))
+
 (provide 'mugu-project-vterm)
 ;;; mugu-project-vterm ends here

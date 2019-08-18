@@ -25,6 +25,7 @@
     ("fr" (mugu-counsel-fzf-file mugu-directory) "find files recursively")
     ("fa" (mugu-counsel-fzf-any mugu-directory) "find any recursively")
     ("fl" counsel-recentf "file recently used")
+    ("t" mugu-vterm-switch "switch terminal")
     ("d" mugu-directory-with-current-file-path "cd to current file" :color red :column "2-Change Dir")
     ("cd" mugu-counsel-cd "change dir" :color red)
     ("cr" (mugu-counsel-fzf-dir mugu-directory) "change dir recursively" :color red)
