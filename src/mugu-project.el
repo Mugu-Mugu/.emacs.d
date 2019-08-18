@@ -21,7 +21,7 @@ Note that this may fails when several project have the same name."
   (-first-item
    (--filter (equal project-name (projectile-project-name it)) projectile-known-projects)))
 
-(defun mugu-project-switch-buffer ()
+(defun mugu-project-switch-buffer-in-project ()
   "Interactively switch to a buffer in current project."
   (let ((buffers-in-project (-map 'buffer-name
                                   (-filter 'mugu-project-buffer-in-project-p
@@ -65,10 +65,12 @@ If BUFFER is nil, it applies to `current-buffer' instead."
   (with-current-buffer (or buffer (current-buffer))
     (setq-local projectile-project-root project-name)))
 
-(defun mugu-project-buffer-in-project-p (buffer &optional project)
-  "Predicate determning if BUFFER is in project PROJECT.
-If PROJECT is nil, current project is used if any."
-  (equal (projectile-project-name project) (mugu-project-buffer-project buffer)))
+(defun mugu-project-buffer-in-project-p (buffer &optional project-name)
+  "Predicate determning if BUFFER is in project named PROJECT-NAME.
+If PROJECT-NAME is nil, current project name is used if any.
+Name is used instead of project because of ~ and other shnenanigans."
+  (equal (or project-name mugu-project-current-name)
+         (projectile-project-name (mugu-project-buffer-project buffer))))
 
 (defmenu mugu-project-menu
   (:color blue :hint nil :body-pre (unless (mugu-project-root)
@@ -86,21 +88,19 @@ If PROJECT is nil, current project is used if any."
   ("g" counsel-git-grep  "gitgrep")
   ("rg" (counsel-rg "" projectile-project-root) "ripgrep")
   ("d" mugu-project-cd "cd" :color blue :column "Find")
-  ("b" (mugu-project-switch-buffer) "buffer" :color blue)
+  ("b" (mugu-project-switch-buffer-in-project) "buffer" :color blue)
   ("f" (mugu-counsel-fzf-file (mugu-project-root)) "open file alternative")
   ("q" nil "quit menu" :color blue :column nil))
 
- (defun mugu-project-switch-buffer-global ()
-  "Switch to another buffer changing project and wconf if nessecary."
-  (interactive)
+(defun mugu-project-switch-buffer (buffer)
+  "Switch to BUFFER changing project if required."
+  (interactive (list (save-window-excursion (call-interactively #'ivy-switch-buffer)
+                                            (current-buffer))))
   (let* ((old-project (mugu-project-buffer-project (current-buffer)))
-         (new-buffer (save-window-excursion (call-interactively 'ivy-switch-buffer)
-                                            (current-buffer)))
-         (new-project (mugu-project-buffer-project new-buffer)))
-    ;; (message "switching to buffer %s from old-project %s to new-project %s" new-buffer old-project new-project)
+         (new-project (mugu-project-buffer-project buffer)))
     (when (and new-project (projectile-project-p new-project))
       (projectile-switch-project-by-name new-project))
-    (switch-to-buffer new-buffer)))
+    (switch-to-buffer buffer)))
 
 (defun mugu-project-save-wconf ()
   "Save current windows configuration."
