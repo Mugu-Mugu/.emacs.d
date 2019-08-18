@@ -205,7 +205,9 @@
  '(recentf-max-saved-items 1000)
  '(ruby-insert-encoding-magic-comment nil)
  '(safe-local-variable-values
-   '((checkdoc-package-keywords-flag)
+   '((projectile-project-run-cmd . "mkdir -p build; cd build; cmake ..; make run")
+     (projectile-project-compilation-cmd . "mkdir -p build; cd build; cmake ..; make")
+     (checkdoc-package-keywords-flag)
      (bug-reference-bug-regexp . "#\\(?2:[[:digit:]]+\\)")))
  '(savehist-additional-variables '(search ring regexp-search-ring))
  '(savehist-autosave-interval 60)
