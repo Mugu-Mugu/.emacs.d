@@ -33,11 +33,14 @@
   :defer
   :commands vterm
   :init
-  (add-to-list 'load-path "/home/david/.emacs.d/straight/build/vterm"))
+  (add-to-list 'load-path "/home/david/.emacs.d/straight/build/vterm")
+  :config
+  (require 'mugu-vterm))
 
 (use-package mugu-vterm
+  :defer
   :straight nil
-  :after vterm
+  :commands mugu-vterm-switch
   :config
   (mugu-vterm-activate))
 
