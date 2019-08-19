@@ -146,7 +146,7 @@ Penalty is computed relative to NOW."
 (defun mugu-orgw--score-priority (headline)
   "Return a penalty score for HEADLINE dependant on last active field.
 Penalty is computed relative to NOW."
-  (- (or (org-element-property :priority headline) 100)))
+  (- (or (mugu-orgu-get-priority headline) 100)))
 
 (defun mugu-orgw--sort-cmp-score (score-fun hl-left hl-right)
   "Relation order between HL-LEFT and HL-RIGHT based on SCORE-FUN.
@@ -157,7 +157,7 @@ the corresponding headline."
         (score-right (funcall score-fun hl-right)))
     (cond ((> score-left score-right) 'sup)
           ((< score-left score-right) 'inf)
-          ((< score-left score-right) nil))))
+          ((= score-left score-right) nil))))
 
 (defun mugu-orgw-sort-cmp-headlines (hl-left hl-right)
   "Relation order between HL-LEFT and HL-RIGHT based on sorting priority."
