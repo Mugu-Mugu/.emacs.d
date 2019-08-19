@@ -35,9 +35,10 @@ Note that this may fails when several project have the same name."
   "Return the project of `current-buffer'.
 For non-file buffer, the behavious is special as they dont have a meaningful
 `default-directory'."
-  (if buffer-file-truename
-      (projectile-project-root)
-    (or projectile-project-root (mugu-project-root-from-name mugu-project-current-name))))
+  (let ((projectile-project-root-cache (ht-create)))
+    (if buffer-file-truename
+        (projectile-project-root)
+      (or projectile-project-root (mugu-project-root-from-name mugu-project-current-name)))))
 
 (defun mugu-project-name ()
   "Return the name of the current project."
@@ -50,21 +51,21 @@ For non-file buffer, the behavious is special as they dont have a meaningful
   (mugu-space-main))
 
 (defun mugu-project-buffer-project (&optional buffer)
-  "Retrieve the project name of BUFFER.
+  "Retrieve the project root of BUFFER.
 If BUFFER is not given, use `current-buffer' instead."
   (let* ((buffer (or buffer (current-buffer)))
          (buffer-cached-root (buffer-local-value 'projectile-project-root buffer))
-         (buffer-is-file (buffer-local-value 'buffer-file-truename buffer))
-         (buffer-project (or buffer-cached-root (with-current-buffer buffer (mugu-project-root)))))
-    (when (and buffer-is-file (not buffer-cached-root))
-      (with-current-buffer buffer (setq-local projectile-project-root buffer-project)))
-    buffer-project))
+         (buffer-is-file (buffer-local-value 'buffer-file-truename buffer)))
+    (message "for buffer %s cached root is %s and is file is %s" buffer buffer-cached-root buffer-is-file)
+    (or buffer-cached-root
+        (and buffer-is-file (with-current-buffer buffer
+                              (setq-local projectile-project-root (mugu-project-root)))))))
 
 (defun mugu-project-set-buffer-project (project-name &optional buffer)
   "Define PROJECT-NAME for BUFFER.
 If BUFFER is nil, it applies to `current-buffer' instead."
   (with-current-buffer (or buffer (current-buffer))
-    (setq-local projectile-project-root project-name)))
+    (setq-local projectile-project-root (mugu-project-root-from-name project-name))))
 
 (defun mugu-project-vc ()
   "Call VC backend for current project."
@@ -99,32 +100,44 @@ Name is used instead of project because of ~ and other shnenanigans."
   ("f" (mugu-counsel-fzf-file (mugu-project-root)) "open file alternative")
   ("q" nil "quit menu" :color blue :column nil))
 
+(defun mugu-project--set-project-of-buffer (buffer)
+  "Change the project to the one owning BUFFER."
+  (let* ((current-project (mugu-project-root-from-name mugu-project-current-name))
+         (old-project (or (mugu-project-buffer-project (current-buffer)) current-project))
+         (new-project (or (mugu-project-buffer-project buffer) current-project)))
+    (when (not (equal (projectile-project-name old-project)
+                      (projectile-project-name new-project)))
+      (projectile-switch-project-by-name new-project))))
+
 (defun mugu-project-switch-buffer (buffer)
   "Switch to BUFFER changing project if required."
   (interactive (list (save-window-excursion (call-interactively #'ivy-switch-buffer)
                                             (current-buffer))))
-  (let* ((old-project (mugu-project-buffer-project (current-buffer)))
-         (new-project (mugu-project-buffer-project buffer)))
-    (when (and new-project (projectile-project-p new-project))
-      (projectile-switch-project-by-name new-project))
-    (switch-to-buffer buffer)))
+  (mugu-project--set-project-of-buffer buffer)
+  (switch-to-buffer buffer))
+
+(defun mugu-project-pop-to-buffer (buffer &rest args)
+  "Switch to BUFFER using `pop-to-buffer' switching project if required.
+ARGS are passed as is to `pop-to-buffer'"
+  (mugu-project--set-project-of-buffer buffer)
+  (apply #'pop-to-buffer buffer args))
 
 (defun mugu-project-save-wconf ()
   "Save current windows configuration."
   (when (mugu-project-name)
     (ht-set mugu-project-wconf-map (mugu-project-name) (current-window-configuration))))
 
-(defun mugu-project-restore-wconf ()
-  "Restore project windows configuration or clear it if new after switch."
-  (if (ht-contains? mugu-project-wconf-map (mugu-project-name))
-      (set-window-configuration (ht-get mugu-project-wconf-map (mugu-project-name)))
+(defun mugu-project-restore-wconf (project-name)
+  "Restore project windows configuration of project PROJECT-NAME.
+If there was no saved for PROJECT-NAME, clear all windows."
+  (if (ht-contains? mugu-project-wconf-map project-name)
+      (set-window-configuration (ht-get mugu-project-wconf-map project-name))
     (delete-other-windows)))
 
 (defun mugu-project-after-switch ()
   "Actions after project switch: set current project and open a default buffer."
-  (mugu-project-restore-wconf)
-  ;; (message "switching to project %s" projectile-project-name)
   (setq mugu-project-current-name projectile-project-name)
+  (mugu-project-restore-wconf projectile-project-name)
   (unless (projectile-project-buffer-p (current-buffer) default-directory)
     (switch-to-buffer "*Messages*")))
 

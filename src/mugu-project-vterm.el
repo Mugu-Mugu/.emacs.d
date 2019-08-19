@@ -23,10 +23,10 @@ If PROJECT-NAME is not defined, `mugu-project-name' is used instead."
          (existing-vterms (mugu-pvterm-list-project-vterm project-name)))
     (pcase (length existing-vterms)
       (0 (mugu-pvterm-create project-name))
-      (1 (mugu-project-switch-buffer (-first-item existing-vterms)))
-      (_ (mugu-project-switch-buffer (get-buffer
-                                      (ivy-read (format "Select a terminal in project %s" project-name)
-                                                (-map #'buffer-name existing-vterms))))))))
+      (1 (mugu-vterm-pop (-first-item existing-vterms)))
+      (_ (mugu-vterm-pop (get-buffer
+                          (ivy-read (format "Select a terminal in project %s" project-name)
+                                    (-map #'buffer-name existing-vterms))))))))
 
 (defun mugu-pvterm-create (&optional project-name term-name commands)
   "Create vterm for PROJECT-NAME named TERM-NAME.
@@ -35,7 +35,7 @@ Run COMMANDS upon creation if defined."
   (interactive)
   (let* ((project-name (or project-name (mugu-project-name)))
          (term-name (or term-name project-name)))
-    (vterm (format "vterm (%s)" term-name))
+    (mugu-vterm-create (format "vterm (%s)" term-name))
     (mugu-project-set-buffer-project project-name)
     (when commands
       (vterm-send-string commands t)
@@ -46,6 +46,7 @@ Run COMMANDS upon creation if defined."
   (mugu-menu-add-entries 'mugu-project-menu
                          '("tt" mugu-pvterm-create-or-switch "create or switch to term" :column "Terminal")
                          '("tc" mugu-pvterm-create "create a term")))
+
 
 (provide 'mugu-project-vterm)
 ;;; mugu-project-vterm ends here

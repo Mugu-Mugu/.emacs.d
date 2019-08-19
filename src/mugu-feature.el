@@ -23,8 +23,16 @@ If BUFFER is nil, an interactive prompt will be provided."
                buffer)
 
     (call-interactively (mugu-feature--select-method 'mugu-project-switch-buffer
-                                                     (unless buffer 'ivy-switch-buffer)
+                                                     'ivy-switch-buffer
                                                      'switch-to-buffer))))
+
+(defun mugu-feature-pop-to-buffer (buffer &rest args)
+  "Pop to BUFFER.
+ARGS are unspecified."
+  (interactive)
+  (apply (mugu-feature--select-method 'mugu-project-pop-to-buffer
+                                        'pop-to-buffer)
+         buffer args))
 
 (provide 'mugu-feature)
 ;;; mugu-feature ends here

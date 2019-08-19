@@ -10,7 +10,7 @@
 (require 'general)
 (require 'mugu-feature)
 
-(defvar mugu-vterm--cursor-pos 0
+(defvar-local mugu-vterm--cursor-pos 0
   "Pos of vterm cursor.")
 
 (defun mugu-vterm--record-cursor-pos (&optional offset)
@@ -74,17 +74,33 @@ synched"
   (vterm-yank)
   (mugu-vterm--record-cursor-pos (length (substring-no-properties (current-kill 0)))))
 
+(defun mugu-vterm-pop (buffer)
+  "Switch to the BUFFER and display it in a side window."
+  (mugu-feature-pop-to-buffer buffer
+                              (cons #'display-buffer-in-side-window
+                                    '((side . top)
+                                      (slot . 0)
+                                      (window-height . 0.6)
+                                      (inhibit-same-window . nil)))))
+
 (defun mugu-vterm-switch ()
   "Switch to a vterm buffer.
 If none exists, one will be created."
   (interactive)
    (let* ((existing-vterms (-filter #'mugu-vterm-buffer-vterm-p (buffer-list))))
-    (pcase (length existing-vterms)
-      (0 (vterm))
-      (1 (mugu-feature-switch-buffer (-first-item existing-vterms)))
-      (_ (mugu-feature-switch-buffer (get-buffer
-                                      (ivy-read (format "Select a terminal: " )
-                                                (-map #'buffer-name existing-vterms))))))))
+     (pcase (length existing-vterms)
+       (0 (mugu-vterm-create))
+       (1 (mugu-vterm-pop (-first-item existing-vterms)))
+       (_ (mugu-vterm-pop (get-buffer
+                               (ivy-read (format "Select a terminal: ")
+                                         (-map #'buffer-name existing-vterms))))))))
+
+(defun mugu-vterm-create (&optional name)
+  "Create a vterm buffer named with NAME if provided."
+  (mugu-vterm-pop
+   (save-window-excursion
+     (vterm (format "vterm (%s)" name))
+     (current-buffer))))
 
 (defun mugu-vterm-activate ()
   "Configure vterm integration."
