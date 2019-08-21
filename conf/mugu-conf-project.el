@@ -12,6 +12,7 @@
   :diminish projectile-mode
   :after mugu-project
   :defer
+  :commands projectile-mode
   :config
   (setq projectile-completion-system 'ivy)
   (add-hook 'kill-emacs-hook 'projectile-save-known-projects)
@@ -30,8 +31,7 @@
 
 (use-package mugu-project-vterm
   :straight nil
-  :defer
-  :commands (mugu-pvterm-create-or-switch)
+  :after mugu-project
   :config
   (mugu-pvterm-activate))
 
