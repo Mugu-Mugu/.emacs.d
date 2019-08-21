@@ -6,7 +6,6 @@
 ;; to move elsewhere
 (use-package yaml-mode :defer)
 (use-package web-mode :defer)
-(use-package wgrep :defer)
 (use-package restclient :defer)
 (use-package ivy-posframe
   :defer

@@ -76,6 +76,8 @@
   :config
   (mugu-mc-enable-lispy-integration))
 
+(use-package wgrep :defer)
+
 (use-package mugu-wgrep
   :straight nil
   :after ivy
