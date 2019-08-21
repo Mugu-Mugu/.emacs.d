@@ -4,7 +4,7 @@
 
 ;;; Code:
 (require 'mugu-menu)
-(require 'mugu-feature)
+(require 'mugu-buffer)
 (require 'general)
 
 (defun mugu-space-activate-helm-menu ()
@@ -20,7 +20,7 @@
   -> File    Dir : %s(mugu-directory-pwd-file)
   -> Current Dir : %s(mugu-directory-pwd)
 "
-    ("b" mugu-feature-switch-buffer "previous buffer" :column "1-Change File")
+    ("b" mugu-buffer-switch "previous buffer" :column "1-Change File")
     ("ff" (with-mugu-dir (counsel-find-file)) "find files")
     ("fr" (mugu-counsel-fzf-file mugu-directory) "find files recursively")
     ("fa" (mugu-counsel-fzf-any mugu-directory) "find any recursively")
@@ -36,8 +36,8 @@
     ("sgg" google-this "seach w/ google")
     ("y" counsel-yank-pop "yank ring" :column "4-Misc")
     ("u" counsel-unicode-char "insert unicode")
-    ("j" (mugu-scroll-lines 3) "scroll down" :color red)
-    ("k" (mugu-scroll-lines -3) "scroll up" :color red)
+    ("j" scroll-up "scroll down" :color red)
+    ("k" scroll-down "scroll up" :color red)
     ("l" ace-link "link" :color blue)
     ("x" counsel-M-x "execute" :column "5-Execute")
     ("r" ivy-resume "ivy resume")
