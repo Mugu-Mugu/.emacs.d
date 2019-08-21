@@ -8,7 +8,7 @@
 (require 'vterm)
 (require 'ivy)
 (require 'general)
-(require 'mugu-feature)
+(require 'mugu-buffer)
 
 (defvar-local mugu-vterm--cursor-pos 0
   "Pos of vterm cursor.")
@@ -58,14 +58,15 @@ synched"
                       "C-c" #'vterm--self-insert
                       "C-SPC" #'vterm--self-insert
                       "ESC" #'vterm--self-insert)
-  (general-define-key :keymaps '(vterm-mode-map)
+  (general-define-key :keymaps '(vterm-mode-map) :states 'motion
                       [remap evil-paste-after] #'mugu-vterm-paste
                       [remap undo] #'vterm-undo
-                      [remap redo] #'ignore))
+                      [remap redo] #'ignore
+                      "C-c" #'vterm--self-insert))
 
-(defun mugu-vterm-buffer-vterm-p (buffer)
+(defun mugu-vterm-buffer-vterm-p (buffer &rest _args)
   "Predicate indicating if BUFFER is a vterm."
-  (eq 'vterm-mode (buffer-local-value 'major-mode buffer)))
+  (eq 'vterm-mode (buffer-local-value 'major-mode (get-buffer buffer))))
 
 (defun mugu-vterm-paste ()
   "Paste current kill content at current cursor position."
@@ -74,38 +75,35 @@ synched"
   (vterm-yank)
   (mugu-vterm--record-cursor-pos (length (substring-no-properties (current-kill 0)))))
 
-(defun mugu-vterm-pop (buffer)
-  "Switch to the BUFFER and display it in a side window."
-  (mugu-feature-pop-to-buffer buffer
-                              (cons #'display-buffer-in-side-window
-                                    '((side . top)
-                                      (slot . 0)
-                                      (window-height . 0.6)
-                                      (inhibit-same-window . nil)))))
-
-(defun mugu-vterm-switch ()
+ (defun mugu-vterm-switch ()
   "Switch to a vterm buffer.
 If none exists, one will be created."
   (interactive)
    (let* ((existing-vterms (-filter #'mugu-vterm-buffer-vterm-p (buffer-list))))
      (pcase (length existing-vterms)
        (0 (mugu-vterm-create))
-       (1 (mugu-vterm-pop (-first-item existing-vterms)))
-       (_ (mugu-vterm-pop (get-buffer
+       (1 (mugu-buffer-switch (-first-item existing-vterms)))
+       (_ (mugu-buffer-switch (get-buffer
                                (ivy-read (format "Select a terminal: ")
                                          (-map #'buffer-name existing-vterms))))))))
 
 (defun mugu-vterm-create (&optional name)
-  "Create a vterm buffer named with NAME if provided."
-  (mugu-vterm-pop
+  "Create a new vterm with NAME if given."
+  (mugu-buffer-switch
    (save-window-excursion
-     (vterm (format "vterm (%s)" name))
-     (current-buffer))))
+     (vterm (format "vterm (%s)" name)))))
 
 (defun mugu-vterm-activate ()
   "Configure vterm integration."
   (mugu-vterm--install-keymaps)
-  (add-hook 'vterm-mode-hook #'mugu-vterm--install-hook))
+  (add-hook 'vterm-mode-hook #'mugu-vterm--install-hook)
+  (add-to-list 'display-buffer-alist
+               '(mugu-vterm-buffer-vterm-p
+                 (display-buffer-in-side-window)
+                 (side . top)
+                 (slot . 0)
+                 (window-height . 0.5)
+                 (inhibit-same-window . nil))))
 
 (provide 'mugu-vterm)
 ;;; mugu-vterm ends here

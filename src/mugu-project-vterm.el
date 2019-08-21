@@ -6,6 +6,7 @@
 ;;; Code:
 (require 'vterm)
 (require 'ivy)
+(require 'mugu-buffer)
 (require 'mugu-vterm)
 (require 'mugu-project)
 
@@ -23,10 +24,10 @@ If PROJECT-NAME is not defined, `mugu-project-name' is used instead."
          (existing-vterms (mugu-pvterm-list-project-vterm project-name)))
     (pcase (length existing-vterms)
       (0 (mugu-pvterm-create project-name))
-      (1 (mugu-vterm-pop (-first-item existing-vterms)))
-      (_ (mugu-vterm-pop (get-buffer
-                          (ivy-read (format "Select a terminal in project %s" project-name)
-                                    (-map #'buffer-name existing-vterms))))))))
+      (1 (mugu-buffer-switch (-first-item existing-vterms)))
+      (_ (mugu-buffer-switch (get-buffer
+                              (ivy-read (format "Select a terminal in project %s" project-name)
+                                        (-map #'buffer-name existing-vterms))))))))
 
 (defun mugu-pvterm-create (&optional project-name term-name commands)
   "Create vterm for PROJECT-NAME named TERM-NAME.
