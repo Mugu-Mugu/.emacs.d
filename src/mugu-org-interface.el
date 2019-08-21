@@ -112,12 +112,12 @@ If REVERSED is not nil, the chosen delay is substracted instead."
 (defsubst mugu-orgi-snooze-headline (headline)
   "Snooze the HEADLINE or the task at point if called interractively."
   (interactive (list (mugu-orgu-element-at-point)))
-  (mugu-orgi--action-snooze-headline headline 'relative))
+  (mugu-orgi--action-snooze-headline headline))
 
 (defsubst mugu-orgi-retard-headline (headline)
   "Retard the HEADLINE or the task at point if called interractively."
   (interactive (list (mugu-orgu-element-at-point)))
-  (mugu-orgi--action-snooze-headline headline nil 'reversed))
+  (mugu-orgi--action-snooze-headline headline 'relative 'reversed))
 
 
 (defun mugu-orgi--action-refile-headline (target-headline-p headline)

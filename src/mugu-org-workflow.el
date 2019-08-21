@@ -119,6 +119,7 @@ It can't be both a task and a project (project takes priority)."
   "Predicate determining if HEADLINE is a stuck project.
 Such a headline is a project with no next child."
   (and (mugu-orgw-project-headline-p headline)
+       (not (eq 'done (org-element-property :todo-type headline)))
        (not (mugu-orgu-headline-has-child-with-todo-keywords headline '("NEXT")))))
 
 (defun mugu-orgw--score-todo (headline)
