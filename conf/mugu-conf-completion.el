@@ -8,7 +8,7 @@
   :diminish company-mode
   :hook (prog-mode . company-mode)
   :custom
-  (company-idle-delay 0)
+  (company-idle-delay 0.25)
   (company-require-match nil)
   :config
   (general-unbind lispy-mode-map "M-k")
@@ -34,6 +34,7 @@
   (setq company-quickhelp-delay 0))
 
 (use-package yasnippet
+  :disabled
   :after company
   :delight yas-minor-mode
   :config
