@@ -1,5 +1,5 @@
 ;;; mugu-vterm --- Summary
-;; Integration with libvterm and my configuration
+;; Integration with libvterm and interface utilities
 ;;; Commentary:
 ;; Enable vterm to work with evil mode
 ;; Also enrich missing features
@@ -12,6 +12,10 @@
 
 (defvar-local mugu-vterm--cursor-pos 0
   "Pos of vterm cursor.")
+(defvar mugu-vterm-list-buffer-function #'mugu-vterm-list-buffer-by-mru
+  "The function to use whenever a list of vterm buffer needs to be made.")
+(defvar mugu-vterm-after-vterm-creation-hook nil
+  "Hook run just after a vterm is created.")
 
 (defun mugu-vterm--record-cursor-pos (&optional offset)
   "Record the current position of the vterm cursor.
@@ -62,11 +66,21 @@ synched"
                       [remap evil-paste-after] #'mugu-vterm-paste
                       [remap undo] #'vterm-undo
                       [remap redo] #'ignore
-                      "C-c" #'vterm--self-insert))
+                      "C-c" #'vterm--self-insert)
+  (general-define-key :states 'motion
+                      "²" #'mugu-vterm-toggle))
 
 (defun mugu-vterm-buffer-vterm-p (buffer &rest _args)
   "Predicate indicating if BUFFER is a vterm."
   (eq 'vterm-mode (buffer-local-value 'major-mode (get-buffer buffer))))
+
+(defun mugu-vterm-list-buffer-by-mru ()
+  "Return a list of opened vterm buffer in mru order."
+  (-filter 'mugu-vterm-buffer-vterm-p (buffer-list)))
+
+(defun mugu-vterm-list-buffer ()
+  "Return a list of opened vterm."
+  (funcall mugu-vterm-list-buffer-function))
 
 (defun mugu-vterm-paste ()
   "Paste current kill content at current cursor position."
@@ -75,23 +89,46 @@ synched"
   (vterm-yank)
   (mugu-vterm--record-cursor-pos (length (substring-no-properties (current-kill 0)))))
 
- (defun mugu-vterm-switch ()
-  "Switch to a vterm buffer.
-If none exists, one will be created."
+(defun mugu-vterm-rename (new-name)
+  "Rename current vterm with NEW-NAME."
   (interactive)
-   (let* ((existing-vterms (-filter #'mugu-vterm-buffer-vterm-p (buffer-list))))
-     (pcase (length existing-vterms)
-       (0 (mugu-vterm-create))
-       (1 (mugu-buffer-switch (-first-item existing-vterms)))
-       (_ (mugu-buffer-switch (get-buffer
-                               (ivy-read (format "Select a terminal: ")
-                                         (-map #'buffer-name existing-vterms))))))))
+  (unless (mugu-vterm-buffer-vterm-p (current-buffer))
+    (error "Current buffer %s is not a vterm" (current-buffer)))
+  (rename-buffer (format "Vterm - %s" new-name)))
+
+(defun mugu-vterm-switch (&optional select-first)
+  "Switch to a vterm buffer interactively if there is several open.
+If none exists, one will be created.
+If SELECT-FIRST is non-nil, select the first buffer in the list `mugu-vterm-list-buffer'."
+  (interactive)
+  (let* ((vterm-list (if select-first
+                         (-take 1 (mugu-vterm-list-buffer))
+                       (mugu-vterm-list-buffer))))
+    (pcase (length vterm-list)
+      (0 (mugu-vterm-create))
+      (1 (mugu-buffer-switch (-first-item vterm-list)))
+      (_ (mugu-buffer-switch (get-buffer
+                              (ivy-read (format "Select a terminal: ")
+                                        (-map #'buffer-name vterm-list))))))))
+
+(defun mugu-vterm-toggle ()
+  "Switch to a vterm buffer or hide one if already displayed."
+  (interactive)
+  (let ((window-displaying-vterm (get-window-with-predicate
+                                  (lambda (window) (mugu-vterm-buffer-vterm-p (window-buffer window))))))
+    (if window-displaying-vterm
+        (delete-window window-displaying-vterm)
+      (mugu-vterm-switch 'select-first))))
 
 (defun mugu-vterm-create (&optional name)
   "Create a new vterm with NAME if given."
   (mugu-buffer-switch
    (save-window-excursion
-     (vterm (format "vterm (%s)" name)))))
+     (vterm (if name
+                (format "vterm (%s)" name)
+              "vterm"))
+     (run-hooks 'mugu-vterm-after-vterm-creation-hook)
+     (current-buffer))))
 
 (defun mugu-vterm-activate ()
   "Configure vterm integration."
@@ -103,7 +140,62 @@ If none exists, one will be created."
                  (side . top)
                  (slot . 0)
                  (window-height . 0.5)
-                 (inhibit-same-window . nil))))
+                 (inhibit-same-window . nil)))
+  (add-to-list 'display-buffer-alist
+               '(".*"
+                 (display-buffer-same-window display-buffer-reuse-window display-buffer-reuse-mode-window)
+                 (inhibit-same-window . nil))
+               'append)
+  ;; (setq display-buffer-alist
+  ;;       '((mugu-vterm-buffer-vterm-p
+  ;;          (display-buffer-in-side-window)
+  ;;          (side . top)
+  ;;          (slot . 0)
+  ;;          (window-height . 0.5)
+  ;;          (inhibit-same-window))
+  ;;         ("\\*Flycheck errors\\*"
+  ;;          (display-buffer-in-side-window)
+  ;;          (side . bottom)
+  ;;          (window-height . 10)
+  ;;          (window-width . 1)
+  ;;          (inhibit-switch-frame . t)
+  ;;          (inhibit-same-window . t))
+  ;;         (" \\*Org todo\\*"
+  ;;          (display-buffer-in-side-window)
+  ;;          (side . bottom)
+  ;;          (slot . 0)
+  ;;          (window-height . 2)
+  ;;          (inhibit-switch-frame . t))
+  ;;         ("CAPTURE*"
+  ;;          (display-buffer-in-side-window display-buffer-same-window display-buffer-use-some-window)
+  ;;          (side . bottom)
+  ;;          (slot . 1)
+  ;;          (window-height . 0.3)
+  ;;          (inhibit-switch-frame . t))
+  ;;         ("\\*Apropos\\*"
+  ;;          (display-buffer-in-side-window)
+  ;;          (side . right)
+  ;;          (slot . -1)
+  ;;          (window-height . 1)
+  ;;          (window-width . 80)
+  ;;          (inhibit-switch-frame . t)
+  ;;          (inhibit-same-window . t))
+  ;;         ("\\*Warnings\\*"
+  ;;          (display-buffer-in-side-window)
+  ;;          (side . bottom)
+  ;;          (slot . 1)
+  ;;          (window-height . 10)
+  ;;          (window-width . 1)
+  ;;          (inhibit-switch-frame . t)
+  ;;          (inhibit-same-window . t))
+  ;;         ("\\*Help\\*"
+  ;;          (display-buffer-in-side-window)
+  ;;          (side . right)
+  ;;          (window-height . 1)
+  ;;          (window-width . 80)
+  ;;          (inhibit-switch-frame . t)
+  ;;          (inhibit-same-window . t))))
+  )
 
 (provide 'mugu-vterm)
 ;;; mugu-vterm ends here
