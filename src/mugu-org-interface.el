@@ -103,11 +103,11 @@ The last command session is resumed after if PERSISTANT is not nil."
 If RELATIVE is not nil, the previous headline timestamp is discarded
 and now is used instead.
 If REVERSED is not nil, the chosen delay is substracted instead."
-  (mugu-orgw-set-timestamp headline
-                           (if reversed
-                               (- (mugu-orgi--pick-delay))
-                             (mugu-orgi--pick-delay))
-                           relative))
+  (mugu-orgw-schedule headline
+                      (if reversed
+                          (- (mugu-orgi--pick-delay))
+                        (mugu-orgi--pick-delay))
+                      relative))
 
 (defsubst mugu-orgi-snooze-headline (headline)
   "Snooze the HEADLINE or the task at point if called interractively."

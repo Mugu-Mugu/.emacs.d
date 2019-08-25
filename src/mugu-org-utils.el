@@ -300,6 +300,11 @@ The cache is actually made for all agenda files."
      (beginning-of-line)
      (org-element-at-point))))
 
+(defun mugu-orgu-timestamp-str (time)
+  "Convert a TIME to a timestamp understood by org mode."
+  (org-timestamp-format (org-timestamp-from-time time 'with-time)
+                        (org-time-stamp-format 'long)))
+
 (defun mugu-orgu-sort-subtree (cmp-fun &optional recursive)
   "Sort the childs of headline at point according to order defined in CMP-FUN.
 CMP-FUN should accept two org-element headline as inputs and should return

@@ -132,17 +132,18 @@ Such a headline is a project with no next child."
     ("CANCELLED" -200)
     (_ -100)))
 
-(defun mugu-orgw--last-active (headline)
+(defun mugu-orgw--get-scheduled (headline)
   "Return the last active data of HEADLINE if present.
 If not present return nil."
-  (string-to-number (or (org-element-property :LAST-ACTIVE headline) "0")))
+  (float-time (org-timestamp-to-time (or (org-element-property :scheduled headline)
+                                         (org-timestamp-from-time 0)))))
 
-(defun mugu-orgw--score-last-active (now headline)
-  "Return a penalty score for HEADLINE dependant on last active field.
+(defun mugu-orgw--score-scheduled (now headline)
+  "Return a penalty score for HEADLINE dependant on scheduled field.
 Penalty is computed relative to NOW."
-  (if (< (mugu-orgw--last-active headline) now)
-      (- (mugu-orgw--last-active headline) now)
-    (- (+ now (mugu-orgw--last-active headline)))))
+  (if (< (mugu-orgw--get-scheduled headline) now)
+      (- (mugu-orgw--get-scheduled headline) now)
+    (- (+ now (mugu-orgw--get-scheduled headline)))))
 
 (defun mugu-orgw--score-priority (headline)
   "Return a penalty score for HEADLINE dependant on last active field.
@@ -162,9 +163,9 @@ the corresponding headline."
 
 (defun mugu-orgw-sort-cmp-headlines (hl-left hl-right)
   "Relation order between HL-LEFT and HL-RIGHT based on sorting priority."
-  (let ((score-last-active (apply-partially #'mugu-orgw--score-last-active (float-time))))
+  (let ((score-scheduled (apply-partially #'mugu-orgw--score-scheduled (float-time))))
     (eq 'sup (or (mugu-orgw--sort-cmp-score #'mugu-orgw--score-todo hl-left hl-right)
-                 (mugu-orgw--sort-cmp-score score-last-active hl-left hl-right)
+                 (mugu-orgw--sort-cmp-score score-scheduled hl-left hl-right)
                  (mugu-orgw--sort-cmp-score #'mugu-orgw--score-priority hl-left hl-right)))))
 
 (defun mugu-orgw-capture-todo (find-loc-find)
@@ -252,8 +253,8 @@ The hack with noflet is to prevent fucking orgmode to sabotage the windows confi
 
     (org-agenda nil "o")))
 
-(defun mugu-orgw-set-timestamp (headline &optional delay relative)
-  "Insert now as a timestamp in HEADLINE property.
+(defun mugu-orgw-schedule (headline &optional delay relative)
+  "Set SCHEDULED field of HEADLINE to now.
 If DELAY is given, add it to the timestamp.
 If RELATIVE is defined, the delay is applied to the old value.  Otherwise it's
 applied to now."
@@ -262,7 +263,9 @@ applied to now."
          (initial-timestamp (or (and relative last-active-raw (string-to-number last-active-raw))
                                 (float-time)))
          (new-timestamp (+ delay initial-timestamp)))
-    (mugu-orgu-put-property headline "last-active" (format "%s" new-timestamp))))
+    (mugu-orgu-do-action #'org-schedule
+                         headline
+                         'remove-old (mugu-orgu-timestamp-str new-timestamp))))
 
 (defun mugu-orgw-current-task ()
   "Retrieve the current active task."
@@ -290,7 +293,7 @@ applied to now."
 Change it's status to NEXT and record the time at which it occured."
   (interactive (list (mugu-orgu-element-at-point)))
   (mugu-orgu-change-todo-state headline "NEXT")
-  (mugu-orgw-set-timestamp headline))
+  (mugu-orgw-schedule headline))
 
 (defun mugu-orgw-set-configuration ()
   "Activate the workflow.
