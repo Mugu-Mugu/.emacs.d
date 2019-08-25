@@ -13,12 +13,17 @@
 Default to `selected-window'."
   (window-parameter (or window (selected-window)) 'window-side))
 
+(defun mugu-window-bury-buffer-delete-window (window)
+  "Delete WINDOW and bury its buffer."
+  (bury-buffer (window-buffer window))
+  (delete-window  window))
+
 (defun mugu-window-delete-next-side ()
   "Delete the next side window."
   (interactive)
   (let ((next-side-window (window-with-parameter 'window-side)))
     (if next-side-window
-        (quit-window nil next-side-window)
+        (mugu-window-bury-buffer-delete-window next-side-window)
       (warn "There is no side window open."))))
 
 (defun mugu-window-delete-all-windows ()
