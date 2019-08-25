@@ -426,22 +426,22 @@ action is performed."
                  (display-buffer-in-side-window display-buffer-same-window display-buffer-use-some-window)
                  (side . bottom)
                  (slot . 1)
-                 (window-height . 0.3)
+                 (window-height . 0.2)
                  (inhibit-switch-frame . t)))
   (add-to-list 'display-buffer-alist
-               '(" \\*Org todo\\*"
+               '("\\*Org todo\\*"
                  (display-buffer-in-side-window)
                  (side . bottom)
-                 (slot . 0)
-                 (window-height . 2)
-                 (inhibit-switch-frame . t)))
+                 (slot . 2)
+                 (window-height . 0.1)))
   (add-to-list 'display-buffer-alist
-               '(".*.org"
+               '(".*.org$"
                  (display-buffer-in-side-window)
                  (side . bottom)
                  (slot . 1)
                  (window-height . 0.6)
-                 (inhibit-switch-frame . t)))
+                 (inhibit-switch-frame . t))
+               'append)
 
   (set-face-attribute 'org-todo nil :foreground "#ff3333" :background nil)
   (advice-add #'org-switch-to-buffer-other-window :around #'mugu-orgi-switch-to-buffer-other-window)
