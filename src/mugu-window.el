@@ -1,38 +1,12 @@
-(require 'hydra)
+;;; mugu-window --- Basic settings for vanilla emacs window -*- lexical-binding: t -*-
+;;; Commentary:
+
+;;; Code:
 (require 'mugu-menu)
 (require 'hydra)
 (require 'winner)
 (require 'use-package)
-
-(winner-mode +1)
-;; configure boring buffer disposition
-(add-to-list 'display-buffer-alist
-             (quote ("\\*Help\\*" . ((display-buffer-in-side-window)
-                                     .
-                                     ((side . right)
-                                      (window-height . 1)
-                                      (window-width . 80)
-                                      (inhibit-switch-frame . t)
-                                      (inhibit-same-window . t))))))
-(add-to-list 'display-buffer-alist
-             (quote ("\\*Warnings\\*" . ((display-buffer-in-side-window)
-                                         .
-                                         ((side . bottom)
-                                          (slot . 1)
-                                          (window-height . 10)
-                                          (window-width . 1)
-                                          (inhibit-switch-frame . t)
-                                          (inhibit-same-window . t))))))
-
-(add-to-list 'display-buffer-alist
-             (quote ("\\*Apropos\\*" . ((display-buffer-in-side-window)
-                                         .
-                                         ((side . right)
-                                          (slot . -1)
-                                          (window-height . 1)
-                                          (window-width . 80)
-                                          (inhibit-switch-frame . t)
-                                          (inhibit-same-window . t))))))
+(require 'ace-window)
 
 (defun lunaryorn-find-side-windows (&optional side)
   "Get all side window if any.
@@ -56,10 +30,18 @@ If SIDE is non-nil only get windows on that side."
         (delete-window window)))))
 
 (defun mugu/delete-others-windows ()
-  "quit all others windows, including side one"
+  "Quit all others windows, including side one."
   (interactive)
   (delete-other-windows)
   (lunaryorn-quit-all-side-windows))
+
+(defun mugu-window-delete-next-side ()
+  "Delete the next side window."
+  (interactive)
+  (let ((next-side-window (window-with-parameter 'window-side)))
+    (if next-side-window
+        (delete-window next-side-window)
+      (warn "There is no side window open."))))
 
 (defmenu mugu-window-resize-menu
   (:color red :hint nil)
@@ -95,7 +77,6 @@ If SIDE is non-nil only get windows on that side."
   ("v" split-window-right "split window vertically" :color blue)
   ("d" delete-window "delete current window")
   ("D" mugu/delete-others-windows "delete *all* other windows")
-  ("f" zoom "focus")
   ("u" winner-undo "undo window conf" :column "3-Undo/Redo")
   ("r" winner-redo "redo window conf")
   ("b" balance-windows "balance window height" :column "4-Sizing")
@@ -104,16 +85,8 @@ If SIDE is non-nil only get windows on that side."
   ("c" mugu-window-resize-menu "resize window size submenu" :color blue)
   ("q" nil "quit menu" :color blue :column nil))
 
-;; (use-package golden-ratio
-;;   :defer 5
-;;   :config
-;;   (setq golden-ratio-auto-scale t)
-;;   (golden-ratio-mode 1))
 
-(use-package zoom
-  :disabled
-  :defer 5
-  :custom
-  (zoom-size '(0.618 . 0.618)))
+
 
 (provide 'mugu-window)
+;;; mugu-window ends here

@@ -16,6 +16,7 @@
 (require 'mugu-conf-evil)
 (require 'mugu-conf-lisp)
 (require 'mugu-conf-session)
+(require 'mugu-conf-window)
 (require 'mugu-conf-modeline)
 (require 'mugu-conf-project)
 (require 'mugu-conf-cosmetics)
@@ -36,7 +37,6 @@
 (require 'mugu-conf-python)
 
 (require 'mugu-site-lisp)
-(require 'mugu-window)
 (require 'mugu-fold)
 
 ;;; languages features
