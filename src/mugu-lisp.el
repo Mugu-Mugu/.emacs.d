@@ -13,7 +13,6 @@
     (insert (format ";;; %s --- #{Summary} -*- lexical-binding: t -*-\n" (file-name-base buffer-file-name)))
     (insert ";;; Commentary:\n")
     (insert "\n;;; Code:\n")
-    (insert ";; -*- lexical-binding: t -*-")
     (goto-char (point-max))
     (insert (format "\n(provide '%s)" (file-name-base buffer-file-name)))
     (insert (format "\n;;; %s ends here" (file-name-base buffer-file-name)))
