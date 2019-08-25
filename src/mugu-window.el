@@ -8,33 +8,6 @@
 (require 'use-package)
 (require 'ace-window)
 
-(defun lunaryorn-find-side-windows (&optional side)
-  "Get all side window if any.
-If SIDE is non-nil only get windows on that side."
-  (let (windows)
-    (walk-window-tree
-     (lambda (window)
-       (let ((window-side (window-parameter window 'window-side)))
-         (when (and window-side (or (not side) (eq window-side side)))
-           (push window windows)))))
-    windows))
-
-(defun lunaryorn-quit-all-side-windows ()
-  "Quit all side windows of the current frame."
-  (interactive)
-  (dolist (window (lunaryorn-find-side-windows))
-    (when (window-live-p window)
-      (quit-window nil window)
-      ;; When the window is still live, delete it
-      (when (window-live-p window)
-        (delete-window window)))))
-
-(defun mugu/delete-others-windows ()
-  "Quit all others windows, including side one."
-  (interactive)
-  (delete-other-windows)
-  (lunaryorn-quit-all-side-windows))
-
 (defun mugu-window-side-p (&optional window)
   "Predicate determining if WINDOW is a side window.
 Default to `selected-window'."
@@ -89,7 +62,7 @@ Default to `selected-window'."
   ("s" split-window-below "split window" :color blue :column "2-Split Management")
   ("v" split-window-right "split window vertically" :color blue)
   ("d" delete-window "delete current window")
-  ("D" mugu/delete-others-windows "delete *all* other windows")
+  ("D" mugu-window-delete-all-windows "delete *all* other windows")
   ("u" winner-undo "undo window conf" :column "3-Undo/Redo")
   ("r" winner-redo "redo window conf")
   ("b" balance-windows "balance window height" :column "4-Sizing")
@@ -97,9 +70,6 @@ Default to `selected-window'."
   ("M" minimize-window "maximize current window")
   ("c" mugu-window-resize-menu "resize window size submenu" :color blue)
   ("q" nil "quit menu" :color blue :column nil))
-
-
-
 
 (provide 'mugu-window)
 ;;; mugu-window ends here
