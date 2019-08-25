@@ -87,7 +87,7 @@ Name is used instead of project because of ~ and other shnenanigans."
   ("a" projectile-add-known-project "register new project" :color red)
   ("u" projectile-remove-known-project "unregister project" :color red)
   ("v" mugu-project-vc "version control" :column "Other")
-  ("g" counsel-git-grep  "gitgrep")
+  ("g" (let ((default-directory (mugu-project-root))) (counsel-git-grep)) "gitgrep")
   ("rg" (counsel-rg "" projectile-project-root) "ripgrep")
   ("d" mugu-project-cd "cd" :color blue :column "Find")
   ("b" (mugu-project-switch-buffer-in-project) "buffer" :color blue)
@@ -123,9 +123,9 @@ If there was no saved for PROJECT-NAME, clear all windows."
     (select-window (frame-first-window))
     (delete-other-windows)))
 
-(defun mugu-project-after-switch ()
-  "Actions after project switch: set current project and open a default buffer."
-  (unless (projectile-project-buffer-p (current-buffer) default-directory)
+(defun mugu-project--fix-buffer (new-project)
+  "Change `current-buffer' if it is not owned by NEW-PROJECT."
+  (unless (projectile-project-buffer-p (current-buffer) new-project)
     (switch-to-buffer "*Messages*")))
 
 (defun mugu-project-switch (new-project)
@@ -134,7 +134,7 @@ If there was no saved for PROJECT-NAME, clear all windows."
   (mugu-project--save-wconf)
   (setq mugu-project-current-name (projectile-project-name new-project))
   (projectile-switch-project-by-name new-project)
-  (mugu-project-after-switch)
+  (mugu-project--fix-buffer new-project)
   (mugu-project--restore-wconf (projectile-project-name new-project)))
 
 (defun mugu-project--switch-maybe (new-buffer)
