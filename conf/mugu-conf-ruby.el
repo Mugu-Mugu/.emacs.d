@@ -9,7 +9,7 @@
 
 (use-package ruby-mode
   :hook
-  (ruby-mode . lsp)
+  ;; (ruby-mode . lsp)
   (ruby-mode . flycheck-mode))
 
 (use-package rvm
@@ -24,8 +24,8 @@
   (setq rspec-use-rvm t)
   (setq rspec-use-docker-when-possible t)
   (setq rspec-docker-command "docker-compose exec")
-  (setq rspec-docker-container "slt")
-  (setq rspec-docker-cwd "/slt_dev/")
+  (setq rspec-docker-container "sls")
+  (setq rspec-docker-cwd "/sls_dev/")
   (setq compilation-scroll-output t))
 
 (use-package mugu-ruby
