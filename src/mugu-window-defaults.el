@@ -31,7 +31,12 @@
                                      (window-height . 1)
                                      (window-width . 80)
                                      (inhibit-switch-frame . t)
-                                     (inhibit-same-window . t))))))
+                                     (inhibit-same-window . t)))))
+
+  (setq display-buffer-base-action
+        '((display-buffer-reuse-window display-buffer-in-previous-window display-buffer-reuse-mode-window display-buffer-same-window)
+          (inhibit-switch-frame . t)))
+  )
 
 (provide 'mugu-window-defaults)
 ;;; mugu-window-defaults ends here

@@ -141,60 +141,6 @@ If SELECT-FIRST is non-nil, select the first buffer in the list `mugu-vterm-list
                  (slot . 0)
                  (window-height . 0.5)
                  (inhibit-same-window . nil)))
-  (add-to-list 'display-buffer-alist
-               '(".*"
-                 (display-buffer-same-window display-buffer-reuse-window display-buffer-reuse-mode-window)
-                 (inhibit-same-window . nil))
-               'append)
-  ;; (setq display-buffer-alist
-  ;;       '((mugu-vterm-buffer-vterm-p
-  ;;          (display-buffer-in-side-window)
-  ;;          (side . top)
-  ;;          (slot . 0)
-  ;;          (window-height . 0.5)
-  ;;          (inhibit-same-window))
-  ;;         ("\\*Flycheck errors\\*"
-  ;;          (display-buffer-in-side-window)
-  ;;          (side . bottom)
-  ;;          (window-height . 10)
-  ;;          (window-width . 1)
-  ;;          (inhibit-switch-frame . t)
-  ;;          (inhibit-same-window . t))
-  ;;         (" \\*Org todo\\*"
-  ;;          (display-buffer-in-side-window)
-  ;;          (side . bottom)
-  ;;          (slot . 0)
-  ;;          (window-height . 2)
-  ;;          (inhibit-switch-frame . t))
-  ;;         ("CAPTURE*"
-  ;;          (display-buffer-in-side-window display-buffer-same-window display-buffer-use-some-window)
-  ;;          (side . bottom)
-  ;;          (slot . 1)
-  ;;          (window-height . 0.3)
-  ;;          (inhibit-switch-frame . t))
-  ;;         ("\\*Apropos\\*"
-  ;;          (display-buffer-in-side-window)
-  ;;          (side . right)
-  ;;          (slot . -1)
-  ;;          (window-height . 1)
-  ;;          (window-width . 80)
-  ;;          (inhibit-switch-frame . t)
-  ;;          (inhibit-same-window . t))
-  ;;         ("\\*Warnings\\*"
-  ;;          (display-buffer-in-side-window)
-  ;;          (side . bottom)
-  ;;          (slot . 1)
-  ;;          (window-height . 10)
-  ;;          (window-width . 1)
-  ;;          (inhibit-switch-frame . t)
-  ;;          (inhibit-same-window . t))
-  ;;         ("\\*Help\\*"
-  ;;          (display-buffer-in-side-window)
-  ;;          (side . right)
-  ;;          (window-height . 1)
-  ;;          (window-width . 80)
-  ;;          (inhibit-switch-frame . t)
-  ;;          (inhibit-same-window . t))))
   )
 
 (provide 'mugu-vterm)
