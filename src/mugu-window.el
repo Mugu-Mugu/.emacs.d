@@ -35,13 +35,26 @@ If SIDE is non-nil only get windows on that side."
   (delete-other-windows)
   (lunaryorn-quit-all-side-windows))
 
+(defun mugu-window-side-p (&optional window)
+  "Predicate determining if WINDOW is a side window.
+Default to `selected-window'."
+  (window-parameter (or window (selected-window)) 'window-side))
+
 (defun mugu-window-delete-next-side ()
   "Delete the next side window."
   (interactive)
   (let ((next-side-window (window-with-parameter 'window-side)))
     (if next-side-window
-        (quit-window next-side-window)
+        (quit-window nil next-side-window)
       (warn "There is no side window open."))))
+
+(defun mugu-window-delete-all-windows ()
+  "Delete all window but the main one."
+  (interactive)
+  (let ((main-window (if (mugu-window-side-p)
+                         (get-window-with-predicate (lambda (w) (not (mugu-window-side-p w))))
+                       (selected-window))))
+    (delete-other-windows main-window)))
 
 (defmenu mugu-window-resize-menu
   (:color red :hint nil)

@@ -9,6 +9,8 @@
 (require 'mugu-directory)
 (require 'mugu-menu)
 (require 'mugu-buffer)
+(require 'mugu-window)
+(require 'mugu-space)
 (require 'projectile)
 (require 'dash)
 (require 'ht)
@@ -121,7 +123,7 @@ If there was no saved for PROJECT-NAME, clear all windows."
   (if (ht-contains? mugu-project-wconf-map project-name)
       (set-window-configuration (ht-get mugu-project-wconf-map project-name))
     (select-window (frame-first-window))
-    (delete-other-windows)))
+    (mugu-window-delete-all-windows)))
 
 (defun mugu-project--fix-buffer (new-project)
   "Change `current-buffer' if it is not owned by NEW-PROJECT."
