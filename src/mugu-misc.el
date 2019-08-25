@@ -71,5 +71,16 @@ OLD-FILE renamed to NEW-FILE."
        (mugu-rename-file (buffer-file-name))
     (rename-buffer (read-buffer "New name for current buffer: " (buffer-name) nil))))
 
+(defmacro with-temp-hook (var-hook hook-function &rest body)
+  "Set up hook, then evaluate BODY, then remove hook.
+HOOK-FUNCTION will be temporarily added to VAR-HOOK."
+  (declare (indent 0))
+  `(let ((original-hook ,var-hook))
+     (unwind-protect
+         (progn
+           (add-hook ',var-hook ,hook-function)
+           ,@body)
+       (setq ,var-hook original-hook))))
+
 (provide 'mugu-misc)
 ;;; mugu-misc ends here
