@@ -38,7 +38,8 @@
   (require 'mugu-vterm))
 
 (use-package mugu-vterm
-  :defer
+  :general
+  (:states 'motion "²" #'mugu-vterm-toggle)
   :straight nil
   :commands mugu-vterm-switch
   :config
