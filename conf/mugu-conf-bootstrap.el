@@ -45,6 +45,7 @@ DIR is expected to be under `user-emacs-directory'."
   "Start the boot sequence."
   (mugu-bootstrap-add-dir "src")
   (mugu-bootstrap-add-dir "conf")
+  (mugu-bootstrap-add-dir "site")
   (mugu-bootstrap-load-straight))
 
 (provide 'mugu-conf-bootstrap)
