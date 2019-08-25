@@ -65,44 +65,51 @@ in capture headline."
        (goto-char (org-element-property :begin ,headline)))
      (progn ,@body)))
 
+(defun mugu-orgu--refile-to (target-headline)
+  "Refile headline at point to TARGET-HEADLINE."
+  (save-restriction
+    (org-narrow-to-element)
+    (let ((rfloc (list (org-element-property :raw-value target-headline)
+                       (org-element-property :file target-headline)
+                       nil
+                       (org-element-property :begin target-headline))))
+      (org-refile nil nil rfloc))))
+
 (defun mugu-orgu-action-headline-refile (headline target-headline)
   "Refile HEADLINE to TARGET-HEADLINE.
 HEADLINE is a an org-element object generated from any mugu-orgu function."
-  (mugu-orgu-with-headline
-    headline
-    (save-restriction
-      (org-narrow-to-element)
-      (let ((rfloc (list (org-element-property :raw-value target-headline)
-                         (org-element-property :file target-headline)
-                         nil
-                         (org-element-property :begin target-headline))))
-        (org-refile nil nil rfloc)))))
+  (mugu-orgu-do-action #'mugu-orgu--refile-to headline target-headline))
 
 (defun mugu-orgu-put-property (headline property value)
   "Change in HEADLINE the choosen PROPERTY to a new VALUE.
 Property refers to the native `org' one (not `org-element')."
-  (mugu-orgu-with-headline
-    headline
-    (org-set-property property (format "%s" value))))
+  (mugu-orgu-do-action #'org-put-property headline property (format "%s" value)))
 
 (defun mugu-orgu-delete-property (headline property)
   "Delete in HEADLINE the choosen PROPERTY.
 Property refers to the native `org' one (not `org-element')."
-  (mugu-orgu-with-headline
-    headline
-    (org-delete-property property)))
+  (mugu-orgu-do-action #'org-delete-property headline property))
 
 (defun mugu-orgu-change-todo-state (headline &optional todo-state)
   "Change the HEADLINE TODO-STATE."
-  (mugu-orgu-with-headline
-    headline
-    (org-todo todo-state)))
+  (mugu-orgu-do-action #'org-todo headline todo-state))
 
 (defun mugu-orgu-set-priority (headline)
   "Change the HEADLINE prirority."
-  (mugu-orgu-with-headline
-    headline
-    (org-priority)))
+  (mugu-orgu-do-action #'org-priority headline))
+
+(defun mugu-orgu-do-action (action-function headline &rest args)
+  "Apply ACTION-FUNCTION to HEADLINE or headline at point if it's nil.
+ARGS are applied as is to ACTION-FUNCTION."
+  (let* ((org-file (org-element-property :file headline))
+         (org-buffer (if org-file
+                         (or (find-buffer-visiting org-file) (find-file-noselect org-file))
+                       (current-buffer)))
+         (org-point (or (org-element-property :begin headline) (point))))
+    (with-current-buffer org-buffer
+      (save-excursion
+        (goto-char org-point)
+        (apply action-function args)))))
 
 (defun mugu-orgu-todo-headline-p (headline)
   "Predicicate for HEADLINE indicating if it's a TODO."
@@ -185,8 +192,7 @@ org-element object related to a candidate headline."
 Returned headlines are org-element format with a :file property added containing
 file path to the headline as well as a :outline property which is an
 aggreagation of all parents headline description."
-  (save-window-excursion
-    (find-file file)
+  (with-current-buffer (or (find-buffer-visiting file) (find-file-noselect file))
     (org-element-map (org-element-parse-buffer 'headline) 'headline
       (mugu-orgu--select-and-decorate-headline select-headline-p))))
 
@@ -261,8 +267,7 @@ modified.
 The cache is actually made for all agenda files."
   (lexical-let*
       ((get-file-headlines (lambda (file)
-                             (save-window-excursion
-                               (find-file file)
+                             (with-current-buffer (or (find-buffer-visiting file) (find-file-noselect file))
                                (org-element-map (org-element-parse-buffer 'headline) 'headline
                                  (lambda (hl) (cons (format "%s%s" file (org-element-property :begin hl))
                                                     hl))))))
@@ -277,8 +282,7 @@ The cache is actually made for all agenda files."
   "Evaluate BODY as if `org-element-at-point' was global."
   `(lexical-let*
        ((get-file-headlines (lambda (file)
-                              (save-window-excursion
-                                (find-file file)
+                              (with-current-buffer (or (find-buffer-visiting file) (find-file-noselect file))
                                 (org-element-map (org-element-parse-buffer 'headline) 'headline
                                   (lambda (hl)
                                     (org-element-put-property hl :file (buffer-file-name))
