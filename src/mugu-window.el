@@ -40,7 +40,7 @@ If SIDE is non-nil only get windows on that side."
   (interactive)
   (let ((next-side-window (window-with-parameter 'window-side)))
     (if next-side-window
-        (delete-window next-side-window)
+        (quit-window next-side-window)
       (warn "There is no side window open."))))
 
 (defmenu mugu-window-resize-menu
