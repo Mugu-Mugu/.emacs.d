@@ -60,6 +60,7 @@ Server/*
 /bookmarks
 var/*
 etc/*
+site/*
 !**/.keep
 *.org_archive
 mugu-packages/mugu-custom.el
