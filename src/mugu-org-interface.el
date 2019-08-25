@@ -435,6 +435,14 @@ action is performed."
                  (slot . 0)
                  (window-height . 2)
                  (inhibit-switch-frame . t)))
+  (add-to-list 'display-buffer-alist
+               '(".*.org"
+                 (display-buffer-in-side-window)
+                 (side . bottom)
+                 (slot . 1)
+                 (window-height . 0.6)
+                 (inhibit-switch-frame . t)))
+
   (set-face-attribute 'org-todo nil :foreground "#ff3333" :background nil)
   (advice-add #'org-switch-to-buffer-other-window :around #'mugu-orgi-switch-to-buffer-other-window)
   (mugu-orgi--configure-ivy))
