@@ -83,5 +83,9 @@ That is: bind SPC SPC for the mode and autoload the menu on first buffer enterin
   (mugu-magit-register-menu-mode 'magit-status-mode 'mugu-magit-status-menu/body)
   (mugu-magit-register-menu-mode 'magit-diff-mode 'mugu-magit-status-menu/body))
 
+(defun mugu-magit-configure ()
+  "Set various magit settings."
+  (setq magit-display-buffer-function #'magit-display-buffer-fullframe-status-topleft-v1))
+
 (provide 'mugu-magit)
 ;;; mugu-magit ends here

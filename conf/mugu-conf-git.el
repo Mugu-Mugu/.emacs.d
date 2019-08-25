@@ -15,7 +15,8 @@
   :straight nil
   :after magit
   :config
-  (mugu-magit-enable-menus))
+  (mugu-magit-enable-menus)
+  (mugu-magit-configure))
 
 (use-package git-timemachine
   :defer
