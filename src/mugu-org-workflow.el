@@ -74,7 +74,7 @@ Those that are meant for transport but already affected won't be selected."
 (defun mugu-orgw-wait-or-snoozed-headline-p (headline)
   "Predicate determining if HEADLINE is waiting."
   (or (equal (org-element-property :todo-keyword headline) "WAIT")
-      (> (mugu-orgw--last-active headline) (float-time))))
+      (> (mugu-orgw--get-scheduled headline) (float-time))))
 
 (defun mugu-orgw-todo-headline-p (headline)
   "Predicate determining if HEADLINE is active.
@@ -133,7 +133,7 @@ Such a headline is a project with no next child."
     (_ -100)))
 
 (defun mugu-orgw--get-scheduled (headline)
-  "Return the last active data of HEADLINE if present.
+  "Return the scheduled data of HEADLINE if present.
 If not present return nil."
   (float-time (org-timestamp-to-time (or (org-element-property :scheduled headline)
                                          (org-timestamp-from-time 0)))))
@@ -261,9 +261,10 @@ If DELAY is given, add it to the timestamp.
 If RELATIVE is defined, the delay is applied to the old value.  Otherwise it's
 applied to now."
   (let* ((delay (or delay 0))
-         (last-active-raw (org-element-property :LAST-ACTIVE headline))
-         (initial-timestamp (or (and relative last-active-raw (string-to-number last-active-raw))
-                                (float-time)))
+         (old-scheduled-raw (org-element-property :scheduled headline))
+         (initial-timestamp (if (and relative old-scheduled-raw)
+                                (mugu-orgw--get-scheduled headline)
+                              (float-time)))
          (new-timestamp (+ delay initial-timestamp)))
     (mugu-orgu-do-action #'org-schedule
                          headline
