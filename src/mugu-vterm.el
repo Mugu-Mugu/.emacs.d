@@ -139,7 +139,7 @@ If SELECT-FIRST is non-nil, select the first buffer in the list `mugu-vterm-list
                  (display-buffer-in-side-window)
                  (side . top)
                  (slot . 0)
-                 (window-height . 0.5)
+                 (window-height . 0.7)
                  (inhibit-same-window . nil)))
   )
 

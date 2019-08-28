@@ -5,6 +5,7 @@
 ;;; Code:
 (require 'ivy)
 (require 'mugu-menu)
+(require 'mugu-window)
 
 (defun mugu-ivy-yank-action (x)
   "Yank the candidate X."
@@ -26,6 +27,7 @@
 
 (defun mugu-ivy-set-config ()
   "Gather all ivy configuration."
+  (mugu-window-configure-side-window "\\*ivy-occur*" 'bottom 0.8)
   (setq ivy-use-virtual-buffers t
         ivy-count-format "(%d/%d) "
         ivy-height 20

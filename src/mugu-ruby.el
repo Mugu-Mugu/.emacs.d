@@ -36,6 +36,14 @@
 
 (defun mugu-ruby-activate ()
   "Activate ruby configuration."
+
+  (add-to-list 'display-buffer-alist
+               '("\\*rspec-compilation\\*"
+                 (display-buffer-in-side-window display-buffer-same-window display-buffer-use-some-window)
+                 (side . top)
+                 (slot . 1)
+                 (window-height . 0.4)
+                 (inhibit-switch-frame . t)))
   (mugu-menu-register-mode-menu 'ruby-mode 'mugu-ruby-menu))
 
 (provide 'mugu-ruby)

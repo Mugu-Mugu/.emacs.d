@@ -34,7 +34,7 @@
                                      (inhibit-same-window . t)))))
 
   (setq display-buffer-base-action
-        '((display-buffer-reuse-window display-buffer-in-previous-window display-buffer-reuse-mode-window display-buffer-same-window)
+        '((display-buffer-reuse-window display-buffer-same-window)
           (inhibit-switch-frame . t)))
   )
 
