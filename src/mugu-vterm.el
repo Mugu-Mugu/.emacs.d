@@ -66,7 +66,12 @@ synched"
                       [remap evil-paste-after] #'mugu-vterm-paste
                       [remap undo] #'vterm-undo
                       [remap redo] #'ignore
-                      "C-c" #'vterm--self-insert)
+                      "C-c" #'vterm--self-insert
+                      [up] #'vterm-send-up
+                      [down] #'vterm-send-down)
+  ;; hard
+  ;; (general-define-key :keymaps '(vterm-mode-map) :states 'normal
+  ;;                     "C-r" #'vterm--self-insert)
   (general-define-key :states 'motion
                       "²" #'mugu-vterm-toggle))
 
@@ -89,12 +94,23 @@ synched"
   (vterm-yank)
   (mugu-vterm--record-cursor-pos (length (substring-no-properties (current-kill 0)))))
 
-(defun mugu-vterm-rename (new-name)
-  "Rename current vterm with NEW-NAME."
-  (interactive)
-  (unless (mugu-vterm-buffer-vterm-p (current-buffer))
-    (error "Current buffer %s is not a vterm" (current-buffer)))
-  (rename-buffer (format "Vterm - %s" new-name)))
+(defun mugu-vterm-rename (vterm-buffer new-name)
+  "Rename VTERM-BUFFER to NEW-NAME."
+  (interactive (list (mugu-vterm--select-terminal) (read-string "New vterm name: ")))
+  (with-current-buffer vterm-buffer
+    (rename-buffer (format "Vterm - %s" new-name) 'unique)))
+
+(defun mugu-vterm--select-terminal ()
+  "Interractively select a terminal and return it's name."
+  (ivy-read (format "Select a terminal: ")
+            (-map #'buffer-name (mugu-vterm-list-buffer))
+            :preselect 1))
+
+(defun mugu-vterm-kill (term-name)
+  "Kill vterm TERM-NAME or select one to kill."
+  (interactive (list (mugu-vterm--select-terminal)))
+  (let ((kill-buffer-query-functions nil))
+    (kill-buffer term-name)))
 
 (defun mugu-vterm-switch (&optional select-first)
   "Switch to a vterm buffer interactively if there is several open.
@@ -108,8 +124,7 @@ If SELECT-FIRST is non-nil, select the first buffer in the list `mugu-vterm-list
       (0 (mugu-vterm-create))
       (1 (mugu-buffer-switch (-first-item vterm-list)))
       (_ (mugu-buffer-switch (get-buffer
-                              (ivy-read (format "Select a terminal: ")
-                                        (-map #'buffer-name vterm-list))))))))
+                              (mugu-vterm--select-terminal)))))))
 
 (defun mugu-vterm-toggle ()
   "Switch to a vterm buffer or hide one if already displayed."
@@ -122,6 +137,7 @@ If SELECT-FIRST is non-nil, select the first buffer in the list `mugu-vterm-list
 
 (defun mugu-vterm-create (&optional name)
   "Create a new vterm with NAME if given."
+  (interactive (list (read-string "Vterm name? ")))
   (mugu-buffer-switch
    (save-window-excursion
      (vterm (if name

@@ -31,8 +31,8 @@ Then execute COMMANDS if any."
 
   (let* ((project-name (or project-name (mugu-project-name)))
          (term-name (or term-name project-name)))
-    (mugu-vterm-rename term-name)
     (mugu-project-set-buffer-project project-name)
+    (mugu-vterm-rename (current-buffer) term-name)
     (when commands
       (vterm-send-string commands t)
       (vterm-send-return))))
