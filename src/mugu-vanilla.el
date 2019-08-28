@@ -58,7 +58,7 @@ had chance to be loaded."
 (defsubst mugu-vanilla-set-perf-settings ()
   "."
   (setq-default bidi-display-reordering nil)
-  (setq gc-cons-threshold 8000000)
+  (setq gc-cons-threshold 800000000)
   (add-hook 'focus-out-hook #'mugu-vanilla--gc))
 
 (defsubst mugu-vanilla-set-other-settings ()
