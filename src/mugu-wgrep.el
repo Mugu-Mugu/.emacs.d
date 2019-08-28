@@ -1,5 +1,4 @@
-;;; mugu-wgrep --- Summary
-;; tbc
+;;; mugu-wgrep --- Interface improvement to wgrep -*- lexical-binding: t -*-
 ;;; Commentary:
 
 ;;; Code:
@@ -28,7 +27,7 @@ Cancel TIMER if still running and leave applicable window."
 
 (defun mugu-wgrep--prepare-menu ()
   "Install auto leave hook for multi cursor menu."
-  (add-hook 'evil-normal-state-exit-hook #'mugu-wgrep--edit-mode))
+  (add-hook 'evil-normal-state-exit-hook #'mugu-wgrep--edit-mode nil 'local))
 
 (defun mugu-wgrep-menu-maybe (buffer)
   "Ensure a wgrep menu is active in the BUFFER.
@@ -47,17 +46,30 @@ Break occur otherwise..."
 (defun mugu-wgrep-leave-active (with-fun)
   "Exit active mode WITH-FUN."
   (setq mugu-wgrep-active nil)
-  (call-interactively with-fun)
+  (funcall with-fun)
   (mugu-wgrep-passive-menu))
+
+(defun mugu-wgrep--abandon-and-quit ()
+  "Quit current wgrep session and undo all change not saved."
+  (wgrep-abort-changes)
+  (bury-buffer)
+  (mugu-wgrep--cleanup))
+
+(defun mugu-wgrep--commit-change ()
+  "Validate current change and save all buffers."
+  (wgrep-finish-edit)
+  (wgrep-save-all-buffers))
 
 (defmenu mugu-wgrep-passive-menu (:hint nil :color pink :pre (mugu-wgrep--prepare-menu))
   "Modifying the occur buffer will trigger wgrep. "
-  ("q" (bury-buffer) "quit" :color blue))
+  ("q" (bury-buffer) "quit" :color blue)
+  ("M-e" (mugu-wgrep--edit-mode) "toggle wgrep edit mode" :color blue))
 
 (defmenu mugu-wgrep-active-menu (:hint nil :color pink)
-  ("M-f" (mugu-wgrep-leave-active #'wgrep-finish-edit) "finish edit" :color blue)
+  ("M-f" (mugu-wgrep-leave-active #'mugu-wgrep--commit-change) "finish edit" :color blue)
   ("M-d" wgrep-mark-deletion "delete line")
-  ("M-u" (mugu-wgrep-leave-active #'wgrep-abort-changes) "undo everything" :color blue))
+  ("M-u" (mugu-wgrep-leave-active #'wgrep-abort-changes) "undo everything" :color blue)
+  ("M-q" (mugu-wgrep--abandon-and-quit) "undo and quit" :color blue))
 
 (defun mugu-wgrep-activate-conf ()
   "Set my config for occur mode."
