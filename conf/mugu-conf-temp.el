@@ -13,7 +13,7 @@
   (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-center)))
   (setq posframe-inhibit-double-buffering t)
   (ivy-posframe-mode))
-;;; Code:
+
 
 (provide 'mugu-conf-temp)
 ;;; mugu-conf-temp ends here

@@ -36,7 +36,7 @@
 (require 'mugu-conf-javascript)
 (require 'mugu-conf-python)
 (require 'mugu-conf-site-lisp)
-(require 'mugu-fold)
+(require 'mugu-conf-fold)
 
 ;;; languages features
 (require 'mugu-ada)
