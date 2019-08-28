@@ -5,12 +5,17 @@
 (require 'use-package)
 
 (use-package yafolding
-  :defer
-  )
+  :defer)
 
 (use-package mugu-yafold
   :straight nil
-  )
+  :general
+  (:keymaps 'global
+            :states 'motion
+            :predicate '(not (eq major-mode 'org-mode))
+            "<tab>" (general-key-dispatch #'yafolding-toggle-element
+                      :timeout 0.15
+                      "<tab>" 'mugu-yafold-main)))
 
 (use-package outline
   :defer t
