@@ -39,6 +39,7 @@
 (require 'mugu-conf-fold)
 
 ;;; languages features
+(require 'mugu-conf-xml)
 (require 'mugu-ada)
 (require 'mugu-rust)
 
