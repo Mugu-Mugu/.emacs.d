@@ -11,6 +11,7 @@
   (interactive)
   (unless origami-mode
     (origami-mode 1))
+  (setq last-command #'origami-recursively-toggle-node)
   (call-interactively #'origami-recursively-toggle-node))
 
 ;;*
@@ -31,37 +32,15 @@
   ("zc" origami-close-all-nodes "close all recursively")
   ("za" origami-toggle-all-nodes "toogle all")
   ;; ("ii" (counsel-outline) "jump to")
-  ("j" (mugu-origami-next-fold) "↓ fold" :column "Navigation")
-  ("k" (mugu-origami-prev-fold) "↑ fold")
+  ("h" origami-backward-fold-same-level "↓ fold same level" :column "Navigation")
+  ("j" origami-forward-fold "↓ fold")
+  ("k" origami-previous-fold "↑ fold")
+  ("l" origami-forward-fold-same-level "↑ fold same level")
   ("zz" (recenter) "recenter view")
   ("q" nil "exit" :color blue :column nil))
 
-(defun mugu-origami-line-with-fold? ()
-  "Return t if point is on a origami fold."
-  (-when-let (tree (origami-get-fold-tree (current-buffer)))
-    (--first (and (>= (line-number-at-pos (point))
-                      (line-number-at-pos (+ (origami-fold-beg it) (origami-fold-offset it))))
-                  (<= (line-number-at-pos (point))
-                      (line-number-at-pos (origami-fold-end it))))
-             (origami-fold-children tree))))
-
-(defun mugu-origami-next-fold ()
-  "Go to begining of next fold."
-  (interactive)
-  (-when-let (tree (origami-get-fold-tree (current-buffer)))
-    (-when-let (next-fold (--first (and (< (line-number-at-pos (point))
-                                           (line-number-at-pos (+ (origami-fold-beg it) (origami-fold-offset it)))))
-                                   (origami-fold-children tree)))
-      (goto-char (+ (origami-fold-beg next-fold) (origami-fold-offset next-fold))))))
-
-(defun mugu-origami-prev-fold ()
-  "Go to begining of previous fold."
-  (interactive)
-  (-when-let (tree (origami-get-fold-tree (current-buffer)))
-    (-when-let (prev-fold (--first (and (> (line-number-at-pos (point))
-                                           (line-number-at-pos (+ (origami-fold-beg it) (origami-fold-offset it)))))
-                                   (reverse (origami-fold-children tree))))
-      (goto-char (+ (origami-fold-beg prev-fold) (origami-fold-offset prev-fold))))))
+(general-define-key :states 'motion
+                    "<f5>" #'origami-recursively-toggle-node)
 
 (provide 'mugu-origami)
 ;;; mugu-origami ends here

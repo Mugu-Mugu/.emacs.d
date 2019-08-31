@@ -41,5 +41,9 @@
                       :timeout 0.22
                       "<tab>" 'mugu-origami-menu)))
 
+(use-package lsp-origami
+  :defer
+  :hook (origami-mode-hook . lsp-origami-mode))
+
 (provide 'mugu-conf-fold)
 ;;; mugu-conf-fold ends here
