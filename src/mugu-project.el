@@ -53,9 +53,9 @@ If buffer has no project, return current active one instead."
   "Retrieve the project root of BUFFER.
 If BUFFER is not given, use `current-buffer' instead."
   (with-current-buffer (or buffer (current-buffer))
-    (if buffer-file-truename
-        (projectile-project-root)
-      projectile-project-root)))
+    (if (or projectile-project-root (not buffer-file-truename))
+        projectile-project-root
+      (setq projectile-project-root (projectile-project-root)))))
 
 (defun mugu-project-set-buffer-project (project-name &optional buffer)
   "Define PROJECT-NAME for BUFFER.
