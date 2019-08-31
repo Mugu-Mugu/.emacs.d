@@ -63,7 +63,7 @@
  '(ediff-window-setup-function 'ediff-setup-windows-plain)
  '(edt-bottom-scroll-margin 0)
  '(edt-top-scroll-margin 0)
- '(electric-pair-mode t)
+ '(electric-pair-mode nil)
  '(elpy-modules
    '(elpy-module-company elpy-module-eldoc elpy-module-pyvenv elpy-module-yasnippet elpy-module-django elpy-module-sane-defaults))
  '(enh-ruby-add-encoding-comment-on-save nil)

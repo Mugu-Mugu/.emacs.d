@@ -61,7 +61,7 @@
  '(ediff-window-setup-function (quote ediff-setup-windows-plain))
  '(edt-bottom-scroll-margin 0)
  '(edt-top-scroll-margin 0)
- '(electric-pair-mode t)
+ '(electric-pair-mode nil)
  '(elpy-modules
    (quote
     (elpy-module-company elpy-module-eldoc elpy-module-pyvenv elpy-module-yasnippet elpy-module-django elpy-module-sane-defaults)))
