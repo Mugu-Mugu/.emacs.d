@@ -83,6 +83,7 @@ Selected action : %s(ivy-action-name) %s(if ivy-calling \"auto called\" \"\")
   ("RET" ivy-done "done default" :color blue :column "Done")
   ("C-j" ivy-alt-done "take input" :color blue)
   ("TAB" ivy-dispatching-done "done choose" :color blue)
+  ("M-o" ivy-dispatching-done "done choose" :color blue)
   ("o" ivy-occur "make occur" :exit t))
 
 (defmenu mugu-ivy-passive-menu (:hint nil :color pink)
