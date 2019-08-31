@@ -32,9 +32,18 @@
                                (?t . evil-surround-read-tag)
                                (?< . evil-surround-read-tag)
                                (?f . evil-surround-function)))
-  :config
-  (global-evil-surround-mode 1)
+  :commands global-evil-surround-mode
+  :config (global-evil-surround-mode 1)
   (evil-define-key 'visual evil-surround-mode-map "s" 'evil-surround-region))
+
+(use-package evil-matchit
+  :defer 1
+  :config (global-evil-matchit-mode 1))
+
+(use-package evil-commentary
+  :defer 1
+  :delight
+  :config (evil-commentary-mode))
 
 (use-package evil-mc
   :diminish
@@ -55,6 +64,54 @@
   :general
   (:states '(normal visual)
            "," #'mugu-mc-menu))
+
+(use-package evil-numbers
+  :defer
+  :general
+  (:states 'normal
+           "C-a" #'evil-numbers/inc-at-pt
+           "C-x" #'evil-numbers/dec-at-pt))
+
+(use-package evil-indent-plus
+  :after evil
+  :config
+  (evil-indent-plus-default-bindings))
+
+(use-package evil-lion
+  :defer
+  :general
+  (:states '(normal visual)
+           "gl" #'evil-lion-left
+           "gL" #'evil-lion-right))
+
+(use-package evil-exchange
+  :disabled "default bindings are conflicted and this package is less useful than other"
+  :defer
+  :general
+  (:state '(normal visual)
+          "cx" #'evil-exchange
+          "cX" #'evil-exchange-cancel))
+
+(use-package evil-goggles
+  :disabled "It does exactly nothing!"
+  :defer 1
+  :config
+  (evil-goggles-mode)
+  (setq evil-goggles-pulse t))
+
+(use-package evil-owl
+  :disabled "because recipe is not found"
+  :defer 2
+  :config
+  (setq evil-owl-display-method 'posframe
+        evil-owl-extra-posframe-args '(:width 50 :height 20)
+        evil-owl-max-string-length 50)
+  (evil-owl-mode))
+
+(use-package evil-escape
+  ;; I may use the super escape provided here but I do not need nor have a binding for it
+  :defer
+  :commands evil-escape)
 
 (provide 'mugu-conf-evil)
 ;;; mugu-conf-evil ends here
