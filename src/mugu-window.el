@@ -24,7 +24,7 @@ Default to `selected-window'."
   (let ((next-side-window (window-with-parameter 'window-side)))
     (if next-side-window
         (mugu-window-bury-buffer-delete-window next-side-window)
-      (warn "There is no side window open."))))
+      (message "There is no side window open."))))
 
 (defun mugu-window-delete-all-windows ()
   "Delete all window but the main one."
