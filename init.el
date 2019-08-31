@@ -40,6 +40,7 @@
 
 ;;; languages features
 (require 'mugu-conf-xml)
+(require 'mugu-conf-json)
 (require 'mugu-ada)
 (require 'mugu-rust)
 
