@@ -5,7 +5,7 @@
 (require 'mugu-menu)
 (require 'yafolding)
 
-(defmenu mugu-yafold-main (:color red :hint nil :body-pre (require 'origami))
+(defmenu mugu-yafold-main (:color red :hint nil :body-pre (require 'yafolding))
   "Bindings for general folding (code and outline)."
   ("<tab>" yafolding-toggle-element "toggle-element" :column "Local")
   ("o" yafolding-show-element "show-element")

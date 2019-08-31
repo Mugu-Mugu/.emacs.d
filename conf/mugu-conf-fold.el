@@ -5,21 +5,18 @@
 (require 'use-package)
 
 (use-package yafolding
-  :defer)
+  :disabled
+  :defer
+  :commands yafolding-toggle-element)
 
 (use-package mugu-yafold
   :straight nil
-  :general
-  (:keymaps 'global
-            :states 'motion
-            :predicate '(not (eq major-mode 'org-mode))
-            "<tab>" (general-key-dispatch #'yafolding-toggle-element
-                      :timeout 0.15
-                      "<tab>" 'mugu-yafold-main)))
+  :disabled
+  :commands mugu-yafold-main
+  :general)
 
 (use-package outline
   :defer t
-  :disabled
   :delight outline-minor-mode)
 
 (use-package outshine
@@ -29,12 +26,20 @@
   :hook  ((emacs-lisp-mode) . outshine-mode))
 
 (use-package origami
-  :defer t
-  :disabled)
+  :commands origami-mode origami-recursively-toggle-node
+  :defer)
 
 (use-package mugu-origami
   :straight nil
-  :disabled)
+  :defer
+  :commands mugu-origami-menu mugu-origami-toggle-node-and-activate
+  :general
+  (:keymaps 'global
+            :states 'motion
+            :predicate '(not (eq major-mode 'org-mode))
+            "<tab>" (general-key-dispatch #'mugu-origami-toggle-node-and-activate
+                      :timeout 0.22
+                      "<tab>" 'mugu-origami-menu)))
 
 (provide 'mugu-conf-fold)
 ;;; mugu-conf-fold ends here
