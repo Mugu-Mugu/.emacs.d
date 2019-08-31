@@ -44,5 +44,8 @@
   :config
   (mugu-orgw-set-configuration))
 
+(use-package org-bullets
+  :hook (org-mode . org-bullets-mode))
+
 (provide 'mugu-conf-org)
 ;;; mugu-conf-org ends here
