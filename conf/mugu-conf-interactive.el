@@ -60,22 +60,6 @@
   (general-def '(motion visual)
     "RET" 'er/expand-region))
 
-(use-package evil-mc
-  :diminish
-  :defer
-  :commands evil-mc-make-and-goto-next-match evil-mc-make-and-goto-prev-match
-  :config
-  (global-evil-mc-mode))
-
-(use-package mugu-mc
-  :straight nil
-  :commands mugu-mc-menu
-  :defer
-  :init
-  (general-def '(normal visual) "," #'mugu-mc-menu)
-  :config
-  (mugu-mc-enable-lispy-integration))
-
 (use-package wgrep :defer)
 
 (use-package mugu-wgrep

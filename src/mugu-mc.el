@@ -37,17 +37,5 @@
   ("q" nil "exit" :column nil)
   ("," nil "exit"))
 
-(defun mugu-mc-enable-lispy-integration ()
-  "So it may work in lispy..."
-  (evil-mc-define-handler evil-mc-execute-default-evil-lispy-state ()
-    :cursor-clear region
-    (evil-insert-repeat-hook)
-    (evil-mc-execute-call-with-count)
-    (evil-maybe-remove-spaces nil))
-
-  (add-to-list 'evil-mc-incompatible-minor-modes 'lispy-mode)
-  (add-to-list 'evil-mc-known-commands '(lispy-delete-backward (:default . evil-mc-execute-default-call-with-count)))
-  (add-to-list 'evil-mc-known-commands '(lispy-quotes (:default . evil-mc-execute-default-call-with-count))))
-
 (provide 'mugu-mc)
 ;;; mugu-mc ends here

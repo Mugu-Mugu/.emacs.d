@@ -36,5 +36,25 @@
   (global-evil-surround-mode 1)
   (evil-define-key 'visual evil-surround-mode-map "s" 'evil-surround-region))
 
+(use-package evil-mc
+  :diminish
+  :defer
+  :general (:states
+            'motion
+            "C-n" #'evil-mc-make-and-goto-next-match
+            "C-p" #'evil-mc-make-and-goto-prev-match)
+  :config
+  (global-evil-mc-mode)
+  (add-to-list 'evil-mc-incompatible-minor-modes 'lispy-mode)
+  (add-to-list 'evil-mc-incompatible-minor-modes 'evil-lispy-mode))
+
+(use-package mugu-mc
+  :straight nil
+  :after evil-mc
+  :commands mugu-mc-menu
+  :general
+  (:states '(normal visual)
+           "," #'mugu-mc-menu))
+
 (provide 'mugu-conf-evil)
 ;;; mugu-conf-evil ends here
