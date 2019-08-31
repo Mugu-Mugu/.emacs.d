@@ -31,7 +31,7 @@
   :after company
   :config
   (company-quickhelp-mode 1)
-  (setq company-quickhelp-delay 0))
+  (setq company-quickhelp-delay 0.25))
 
 (use-package yasnippet
   :disabled
