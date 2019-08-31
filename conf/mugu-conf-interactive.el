@@ -6,7 +6,9 @@
 (require 'use-package)
 (require 'general)
 
-(use-package smex :defer)
+(use-package smex
+  :defer
+  :disabled)
 
 (use-package mugu-space
   :straight nil
@@ -68,6 +70,15 @@
   :config
   (mugu-wgrep-activate-conf))
 
+(use-package prescient
+  :custom
+  (prescient-persist-mode t))
+
+(use-package ivy-prescient
+  :config
+  (ivy-prescient-mode))
+
+(use-package company-prescient)
 
 (provide 'mugu-conf-interactive)
 ;;; mugu-conf-interactive ends here
