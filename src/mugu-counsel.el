@@ -50,19 +50,29 @@ INITIAL-DIRECTORY ONLY-F-OR-D"
   (interactive)
   (mugu-directory-cd (read-directory-name "Change dir: " mugu-directory)))
 
+(defun mugu-counsel--thing-at-point ()
+  "Retrieve the thing at point taking into account visual state."
+  (if (evil-visual-state-p)
+      (let* ((visual-range (evil-visual-range))
+             (beg (-first-item visual-range))
+             (end (-second-item visual-range)))
+        (evil-change-to-previous-state)
+        (buffer-substring-no-properties beg end))
+    (thing-at-point 'symbol t)))
+
 ;; * Interactive grep commands
 
 (defun mugu-counsel-super-star ()
   "A ivy swiper variant of vim famous super star."
   (interactive)
   (let ((ivy-hooks-alist '((t . mugu-ivy-active-menu))))
-    (counsel-grep-or-swiper (thing-at-point 'symbol t))))
+    (counsel-grep-or-swiper (mugu-counsel--thing-at-point))))
 
 (defun mugu-counsel-hyper-star ()
   "A ivy swiper variant of vim famous super star.  Recursive!!"
   (interactive)
   (let ((ivy-hooks-alist '((t . mugu-ivy-active-menu))))
-    (counsel-rg (thing-at-point 'symbol t))))
+    (counsel-rg (mugu-counsel--thing-at-point))))
 
 (defun mugu-counsel-describe-custom ()
   "List all customizable variables."
