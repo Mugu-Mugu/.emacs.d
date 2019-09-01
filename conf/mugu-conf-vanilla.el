@@ -13,7 +13,8 @@
   (mugu-vanilla-set-encoding-settings)
   (mugu-vanilla-set-backup-settings)
   (mugu-vanilla-set-visual-settings)
-  (mugu-vanilla-set-other-settings))
+  (mugu-vanilla-set-other-settings)
+  (mugu-vanilla-set-evil-initial-states))
 
 (use-package diminish)
 

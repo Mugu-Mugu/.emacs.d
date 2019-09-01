@@ -21,11 +21,13 @@
 
 (use-package general :demand)
 
+(use-package ivy :demand)
+
 (use-package key-chord
   :demand
   :config
   (key-chord-mode t)
-  (setq key-chord-two-keys-delay 0.1))
+  (setq key-chord-two-keys-delay 0.13))
 
 
 (provide 'mugu-conf-keystone)

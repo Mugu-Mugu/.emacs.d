@@ -5,6 +5,7 @@
 ;;; Code:
 (require 'mugu-cosmetics)
 (require 'mugu-misc)
+(require 'evil)
 
 ;; * begin:
 (defun mugu-vanilla--gc ()
@@ -58,8 +59,12 @@ had chance to be loaded."
 (defsubst mugu-vanilla-set-perf-settings ()
   "."
   (setq-default bidi-display-reordering nil)
-  (setq gc-cons-threshold 800000000)
-  (add-hook 'focus-out-hook #'mugu-vanilla--gc))
+  (setq gc-cons-threshold 80000000)
+  (setq after-focus-change-function #'mugu-vanilla--gc))
+
+(defsubst mugu-vanilla-set-evil-initial-states ()
+  "Set initial states that make sence for vanilla modes."
+  (evil-set-initial-state 'debugger-mode 'motion))
 
 (defsubst mugu-vanilla-set-other-settings ()
   "Leftover that could not be tied to a particular feature."
