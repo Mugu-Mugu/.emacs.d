@@ -7,10 +7,13 @@
 (require 'mugu-menu)
 
 ;; * begin:
-(use-package js-mode
+(use-package mugu-js
   :straight nil
-  :hook (js-mode . lsp)
-  :config (mugu-lsp-activate-for-keymap 'js-mode-map))
+  :hook
+  (js-mode . lsp)
+  (js-mode . mugu-js-configure-file)
+  :config
+  (mugu-js-configure-package))
 
 (use-package js2-mode
   :disabled "Because js-mode is better on 27 and is officialy recommanded by js2 team"
