@@ -1,6 +1,0 @@
-[submodule "my-melpa-packages"]
-	path = my-melpa-packages
-	url = https://github.com/Mugu-Mugu/my-melpa-packages.git
-[submodule "mdf-ext-packages/swiper"]
-	path = mdf-ext-packages/swiper
-	url = https://github.com/Mugu-Mugu/swiper
