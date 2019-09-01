@@ -10,6 +10,8 @@
 (require 'lsp)
 (require 'lsp-ui)
 (require 'mugu-lang)
+(require 'dumb-jump)
+(require 'mugu-dumbjump)
 
 (defmenu mugu-lsp-menu (:color blue :hint nil :inherit (mugu-lang-menu-hydra/heads))
   "-- Language menu -- "
@@ -21,10 +23,15 @@
   ("mD" lsp-workspace-folders-remove "Remove workspace folder")
   ("ms" lsp-workspace-folders-open "Switch workspace folder"))
 
+(defun mugu-lsp-goto-def ()
+  "Goto definition at point with LSP or another tool."
+  (interactive)
+  (with-dump-jump-fallback (lsp-find-definition)))
+
 (defun mugu-lsp-activate-for-keymap (keymap-sym)
   "Configure lsp binding for the given KEYMAP-SYM symbol."
   (general-define-key :keymaps keymap-sym
-                      [remap mugu-lang-goto-def] #'lsp-find-definition
+                      [remap mugu-lang-goto-def] #'mugu-lsp-goto-def
                       [remap mugu-lang-find-ref] #'lsp-ui-peek-find-references
                       [remap mugu-lang-execute-code-action] #'lsp-execute-code-action
                       [remap mugu-lang-format-buffer] #'lsp-format-buffer
