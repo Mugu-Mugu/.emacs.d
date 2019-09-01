@@ -7,12 +7,16 @@
 (use-package json-mode
   :mode ("\\.json\\'" . json-mode)
   :config
-  (defmenu mugu-json-menu
+  (require 'mugu-lang)
+  (defmenu mugu-json-additional-menu
     (:color blue :hint nil)
-    ("f" json-mode-beautify "reformat")
     ("p" json-mode-show-path "display path")
     ("y" json-mode-kill-path "copy path"))
-  (mugu-menu-register-mode-menu 'json-mode #'mugu-json-menu))
+  (general-define-key
+   :keymaps 'json-mode-map
+   [remap mugu-menu-call-mode-menu] #'mugu-lang-menu
+   [remap mugu-lang-additional-menu] #'mugu-json-additional-menu
+   [remap mugu-lang-format-buffer] #'json-mode-beautify))
 
 (provide 'mugu-conf-json)
 ;;; mugu-conf-json ends here

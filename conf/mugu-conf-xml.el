@@ -17,8 +17,10 @@
 
 (use-package mugu-xml
   :straight nil
-  :hook
-  (nxml-mode . mugu-xml-activate))
+  :general
+  (:keymap 'nxml-mode-map
+           [remap mugu-menu-call-mode-menu] #'mugu-xml-lang-menu
+           [remap mugu-lang-format-buffer] #'mugu-xml-pretty-print))
 
 (provide 'mugu-conf-xml)
 ;;; mugu-conf-xml ends here

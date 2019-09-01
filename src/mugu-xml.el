@@ -3,6 +3,7 @@
 
 ;;; Code:
 (require 'mugu-menu)
+(require 'mugu-lang)
 
 (defun mugu-xml-pretty-print ()
   "Pretty print current xml buffer."
@@ -11,14 +12,7 @@
     (shell-command (format "xmllint --format %s" buffer-file-truename)
                    (current-buffer))))
 
-(defmenu mugu-xml-menu (:hint nil :color blue)
-  ("f" mugu-xml-pretty-print "format xml file" :column "Action"))
-
-
-(defun mugu-xml-activate ()
-  "Activate xml integration."
-  (mugu-menu-register-mode-menu 'nxml-mode #'mugu-xml-menu)
-  (remove-hook 'nxml-mode-hook #'mugu-xml-activate))
+(defalias 'mugu-xml-lang-menu #'mugu-lang-menu)
 
 (provide 'mugu-xml)
 ;;; mugu-xml ends here
