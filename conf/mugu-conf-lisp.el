@@ -45,10 +45,13 @@
      (additional-movement normal visual motion))))
 
 (use-package mugu-lisp
-  :after evil-lispy
+  :defer
   :straight nil
+  :general
+  (:keymaps 'emacs-lisp-mode-map
+            [remap mugu-menu-call-mode-menu] #'mugu-lisp-lang-menu)
   :config
-  (mugu-menu-register-mode-menu 'emacs-lisp-mode 'mugu-lisp-main-menu))
+  (mugu-lisp-set-bindings))
 
 (use-package eldoc
   :defer

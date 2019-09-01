@@ -5,6 +5,7 @@
 
 ;;; Code:
 (require 'mugu-menu)
+(require 'general)
 
 (defmacro define-mugu-lang-command (name)
   "Define a mugu-lang stub command named mugu-lang- NAME."
@@ -45,6 +46,11 @@
   ("m" mugu-lang-test-method "verify method")
   ("s" mugu-lang-test-single-at-point "verify example")
   ("a" mugu-lang-test-all-in-project "verify project"))
+
+(defun mugu-lang-activate-for-mode (mode)
+  "Activate the mugu lang mode for MODE."
+  (general-define-key :keymaps (intern (format "%s-mode-map" mode))
+                      [remap mugu-menu-call-mode-menu] #'mugu-lang-menu))
 
 (provide 'mugu-lang)
 ;;; mugu-lang ends here
