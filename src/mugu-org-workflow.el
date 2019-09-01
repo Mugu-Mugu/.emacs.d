@@ -141,9 +141,10 @@ If not present return nil."
 (defun mugu-orgw--score-scheduled (now headline)
   "Return a penalty score for HEADLINE dependant on scheduled field.
 Penalty is computed relative to NOW."
-  (if (< (mugu-orgw--get-scheduled headline) now)
-      (- (mugu-orgw--get-scheduled headline) now)
-    (- (+ now (mugu-orgw--get-scheduled headline)))))
+  (let ((scheduled-time (mugu-orgw--get-scheduled headline)))
+    (cond ((< scheduled-time 0) 0)
+          ((< scheduled-time now) (- now scheduled-time))
+          ((>= scheduled-time now) (- (- scheduled-time) now)))))
 
 (defun mugu-orgw--score-priority (headline)
   "Return a penalty score for HEADLINE dependant on last active field.
