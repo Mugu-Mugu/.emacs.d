@@ -32,16 +32,28 @@
                                (?t . evil-surround-read-tag)
                                (?< . evil-surround-read-tag)
                                (?f . evil-surround-function)))
-  :commands global-evil-surround-mode
-  :config (global-evil-surround-mode 1)
-  (evil-define-key 'visual evil-surround-mode-map "s" 'evil-surround-region))
+  :general
+  (:states 'operator
+           "s" #'evil-surround-edit
+           "s" #'evil-surround-edit)
+  (:states 'visual
+           "s" #'evil-surround-region)
+  :config
+  (global-evil-surround-mode 1))
 
 (use-package evil-matchit
-  :defer 1
+  :custom
+  (evilmi-shortcut "%")
+  :general
+  (:states '(normal visual)
+           "%" #'evilmi-jump-items)
   :config (global-evil-matchit-mode 1))
 
 (use-package evil-commentary
-  :defer 1
+  :general
+  (:states 'normal
+           "gc" 'evil-commentary
+           "gy" 'evil-commentary-yank)
   :delight
   :config (evil-commentary-mode))
 
@@ -49,7 +61,7 @@
   :diminish
   :defer
   :general (:states
-            'motion
+            '(normal visual)
             "C-n" #'evil-mc-make-and-goto-next-match
             "C-p" #'evil-mc-make-and-goto-prev-match)
   :config
@@ -59,7 +71,6 @@
 
 (use-package mugu-mc
   :straight nil
-  :after evil-mc
   :commands mugu-mc-menu
   :general
   (:states '(normal visual)
