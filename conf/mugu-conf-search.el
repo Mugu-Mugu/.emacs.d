@@ -19,7 +19,15 @@
   (mugu-sx-configure-bindings))
 
 (use-package google-this
+  :disabled
+  "It sucks, same as webjump: it forgots that interactive is not everything...
+can't search without inserting whatever shit is at point."
   :defer)
+
+(use-package engine-mode :defer)
+(use-package mugu-search
+  :straight nil
+  :commands engine/search-google)
 
 (provide 'mugu-conf-search)
 ;;; mugu-conf-search ends here
