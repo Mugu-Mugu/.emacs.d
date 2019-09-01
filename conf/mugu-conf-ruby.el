@@ -21,12 +21,12 @@
 
 (use-package mugu-ruby
   :straight nil
-  :after ruby-mode
   :general
   (:keymaps 'ruby-mode-map
             [remap mugu-lang-goto-def] #'dumb-jump-go
-            [remap mugu-menu-call-mode-menu] #'mugu-lang-menu)
-  :config (mugu-ruby-activate))
+            [remap mugu-menu-call-mode-menu] #'mugu-ruby-lang-menu)
+  :config
+  (mugu-ruby-activate))
 
 (use-package robe
   :disabled "because it doesn't support multi project in same emacs version"
