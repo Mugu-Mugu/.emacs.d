@@ -447,12 +447,6 @@ action is performed."
   (advice-add #'org-switch-to-buffer-other-window :around #'mugu-orgi-switch-to-buffer-other-window)
   (mugu-orgi--configure-ivy))
 
-(defun mugu-orgi-activate-menus ()
-  "Activate org major mode and global menus."
-  (add-hook 'org-agenda-mode-hook #'mugu-orgi-menu-agenda-major-mode)
-  (mugu-menu-register-mode-menu 'org-agenda-mode 'mugu-orgi-menu-agenda-major-mode)
-  (mugu-menu-register-mode-menu 'org-mode 'mugu-orgi-menu-org-major-mode))
-
 (defun mugu-orgi-configure-keys ()
   "Gather keys binding in one place."
   ;; (setq org-agenda-ignore-drawer-properties '(effort appt category))

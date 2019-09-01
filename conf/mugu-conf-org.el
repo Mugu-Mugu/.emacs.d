@@ -12,10 +12,10 @@
 (use-package org-agenda
   :after org
   :straight nil
-  :functions mugu-orgi-menu-agenda-major-mode mugu-menu-register-mode-menu
-  :config
-  (add-hook 'org-agenda-mode-hook #'mugu-orgi-menu-agenda-major-mode)
-  (mugu-menu-register-mode-menu 'org-agenda-mode #'mugu-orgi-menu-agenda-major-mode)
+  :general
+  (:keymaps 'org-agenda-mode-map
+           [remap mugu-menu-call-mode-menu] #'mugu-orgi-menu-agenda-major-mode)
+  :hook (org-agenda-mode . mugu-orgi-menu-agenda-major-mode)
   :bind
   (:map org-agenda-mode-map
         ("SPC" . mugu-menu-main-menu)))
@@ -32,10 +32,12 @@
 (use-package mugu-org-interface
   :defer
   :straight nil
+  :general
+  (:keymaps 'org-mode-map
+           [remap mugu-menu-call-mode-menu] #'mugu-orgi-menu-org-major-mode)
   :commands mugu-orgi-menu-global
   :config
   (mugu-orgi-set-configuration)
-  (mugu-orgi-activate-menus)
   (mugu-orgi-configure-keys))
 
 (use-package mugu-org-workflow

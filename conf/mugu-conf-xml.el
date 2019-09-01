@@ -18,7 +18,7 @@
 (use-package mugu-xml
   :straight nil
   :general
-  (:keymap 'nxml-mode-map
+  (:keymaps 'nxml-mode-map
            [remap mugu-menu-call-mode-menu] #'mugu-xml-lang-menu
            [remap mugu-lang-format-buffer] #'mugu-xml-pretty-print))
 
