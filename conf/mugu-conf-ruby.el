@@ -7,32 +7,31 @@
 (require 'mugu-hydra)
 (require 'mugu-menu)
 
-(use-package ruby-mode
-  :hook
-  ;; (ruby-mode . lsp)
-  (ruby-mode . flycheck-mode))
-
 (use-package rvm
-  :defer
-  :config
-  (rvm-use-default))
+  :after ruby-mode)
 
 (use-package rspec-mode
-  :after ruby-mode
+  :hook ruby-mode
   :diminish
-  :config
-  (setq rspec-use-rvm t)
-  (setq rspec-use-docker-when-possible t)
-  (setq rspec-docker-command "docker-compose exec")
-  (setq rspec-docker-container "sls")
-  (setq rspec-docker-cwd "/sls_dev/")
-  (setq compilation-scroll-output t))
+  :custom
+  (rspec-use-rvm t)
+  (rspec-use-docker-when-possible t)
+  (rspec-docker-command "docker-compose exec")
+  (compilation-scroll-output t))
 
 (use-package mugu-ruby
-  :after ruby-mode
   :straight nil
-  :config
-  (mugu-ruby-activate))
+  :after ruby-mode
+  :general
+  (:keymaps 'ruby-mode-map
+            [remap mugu-lang-goto-def] #'dumb-jump-go
+            [remap mugu-menu-call-mode-menu] #'mugu-lang-menu)
+  :config (mugu-ruby-activate))
+
+(use-package robe
+  :disabled "because it doesn't support multi project in same emacs version"
+  :hook
+  (ruby-mode . robe-mode))
 
 (provide 'mugu-conf-ruby)
 ;;; mugu-conf-ruby ends here

@@ -3,19 +3,11 @@
 ;;; Commentary:
 
 ;;; Code:
-(require 'mugu-lsp)
-(require 'mugu-menu)
+(require 'mugu-window-utils)
+(require 'mugu-lang)
+(require 'rspec-mode)
 
-;; * begin:
- (defmenu mugu-ruby-menu
-  (:color blue :hint nil :inherit (mugu-lsp-menu-hydra/heads))
-  "menu for ruby mode"
-  ("tt" rspec-verify "verify test" :column "rspec")
-  ("tr" rspec-rerun "rerun test")
-  ("tg" mugu-ruby-toggle-spec-and-target "switch spec/file")
-  ("tm" mugu-ruby-verify-method "verify method")
-  ("ts" rspec-verify-single "verify example")
-  ("ta" rspec-verify-all "verify project"))
+(defvar mugu-ruby-prettify-cmd "npm run rubocop-prettify " "Base command to prettify a file.")
 
 (defun mugu-ruby-toggle-spec-and-target ()
   "Try to toggle method spec and implem."
@@ -24,6 +16,13 @@
     (ignore-errors (rspec-toggle-spec-and-target-find-example))
     (when (eq buffer-name (buffer-name))
       (rspec-toggle-spec-and-target))))
+
+(defun mugu-ruby-prettify (file)
+  "Prettify FILE."
+  (interactive (list buffer-file-truename))
+  (if (eq major-mode 'ruby-mode)
+      (shell-command (format "%s %s" mugu-ruby-prettify-cmd file))
+    (message "Can only prettify ruby file")))
 
 (defun mugu-ruby-verify-method ()
   "Try to verify current method."
@@ -36,15 +35,19 @@
 
 (defun mugu-ruby-activate ()
   "Activate ruby configuration."
+  (mugu-window-configure-side-window "\\*rspec-compilation\\*" 'top 0.7)
+  (mugu-ruby-activate-rspec-binding))
 
-  (add-to-list 'display-buffer-alist
-               '("\\*rspec-compilation\\*"
-                 (display-buffer-in-side-window display-buffer-same-window display-buffer-use-some-window)
-                 (side . top)
-                 (slot . 1)
-                 (window-height . 0.4)
-                 (inhibit-switch-frame . t)))
-  (mugu-menu-register-mode-menu 'ruby-mode 'mugu-ruby-menu))
+(defun mugu-ruby-activate-rspec-binding ()
+  "."
+  (general-define-key :keymaps 'ruby-mode-map
+   [remap mugu-lang-format-buffer] #'mugu-ruby-prettify
+   [remap mugu-lang-test-file] #'rspec-verify
+   [remap mugu-lang-test-rerun-last] #'rspec-rerun
+   [remap mugu-lang-test-toggle-goto] #'mugu-ruby-toggle-spec-and-target
+   [remap mugu-lang-test-method] #'mugu-ruby-verify-method
+   [remap mugu-lang-test-single-at-point] #'rspec-verify-single
+   [remap mugu-lang-test-all-in-project] #'rspec-verify-all))
 
 (provide 'mugu-ruby)
 ;;; mugu-ruby ends here
