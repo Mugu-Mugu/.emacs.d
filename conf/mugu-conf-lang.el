@@ -32,6 +32,14 @@
   :straight nil
   :after lsp-mode
   :commands mugu-lsp-menu)
+(use-package dumb-jump
+  :defer
+  :custom
+  (dumb-jump-selector 'ivy)
+  (dumb-jump-confirm-jump-to-modified-file nil)
+  :config
+  (add-hook 'dumb-jump-after-jump-hook #'recenter))
+
 
 (provide 'mugu-conf-lang)
 ;;; mugu-conf-lang ends here
