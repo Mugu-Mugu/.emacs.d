@@ -72,7 +72,7 @@ synched"
   ;; hard
   ;; (general-define-key :keymaps '(vterm-mode-map) :states 'normal
   ;;                     "C-r" #'vterm--self-insert)
-  (general-define-key :states 'motion
+  (general-define-key :states '(motion normal)
                       "²" #'mugu-vterm-toggle))
 
 (defun mugu-vterm-buffer-vterm-p (buffer &rest _args)
@@ -132,7 +132,7 @@ If SELECT-FIRST is non-nil, select the first buffer in the list `mugu-vterm-list
   (let ((window-displaying-vterm (get-window-with-predicate
                                   (lambda (window) (mugu-vterm-buffer-vterm-p (window-buffer window))))))
     (if window-displaying-vterm
-        (delete-window window-displaying-vterm)
+        (mugu-vterm-switch)
       (mugu-vterm-switch 'select-first))))
 
 (defun mugu-vterm-create (&optional name)
