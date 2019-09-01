@@ -12,26 +12,25 @@
   :custom
   (lsp-prefer-flymake nil)
   (lsp-auto-guess-root t)
-  :config
-  (require 'lsp-ui))
+  (lsp-enable-snippet nil))
 
 (use-package lsp-ui
   :defer
   :commands lsp-ui-mode
-  :hook
-  (lsp-mode . lsp-ui-mode)
-  :config)
+  :hook (lsp-mode . lsp-ui-mode))
 
 (use-package company-lsp
   :after (company lsp-mode)
   :commands company-lsp
-  :custom
-  (company-lsp-cache-candidates nil))
+  :custom (company-lsp-cache-candidates 'auto))
 
 (use-package mugu-lsp
   :straight nil
   :after lsp-mode
-  :commands mugu-lsp-menu)
+  :commands mugu-lsp-menu
+  :config
+  (mugu-lsp-activate-ui-keymap))
+
 (use-package dumb-jump
   :defer
   :custom

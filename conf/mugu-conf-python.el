@@ -25,9 +25,8 @@
   :hook
   (python-mode . lsp)
   (python-mode . flycheck-mode)
-  :init
-  (mugu-menu-register-mode-menu 'python-mode 'mugu-lsp-menu)
   :config
+  (mugu-lsp-activate-for-keymap 'python-mode-map)
   (setq python-shell-interpreter "python3"))
 
 (use-package elpy

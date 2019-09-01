@@ -3,37 +3,31 @@
 ;;; Commentary:
 
 ;;; Code:
-
-;;; Code:
-
 (require 'use-package)
 (require 'mugu-menu)
 
 ;; * begin:
-(use-package rjsx-mode
+(use-package js-mode
+  :straight nil
+  :hook (js-mode . lsp)
+  :config (mugu-lsp-activate-for-keymap 'js-mode-map))
+
+(use-package js2-mode
+  :disabled "Because js-mode is better on 27 and is officialy recommanded by js2 team"
   :defer
-  :disabled
+  :config
+  (setq js2-mode-show-parse-errors nil)
+  (setq js2-mode-show-strict-warnings nil))
+
+(use-package rjsx-mode
+  :disabled "Because js-mode is better on 27"
+  :defer
   :init
   (mugu-menu-register-mode-menu 'rjsx-mode 'mugu-lsp-menu)
   :mode ("\\.js\\'" . rjsx-mode)
   :hook (js2-mode . lsp)
   :config
   (require 'lsp-mode))
-
-(use-package js-mode
-  :straight nil
-  :init
-  (mugu-menu-register-mode-menu 'js-mode 'mugu-lsp-menu)
-  :hook (js-mode . lsp)
-  :config
-  (require 'lsp-mode))
-
-(use-package js2-mode
-  :defer
-  :disabled
-  :config
-  (setq js2-mode-show-parse-errors nil)
-  (setq js2-mode-show-strict-warnings nil))
 
 (provide 'mugu-conf-javascript)
 ;;; mugu-conf-javascript ends here
