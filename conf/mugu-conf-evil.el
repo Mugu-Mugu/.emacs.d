@@ -12,6 +12,7 @@
   (evil-want-C-i-jump t)
   (evil-jumps-cross-buffers nil)
   (evil-overriding-maps nil)
+  :hook (evil-jumps-post-jump . recenter)
   :config
   (evil-mode 1))
 
