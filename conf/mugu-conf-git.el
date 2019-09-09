@@ -9,7 +9,9 @@
   :defer
   :config
   (setq magit-save-repository-buffers 'dontask)
-  (evil-set-initial-state 'git-commit-mode 'insert))
+  (evil-set-initial-state 'git-commit-mode 'insert)
+  :custom
+  (vc-handled-backends nil))
 
 (use-package mugu-magit
   :straight nil
