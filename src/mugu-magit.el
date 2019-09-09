@@ -47,7 +47,7 @@
   (:color red :hint nil)
   ("g" magit-visit-thing "visit" :column  "Actions (Global)" :color blue)
   ("r" magit-refresh "refresh")
-  ("R" magit-refresh-all "refresh all")
+  ("o" other-window "other window")
   ("$" magit-process-buffer "goto magit status")
   ("<RET>" magit-dispatch-popup "magit dispatch" :color blue)
   ("q" nil "quit menu" :color blue :column nil)
@@ -81,7 +81,8 @@ That is: bind SPC SPC for the mode and autoload the menu on first buffer enterin
   (mugu-magit-register-menu-mode 'magit-revision-mode 'mugu-magit-default-menu/body)
   (mugu-magit-register-menu-mode 'magit-log-mode 'mugu-magit-default-menu/body)
   (mugu-magit-register-menu-mode 'magit-status-mode 'mugu-magit-status-menu/body)
-  (mugu-magit-register-menu-mode 'magit-diff-mode 'mugu-magit-status-menu/body))
+  (mugu-magit-register-menu-mode 'magit-diff-mode 'mugu-magit-status-menu/body)
+  (general-define-key :keymaps 'magit-status-mode-map "k" nil))
 
 (defun mugu-magit-configure ()
   "Set various magit settings."
