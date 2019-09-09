@@ -125,9 +125,10 @@ If there was no saved for PROJECT-NAME, clear all windows."
     (select-window (frame-first-window))
     (mugu-window-delete-all-windows)))
 
-(defun mugu-project--fix-buffer (new-project)
+(defun mugu-project--maybe-display-default-buffer (new-project)
   "Change `current-buffer' if it is not owned by NEW-PROJECT."
-  (unless (projectile-project-buffer-p (current-buffer) new-project)
+  (unless (and (mugu-project-buffer-project)
+               (equal (projectile-project-name) (projectile-project-name (mugu-project-buffer-project))))
     (switch-to-buffer "*Messages*")))
 
 (defun mugu-project-switch (new-project)
@@ -136,8 +137,8 @@ If there was no saved for PROJECT-NAME, clear all windows."
   (mugu-project--save-wconf)
   (setq mugu-project-current-name (projectile-project-name new-project))
   (projectile-switch-project-by-name new-project)
-  (mugu-project--fix-buffer new-project)
-  (mugu-project--restore-wconf (projectile-project-name new-project)))
+  (mugu-project--restore-wconf (projectile-project-name new-project))
+  (mugu-project--maybe-display-default-buffer new-project))
 
 (defun mugu-project--switch-maybe (new-buffer)
   "Switch project in NEW-BUFFER if it is different than current buffer."

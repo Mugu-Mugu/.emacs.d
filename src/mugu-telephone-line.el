@@ -56,7 +56,7 @@ It should have form (status . number) where status can be error/warning/info."
 (telephone-line-defsegment mugu-modeline-project-segment ()
   "Displays the current project name, according to projectile."
   (when (fboundp #'projectile-project-name)
-    (propertize (projectile-project-name)
+    (propertize (mugu-project-name)
                 'display '(raise 0.0)
                 'help-echo "Switch project"
                 'local-map (make-mode-line-mouse-map
