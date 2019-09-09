@@ -26,7 +26,7 @@ synched"
 
 (defun mugu-vterm--move-real-cursor ()
   "Send command to vterm to synch its cursor to the current one."
-  (let* ((cursor-difference (- (point) mugu-vterm--cursor-pos))
+  (let* ((cursor-difference (min 100 (max -100 (- (point) mugu-vterm--cursor-pos))))
          (movement-function (if (> cursor-difference 0) #'vterm-send-right #'vterm-send-left)))
     (dotimes (_ (abs cursor-difference))
       (funcall movement-function))
