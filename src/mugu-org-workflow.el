@@ -42,7 +42,14 @@
 (require 'org-capture)
 (require 'org-habit)
 
+;; variable
+(defvar mugu-orgw-forbidden-headline-p-function #'mugu-orgw-private-headline-p)
+
 ;; * Headlines predicate
+(defun mugu-orgw-private-headline-p (headline)
+  "Reject HEADLINE with private tag."
+  (-contains? (mugu-orgu-get-tags headline t) "private"))
+
 (defun mugu-orgw-refilable-headline-p (headline)
   "Predicate determining if HEADLINE is refilable."
   (and (mugu-orgw-task-headline-p headline)
@@ -121,6 +128,12 @@ Such a headline is a project with no next child."
   (and (mugu-orgw-project-headline-p headline)
        (not (eq 'done (org-element-property :todo-type headline)))
        (not (mugu-orgu-headline-has-child-with-todo-keywords headline '("NEXT")))))
+
+(defun mugu-orgw-list-headlines (headline-p)
+  "List headlines satisfying HEADLINE-P and not FORBIDDEN-HEADLINE-P."
+  (let* ((full-headline-p (lambda (h) (and (funcall headline-p h)
+                                           (not (funcall mugu-orgw-forbidden-headline-p-function h))))))
+    (mugu-orgu-list-headlines full-headline-p)))
 
 (defun mugu-orgw--score-todo (headline)
   "Return an integer mapping the todo status of HEADLINE to its sort rank."
@@ -201,7 +214,9 @@ The hack with noflet is to prevent fucking orgmode to sabotage the windows confi
                       ;; (org-agenda-prefix-format " %-10c | %-12s | -12t% %b")
                       (org-agenda-show-all-dates t)
                       (org-agenda-use-time-grid t)
-                      (org-agenda-span 14)
+                      (org-agenda-start-day "-1d")
+                      (org-agenda-start-on-weekday nil)
+                      (org-agenda-span 28)
                       (org-agenda-entry-types '(:deadline :timestamp))))
              (todo ""
                    ((org-agenda-overriding-header "Stuck projects")
@@ -218,7 +233,21 @@ The hack with noflet is to prevent fucking orgmode to sabotage the windows confi
                     (org-agenda-skip-function (mugu-orgu-make-skip-function
                                                #'mugu-orgw-next-task-p))
                     (org-agenda-prefix-format "%-10c | %b"))))))))
+    (org-agenda nil "o")))
 
+(defun mugu-orgw-agenda-today-overview ()
+  "Display a global org agenda with scheduled item today..."
+  (let ((org-agenda-custom-commands
+         `(("o"
+            "Global overview for future activities"
+            ((agenda ""
+                     ((org-agenda-overriding-header "Planned today")
+                      (org-agenda-show-all-dates t)
+                      (org-agenda-use-time-grid t)
+                      (org-agenda-start-day "+0d")
+                      (org-agenda-start-on-weekday nil)
+                      (org-agenda-span 'day)
+                      (org-agenda-entry-types '(:deadline :timestamp :scheduled)))))))))
     (org-agenda nil "o")))
 
 (defun mugu-orgw-agenda-current-overview ()
@@ -273,11 +302,11 @@ applied to now."
 
 (defun mugu-orgw-current-task ()
   "Retrieve the current active task."
-  (-first-item (-sort #'mugu-orgw-sort-cmp-headlines (mugu-orgu-list-headlines 'mugu-orgw-task-headline-p))))
+  (-first-item (-sort #'mugu-orgw-sort-cmp-headlines (mugu-orgw-list-headlines 'mugu-orgw-task-headline-p))))
 
 (defun mugu-orgw-current-project ()
   "Retrieve the current active project."
-  (-first-item (-sort #'mugu-orgw-sort-cmp-headlines (mugu-orgu-list-headlines 'mugu-orgw-project-headline-p))))
+  (-first-item (-sort #'mugu-orgw-sort-cmp-headlines (mugu-orgw-list-headlines 'mugu-orgw-project-headline-p))))
 
 (defun mugu-orgw-list-subtasks (task-headline)
   "Return a list of subtask for the given TASK-HEADLINE."

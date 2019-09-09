@@ -89,7 +89,7 @@ The last command session is resumed after if PERSISTANT is not nil."
 
 (defun mugu-orgi--make-query (headlines-predicate)
   "Make a query returning headlines matching HEADLINES-PREDICATE."
-  (lambda () (mugu-orgu-list-headlines headlines-predicate)))
+  (lambda () (mugu-orgw-list-headlines headlines-predicate)))
 ;;; Actions
 
 (defun mugu-orgi--action-focus-headline (headline)
@@ -123,7 +123,7 @@ If REVERSED is not nil, the chosen delay is substracted instead."
 (defun mugu-orgi--action-refile-headline (target-headline-p headline)
   "Refile HEADLINE to another headline matching predicate TARGET-HEADLINE-P."
   (mugu-orgu-action-headline-refile headline
-                                    (mugu-orgi-counsel--pick-headlines (mugu-orgu-list-headlines target-headline-p))))
+                                    (mugu-orgi-counsel--pick-headlines (mugu-orgw-list-headlines target-headline-p))))
 ;;; Commands
 (mugu-orgi--make-command mugu-orgi-goto-current-task-subtasks
                          (apply-partially #'mugu-orgw-list-subtasks (mugu-orgw-current-task))
@@ -250,6 +250,7 @@ action is performed."
   "Org mode external interface"
   ("aa" (mugu-orgw-agenda-future-overview) "global agenda" :column "Agenda")
   ("ac" (mugu-orgw-agenda-current-overview) "global agenda" :column "Agenda")
+  ("at" (mugu-orgw-agenda-today-overview) "global agenda" :column "Agenda")
   ("ci" (mugu-orgw-capture-todo #'mugu-orgi-goto-inbox-for-capture-headline) "todo to inbox" :column "Capture")
   ("cp" (mugu-orgw-capture-todo #'mugu-orgi-goto-current-project) "task to current project")
   ("ct" (mugu-orgw-capture-todo #'mugu-orgi-goto-current-task) "subtask to current task")
