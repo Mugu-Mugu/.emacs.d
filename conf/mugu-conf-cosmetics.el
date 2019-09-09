@@ -6,15 +6,17 @@
 (require 'use-package)
 
 ;; * begin:
-(use-package all-the-icons :defer)
-(use-package font-lock+ :defer)
+(use-package all-the-icons :defer :disabled)
+(use-package font-lock+ :defer :disabled)
 (use-package beacon
   ;; :defer 3
   :delight
   :custom
   (beacon-color "darkorange")
   :config
-  (beacon-mode))
+  (beacon-mode)
+  :disabled "consume a little too much"
+  )
 
 (use-package minimap
   :defer 3
