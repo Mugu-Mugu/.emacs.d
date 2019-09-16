@@ -35,5 +35,8 @@
   :custom
   (git-messenger:use-magit-popup t))
 
+(use-package forge
+  :after magit)
+
 (provide 'mugu-conf-git)
 ;;; mugu-conf-git ends here

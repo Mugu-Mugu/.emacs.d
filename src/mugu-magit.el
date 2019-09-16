@@ -1,5 +1,4 @@
-;;; mugu-magit --- Summary
-;; tbc
+;;; mugu-magit --- #{Summary} -*- lexical-binding: t -*-
 ;;; Commentary:
 
 ;;; Code:
@@ -74,7 +73,7 @@
 That is: bind SPC SPC for the mode and autoload the menu on first buffer entering"
   (mugu-menu-register-mode-menu `,the-magit-mode `,the-menu)
   (let ((the-hook (intern-soft (concat (symbol-name the-magit-mode) "-hook"))))
-    (add-hook `,the-hook `,the-menu)))
+    (add-hook `,the-hook (lambda () (run-with-timer 0.1 nil the-menu)))))
 
 (defun mugu-magit-enable-menus ()
   "Activate autoloding of magit menu."
