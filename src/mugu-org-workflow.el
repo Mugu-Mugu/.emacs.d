@@ -316,6 +316,13 @@ applied to now."
   "Return a list of subtask for the given PROJECT-HEADLINE."
   (or (mugu-orgu-headline-get-childs project-headline #'mugu-orgw-task-headline-p) (list project-headline)))
 
+(defun mugu-orgw-get-first-active-child (headline)
+  "Return the first active child of HEADLINE.
+If there is none, return HEADLINE.
+If there is several, the first one returned is the most prioritary."
+  (or (-first-item (-sort 'mugu-orgw-sort-cmp-headlines (mugu-orgu-headline-get-childs headline 'identity)))
+      headline))
+
 (defun mugu-orgw-delete-timestamp (headline)
   "Reset the timestamp of HEADLINE to now."
   (interactive (list (mugu-orgu-element-at-point)))

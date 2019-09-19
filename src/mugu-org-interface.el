@@ -45,8 +45,17 @@ ORIG-FUN and ARGS are not read."
 (defun mugu-orgi--prepare-headlines-for-ivy (headlines)
   "Format HEADLINES to ivy expected format of a list of (candidate . object).
 Also sort the collection by urgency."
-  (--map (cons (mugu-orgu-get-outline it) it)
+  (--map (cons (mugu-orgi--display-headline it) it)
          (-sort 'mugu-orgw-sort-cmp-headlines headlines)))
+
+(defun mugu-orgi--display-headline (headline)
+  "Return a string describing HEADLINE."
+  (let* ((first-active-child (mugu-orgw-get-first-active-child headline))
+         (outline (mapconcat (lambda (h) (org-element-property :raw-value h))
+                             (reverse (org-element-lineage first-active-child nil 'with-self))
+                             " > "))
+         (pretty-outline (format "[ %s ] %s" (org-element-property :todo-keyword headline) (substring outline 3))))
+    pretty-outline))
 
 (defun mugu-orgi--counsel-headlines (headlines default-action)
   "Select a headline from HEADLINES and apply it preselected DEFAULT-ACTION.
