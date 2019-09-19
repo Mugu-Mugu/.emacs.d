@@ -54,7 +54,9 @@ Also sort the collection by urgency."
          (outline (mapconcat (lambda (h) (org-element-property :raw-value h))
                              (reverse (org-element-lineage first-active-child nil 'with-self))
                              " > "))
-         (pretty-outline (format "[ %s ] %s" (org-element-property :todo-keyword headline) (substring outline 3))))
+         (pretty-outline (format "[ %s ] %s" (or (org-element-property :todo-keyword headline)
+                                                 "NONE")
+                                 (substring outline 3))))
     pretty-outline))
 
 (defun mugu-orgi--counsel-headlines (headlines default-action)
