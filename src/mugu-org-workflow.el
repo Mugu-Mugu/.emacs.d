@@ -76,11 +76,11 @@ Those that are meant for transport but already affected won't be selected."
 
 (defun mugu-orgw-wait-headline-p (headline)
   "Predicate determining if HEADLINE is waiting."
-  (equal (org-element-property :todo-keyword headline) "WAIT"))
+  (and (mugu-orgw-task-headline-p headline) (equal (org-element-property :todo-keyword headline) "WAIT")))
 
 (defun mugu-orgw-wait-or-snoozed-headline-p (headline)
   "Predicate determining if HEADLINE is waiting."
-  (or (equal (org-element-property :todo-keyword headline) "WAIT")
+  (or (mugu-orgw-wait-headline-p headline)
       (> (mugu-orgw--get-scheduled headline) (float-time))))
 
 (defun mugu-orgw-todo-headline-p (headline)
