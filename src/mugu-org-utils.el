@@ -152,22 +152,6 @@ equivalent one generated from SELECT-HEADLINE-P."
       (when (< (point) (-first-item headline-points))
         (-first-item headline-points)))))
 
-(defun mugu-orgu--get-parent-titles (hl)
-  "Return a list of string where each elem is a title of a parent of HL."
-  (if hl
-      (-concat (mugu-orgu--get-parent-titles (org-element-property :parent hl))
-               (list (org-element-property :raw-value hl)))
-    (list)))
-
-(defun mugu-orgu-get-outline (headline)
-  "Return a string describing the outline of HEADLINE.
-Format is '[ todo-keyword ] file > parent > parent2 > headline'."
-  (s-concat (format "[ %s ] " (or (org-element-property :todo-keyword headline)
-                                  "NONE"))
-            (mapconcat 'identity
-                       (-flatten (-filter 'identity (mugu-orgu--get-parent-titles headline)))
-                       " > ")))
-
 (defun mugu-orgu--select-and-decorate-headline (select-headline-p)
   "Build a headline decorator function when SELECT-HEADLINE-P is fullfilled.
 If predicate is not respected, nil is returned, otherwise the headline is
