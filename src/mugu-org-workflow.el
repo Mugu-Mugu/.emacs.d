@@ -151,6 +151,12 @@ If not present return nil."
   (float-time (org-timestamp-to-time (or (org-element-property :scheduled headline)
                                          (org-timestamp-from-time 0)))))
 
+(defun mugu-orgw--get-deadline (headline)
+  "Return the scheduled data of HEADLINE if present.
+If not present return nil."
+  (float-time (org-timestamp-to-time (or (org-element-property :deadline headline)
+                                         (org-timestamp-from-time 0)))))
+
 (defun mugu-orgw--score-scheduled (now headline)
   "Return a penalty score for HEADLINE dependant on scheduled field.
 Penalty is computed relative to NOW."
@@ -158,6 +164,17 @@ Penalty is computed relative to NOW."
     (cond ((< scheduled-time 0) 0)
           ((< scheduled-time now) scheduled-time)
           ((>= scheduled-time now) (- (- scheduled-time) now)))))
+
+(defun mugu-orgw--score-timestamp-active-or-expired (headline)
+  "Return a penalty score for HEADLINE dependant on any timestamp field.
+If HEADLINE have not any timestamp (or deadline, or scheduled) today then its penalized."
+  (let ((a-day-in-sec (* 60 60 24))
+        (scheduled-diff (- (float-time) (mugu-orgw--get-scheduled headline)))
+        (deadline-diff (- (float-time) (mugu-orgw--get-deadline headline))))
+    (if (or (< scheduled-diff a-day-in-sec) (< deadline-diff a-day-in-sec))
+        1000
+      0)))
+
 
 (defun mugu-orgw--score-priority (headline)
   "Return a penalty score for HEADLINE dependant on last active field.
@@ -178,7 +195,8 @@ the corresponding headline."
 (defun mugu-orgw-sort-cmp-headlines (hl-left hl-right)
   "Relation order between HL-LEFT and HL-RIGHT based on sorting priority."
   (let ((score-scheduled (apply-partially #'mugu-orgw--score-scheduled (float-time))))
-    (eq 'sup (or (mugu-orgw--sort-cmp-score #'mugu-orgw--score-todo hl-left hl-right)
+    (eq 'sup (or (mugu-orgw--sort-cmp-score #'mugu-orgw--score-timestamp-active-or-expired hl-left hl-right)
+                 (mugu-orgw--sort-cmp-score #'mugu-orgw--score-todo hl-left hl-right)
                  (mugu-orgw--sort-cmp-score score-scheduled hl-left hl-right)
                  (mugu-orgw--sort-cmp-score #'mugu-orgw--score-priority hl-left hl-right)))))
 
