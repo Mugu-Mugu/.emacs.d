@@ -150,14 +150,7 @@ If SELECT-FIRST is non-nil, select the first buffer in the list `mugu-vterm-list
   "Configure vterm integration."
   (mugu-vterm--install-keymaps)
   (add-hook 'vterm-mode-hook #'mugu-vterm--install-hook)
-  (add-to-list 'display-buffer-alist
-               '(mugu-vterm-buffer-vterm-p
-                 (display-buffer-in-side-window)
-                 (side . top)
-                 (slot . 0)
-                 (window-height . 0.7)
-                 (inhibit-same-window . nil)))
-  )
+  (mugu-window-configure-side-window 'mugu-vterm-buffer-vterm-p 'top 0.7 t))
 
 (provide 'mugu-vterm)
 ;;; mugu-vterm ends here
