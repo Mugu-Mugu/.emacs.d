@@ -7,6 +7,14 @@
 ;; * begin:
 (require 'use-package)
 
+(use-package doom-modeline
+  :disabled
+  :hook (after-init . doom-modeline-mode)
+  :custom
+  (doom-modeline-irc nil)
+  (doom-modeline-persp-name nil)
+  (doom-modeline-buffer-file-name-style 'buffer-name))
+
 (use-package telephone-line)
 
 (use-package mugu-telephone-line
