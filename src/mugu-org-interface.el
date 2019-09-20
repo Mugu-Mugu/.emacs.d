@@ -407,6 +407,13 @@ action is performed."
                   (when (-fifth-item it) (-fifth-item it)))
             mugu-orgi-headline-actions)))
 
+(defun mugu-orgi-toggle-private ()
+  "Activate or deactivate private task."
+  (interactive)
+  (if (eq mugu-orgw-forbidden-headline-p-function #'ignore)
+      (setq mugu-orgw-forbidden-headline-p-function #'mugu-orgw-private-headline-p)
+    (setq mugu-orgw-forbidden-headline-p-function #'ignore)))
+
 (defun mugu-orgi--configure-ivy ()
   "Customize Ivy experience."
   (ivy-set-actions 'mugu-orgi
