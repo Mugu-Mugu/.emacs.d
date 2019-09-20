@@ -2,24 +2,26 @@
 ;;; Commentary:
 
 ;;; Code:
-(defun mugu-window-configure-side-window (buffer-name-or-predicate direction size)
+(defun mugu-window-configure-side-window (buffer-name-or-predicate direction size &optional dont-bury)
   "Add a rule to `display-buffer-alist' to display a buffer as side window.
 The rule will be assigned to BUFFER-NAME-OR-PREDICATE.
 The side window will be open from DIRECTION which should be top, bottom, right
 or left.
 The SIZE of the window determine how much room it takes.  It must be a float
-between 0.0 and 1.0."
-  (let ((height-or-width (if (or (eq direction 'top)
-                                 (eq direction 'bottom))
-                             'window-height
-                           'window-width)))
-    (add-to-list 'display-buffer-alist
-                 `(,buffer-name-or-predicate
-                   (display-buffer-in-side-window display-buffer-same-window display-buffer-use-some-window)
-                   (side . ,direction)
-                   (slot . 1)
-                   (,height-or-width . ,size)
-                   (inhibit-switch-frame . t)))))
+between 0.0 and 1.0.
+If DONT-BURY is not nil, it will not bury the associated buffer on fast close."
+  (let* ((height-or-width (if (or (eq direction 'top)
+                                  (eq direction 'bottom))
+                              'window-height
+                            'window-width))
+         (display-params `(,buffer-name-or-predicate
+                           (display-buffer-in-side-window display-buffer-same-window display-buffer-use-some-window)
+                           (side . ,direction)
+                           (slot . 1)
+                           (,height-or-width . ,size)
+                           (inhibit-switch-frame . t)
+                           (window-parameters (dont-bury ,dont-bury)))))
+    (add-to-list 'display-buffer-alist display-params)))
 
 (defun mugu-window-side-p (&optional window)
   "Predicate determining if WINDOW is a side window.
@@ -28,7 +30,7 @@ Default to `selected-window'."
 
 (defun mugu-window-bury-buffer-delete-window (window)
   "Delete WINDOW and bury its buffer."
-  (bury-buffer (window-buffer window))
+  (unless (window-parameter window 'dont-bury) (bury-buffer (window-buffer window)))
   (delete-window  window))
 
 (defun mugu-window-delete-next-side ()
