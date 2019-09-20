@@ -128,7 +128,7 @@ If there was no saved for PROJECT-NAME, clear all windows."
 (defun mugu-project--maybe-display-default-buffer (new-project)
   "Change `current-buffer' if it is not owned by NEW-PROJECT."
   (unless (and (mugu-project-buffer-project)
-               (equal (projectile-project-name) (projectile-project-name (mugu-project-buffer-project))))
+               (equal (projectile-project-name) mugu-project-current-name))
     (switch-to-buffer "*Messages*")))
 
 (defun mugu-project-switch (new-project)
