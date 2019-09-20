@@ -338,7 +338,7 @@ applied to now."
   "Return the first active child of HEADLINE.
 If there is none, return HEADLINE.
 If there is several, the first one returned is the most prioritary."
-  (or (-first-item (-sort 'mugu-orgw-sort-cmp-headlines (mugu-orgu-headline-get-childs headline 'identity)))
+  (or (-first-item (-sort 'mugu-orgw-sort-cmp-headlines (mugu-orgu-headline-get-childs headline 'mugu-orgw-active-headline-p)))
       headline))
 
 (defun mugu-orgw-delete-timestamp (headline)
