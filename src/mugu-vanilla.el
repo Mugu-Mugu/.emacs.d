@@ -77,6 +77,7 @@ had chance to be loaded."
   (setq require-final-newline t)
   (setq scroll-conservatively 9999
         scroll-preserve-screen-position t)
+  (setq system-time-locale "C")
   (which-function-mode 0)
   (fset 'yes-or-no-p 'y-or-n-p)
   )
