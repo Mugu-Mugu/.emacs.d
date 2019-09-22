@@ -106,16 +106,29 @@ A project is just a headline (todo or not) with a tag todo."
   (and (mugu-orgw-active-headline-p headline)
        (mugu-orgw-project-headline-p headline)))
 
+(defun mugu-orgw-error-headline-p (headline)
+  "Predicate indicating if HEADLINE breaks some rules."
+  (and (not (equal (org-element-property :todo-keyword headline) "NEXT"))
+       (not (equal (org-element-property :todo-type headline) 'done))
+       (org-element-property :scheduled headline)))
+
 (defun mugu-orgw-task-headline-p (headline)
   "Predicate determining if HEADLINE is a task.
 A task is either:
 - a top level todo HEADLINE
 - or a child todo HEADLINE of a project.
-It can't be both a task and a project (project takes priority)."
+It can't be both a task and a project (project takes priority).
+Rules are bypassed if HEADLINE has a deadline or scheduled information."
   (let ((parent-headline (mugu-orgu-parent-todo-headline headline)))
-    (and (mugu-orgu-todo-headline-p headline)
-         (not (mugu-orgw-project-headline-p headline))
-         (or (not parent-headline) (mugu-orgw-project-headline-p parent-headline)))))
+    (or (mugu-orgw-scheduled-headline-p headline)
+        (and (mugu-orgu-todo-headline-p headline)
+             (not (mugu-orgw-project-headline-p headline))
+             (or (not parent-headline) (mugu-orgw-project-headline-p parent-headline))))))
+
+(defun mugu-orgw-scheduled-headline-p (headline)
+  "Predicate indicating if HEADLINE has a DEADLINE or SCHEDULED field."
+  (or (org-element-property :scheduled headline)
+      (org-element-property :deadline headline)))
 
 (defun mugu-orgw-next-task-headline-p (headline)
   "Predicate determining if HEADLINE is a next task."
@@ -165,16 +178,24 @@ Penalty is computed relative to NOW."
           ((< scheduled-time now) scheduled-time)
           ((>= scheduled-time now) (- (- scheduled-time) now)))))
 
-(defun mugu-orgw--score-timestamp-active-or-expired (headline)
-  "Return a penalty score for HEADLINE dependant on any timestamp field.
-If HEADLINE have not any timestamp (or deadline, or scheduled) today then its penalized."
-  (let ((a-day-in-sec (* 60 60 24))
-        (scheduled-diff (- (float-time) (mugu-orgw--get-scheduled headline)))
-        (deadline-diff (- (float-time) (mugu-orgw--get-deadline headline))))
-    (if (or (< scheduled-diff a-day-in-sec) (< deadline-diff a-day-in-sec))
-        1000
-      0)))
+(defun mugu-orgw--score-scheduled-error (headline)
+  "Return a penalty score for HEADLINE based on if HEADLINE has any error."
+  (if (mugu-orgw-error-headline-p headline) 1000 0))
 
+(defun mugu-orgw--score-overdue-headline (headline)
+  "Return a penalty score for HEADLINE.
+If HEADLINE have a past deadline, it's selected"
+  (if (and (org-element-property :deadline headline)
+           (< (mugu-orgw--get-deadline headline) (float-time)))
+      1000
+    0))
+
+(defun mugu-orgw--score-done-headline (headline)
+  "Return a penalty score for a done HEADLINE.
+If HEADLINE is a done todo its penalized."
+  (if (equal 'done (org-element-property :todo-type headline))
+      -1000
+    0))
 
 (defun mugu-orgw--score-priority (headline)
   "Return a penalty score for HEADLINE dependant on last active field.
@@ -195,7 +216,9 @@ the corresponding headline."
 (defun mugu-orgw-sort-cmp-headlines (hl-left hl-right)
   "Relation order between HL-LEFT and HL-RIGHT based on sorting priority."
   (let ((score-scheduled (apply-partially #'mugu-orgw--score-scheduled (float-time))))
-    (eq 'sup (or (mugu-orgw--sort-cmp-score #'mugu-orgw--score-timestamp-active-or-expired hl-left hl-right)
+    (eq 'sup (or (mugu-orgw--sort-cmp-score #'mugu-orgw--score-done-headline hl-left hl-right)
+                 (mugu-orgw--sort-cmp-score #'mugu-orgw--score-overdue-headline hl-left hl-right)
+                 (mugu-orgw--sort-cmp-score #'mugu-orgw--score-scheduled-error hl-left hl-right)
                  (mugu-orgw--sort-cmp-score #'mugu-orgw--score-todo hl-left hl-right)
                  (mugu-orgw--sort-cmp-score score-scheduled hl-left hl-right)
                  (mugu-orgw--sort-cmp-score #'mugu-orgw--score-priority hl-left hl-right)))))
