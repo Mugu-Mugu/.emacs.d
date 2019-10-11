@@ -125,12 +125,19 @@ ARGS are applied as is to ACTION-FUNCTION."
   (and (equal (org-element-property :file headline) (org-element-property :file other-headline))
        (equal (org-element-property :begin headline) (org-element-property :begin other-headline))))
 
+(defun mugu-orgu--position-visible-p (position)
+  "Predicate indicting if POSITION is visible or not in current buffer."
+  (and (<= position (point-max))
+       (<= (point-min) position)))
+
 (defun mugu-orgu-action-headline-goto (headline)
   "Goto HEADLINE.
 HEADLINE is a an org-element object generated from any mugu-orgu function."
   (let* ((headline-point (org-element-property :begin headline))
          (headline-filename (org-element-property :file headline)))
     (find-file headline-filename)
+    (unless (mugu-orgu--position-visible-p headline-point)
+      (widen))
     (goto-char headline-point)))
 
 (defun mugu-orgu-make-skip-function (select-headline-p)
@@ -177,8 +184,10 @@ Returned headlines are org-element format with a :file property added containing
 file path to the headline as well as a :outline property which is an
 aggreagation of all parents headline description."
   (with-current-buffer (or (find-buffer-visiting file) (find-file-noselect file))
-    (org-element-map (org-element-parse-buffer 'headline) 'headline
-      (mugu-orgu--select-and-decorate-headline select-headline-p))))
+    (save-restriction
+      (widen)
+      (org-element-map (org-element-parse-buffer 'headline) 'headline
+        (mugu-orgu--select-and-decorate-headline select-headline-p)))))
 
 (defun mugu-orgu-list-headlines (select-headline-p)
   "Return a list of headlines satisfying SELECT-HEADLINE-P.
