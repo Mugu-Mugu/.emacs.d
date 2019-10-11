@@ -396,6 +396,7 @@ each project file."
                                    (:endgroup . nil)))
   (setq org-lowest-priority ?F)
   (setq org-agenda-files `(,(expand-file-name "~/org/")))
+  (setq calendar-week-start-day 1)
   (org-mode-restart))
 
 (provide 'mugu-org-workflow)
