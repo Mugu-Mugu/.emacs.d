@@ -252,7 +252,7 @@ The hack with noflet is to prevent fucking orgmode to sabotage the windows confi
             "Global overview for future activities"
             ((agenda ""
                      ((org-agenda-overriding-header "Global agenda")
-                      ;; (org-agenda-prefix-format " %-10c | %-12s | -12t% %b")
+                      (org-agenda-prefix-format "%-12t% s %b")
                       (org-agenda-show-all-dates t)
                       (org-agenda-use-time-grid t)
                       (org-agenda-start-day "-1d")
