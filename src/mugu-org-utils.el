@@ -116,6 +116,21 @@ ARGS are applied as is to ACTION-FUNCTION."
   (and (org-element-property :todo-type headline)
        headline))
 
+(defun mugu-orgu-has-parent-p (headline parent-predicate)
+  "Predicate indicating if HEADLINE has any parent meeting PARENT-PREDICATE."
+  (-first-item (-filter parent-predicate (org-element-lineage headline))))
+
+(defun mugu-orgu-has-child-p (headline child-predicate)
+  "Predicate indicating if HEADLINE has any child meeting CHILD-PREDICATE."
+  (let ((child-predicate-ignore-self (lambda (hl)
+                                       (and (not (eq hl headline))
+                                            (funcall child-predicate hl)))))
+    (org-element-map headline 'headline child-predicate-ignore-self nil 'first-match)))
+
+(defun mugu-orgu-timestamp-to-float (org-timestamp)
+  "Convert a ORG-TIMESTAMP to a number of seconds since epoch."
+  (and org-timestamp (float-time (org-timestamp-to-time org-timestamp))))
+
 (defun mugu-orgu-parent-todo-headline (headline)
   "Retrieve the first todo headline parent of HEADLINE if it exists."
   (-first-item (-filter 'mugu-orgu-todo-headline-p (org-element-lineage headline))))

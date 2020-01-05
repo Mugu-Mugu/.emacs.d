@@ -83,11 +83,33 @@ Those that are meant for transport but already affected won't be selected."
   (or (mugu-orgw-wait-headline-p headline)
       (> (mugu-orgw--get-scheduled headline) (float-time))))
 
+(defun mugu-orgw-task-p (headline)
+  "Predicate determining if HEADLINE is a task (has any todo)."
+  (org-element-property :todo-type headline))
+
+(defun mugu-orgw-todo-p (headline)
+  "Predicate determining if HEADLINE is a TODO."
+  (equal (org-element-property :todo-keyword headline) "TODO"))
+
+(defun mugu-orgw-scheduled-task-p (headline)
+  "Predicate determining if HEADLINE is a scheduled task."
+  (and (mugu-orgw-todo-p headline) (mugu-orgw-todo-date-p headline)))
+
 (defun mugu-orgw-todo-headline-p (headline)
-  "Predicate determining if HEADLINE is active.
-Only leaf headline are considered."
-  (and (equal (org-element-property :todo-keyword headline) "TODO")
-       (not (mugu-orgu-headline-has-child-with-todo-keywords headline '("NEXT" "TODO")))))
+  "Predicate determining if HEADLINE is a todo."
+  (equal (org-element-property :todo-keyword headline) "TODO"))
+
+(defun mugu-orgw-todo-date-p (headline)
+  "Predicated determining if HEADLINE has a scheduled or deadline date."
+  (or (mugu-orgw-scheduled-date headline) (mugu-orgw-deadline-date headline)))
+
+(defun mugu-orgw-scheduled-date (headline)
+  "Return the schedule date of HEADLINE if any."
+  (mugu-orgu-timestamp-to-float (org-element-property :scheduled headline)))
+
+(defun mugu-orgw-deadline-date (headline)
+  "Return the deadline date of HEADLINE if any."
+  (mugu-orgu-timestamp-to-float (org-element-property :deadline headline)))
 
 (defun mugu-orgw-next-task-p (headline)
   "Predicate determining if HEADLINE is a next step.
@@ -129,11 +151,6 @@ Rules are bypassed if HEADLINE has a deadline or scheduled information."
   "Predicate indicating if HEADLINE has a DEADLINE or SCHEDULED field."
   (or (org-element-property :scheduled headline)
       (org-element-property :deadline headline)))
-
-(defun mugu-orgw-next-task-headline-p (headline)
-  "Predicate determining if HEADLINE is a next task."
-  (and (mugu-orgw-task-headline-p headline)
-       (equal "NEXT" (org-element-property :todo-keyword headline))))
 
 (defun mugu-orgw-stuck-project-headline-p (headline)
   "Predicate determining if HEADLINE is a stuck project.
@@ -202,18 +219,7 @@ If HEADLINE is a done todo its penalized."
 Penalty is computed relative to NOW."
   (- (or (mugu-orgu-get-priority headline) 100)))
 
-(defun mugu-orgw--sort-cmp-score (score-fun hl-left hl-right)
-  "Relation order between HL-LEFT and HL-RIGHT based on SCORE-FUN.
-SCORE-FUN should be a function taking a headline in parameter and returning a
-integer which correspond to the score.  The higher the score the more prioritary
-the corresponding headline."
-  (let ((score-left (funcall score-fun hl-left))
-        (score-right (funcall score-fun hl-right)))
-    (cond ((> score-left score-right) 'sup)
-          ((< score-left score-right) 'inf)
-          ((= score-left score-right) nil))))
-
-(defun mugu-orgw-sort-cmp-headlines (hl-left hl-right)
+(defun mugu-orgw-sort-headlines (hl-left hl-right)
   "Relation order between HL-LEFT and HL-RIGHT based on sorting priority."
   (let ((score-scheduled (apply-partially #'mugu-orgw--score-scheduled (float-time))))
     (eq 'sup (or (mugu-orgw--sort-cmp-score #'mugu-orgw--score-done-headline hl-left hl-right)
@@ -222,6 +228,53 @@ the corresponding headline."
                  (mugu-orgw--sort-cmp-score #'mugu-orgw--score-todo hl-left hl-right)
                  (mugu-orgw--sort-cmp-score score-scheduled hl-left hl-right)
                  (mugu-orgw--sort-cmp-score #'mugu-orgw--score-priority hl-left hl-right)))))
+
+(defun mugu-orgw--cmp-score-deadline (headline)
+  "Score HEADLINE according to deadline property.
+Deadline makes sense for scheduling when it's past due.
+The earliest one is the most prioritary."
+  (let ((deadline-date (mugu-orgw-deadline-date headline)))
+    (and (mugu-orgw-todo-p headline)
+         deadline-date
+         (< deadline-date (float-time))
+         (- deadline-date))))
+
+(defun mugu-orgw--cmp-score-scheduled (headline)
+  "Score HEADLINE according to scheduled property.
+The earliest one is the most prioritary."
+  (let ((scheduled-date (mugu-orgw-scheduled-date headline)))
+    (and (mugu-orgw-todo-p headline)
+         scheduled-date
+         (- scheduled-date))))
+
+(defun mugu-orgw--cmp-score-todo-state (headline)
+  "Score HEADLINE according to todo state."
+  (pcase (org-element-property :todo-keyword headline)
+    ("TODO" 5)
+    ("WAIT" 4)
+    ("DONE" 3)
+    ("CANCELLED" 2)
+    (_ 1)))
+
+(defun mugu-orgw--cmp-score-priority (headline)
+  "Score HEADLINE according to todo state."
+  (- (mugu-orgu-get-priority headline)))
+
+(defun mugu-orgw--cmp-headlines (score-fun hl-left hl-right)
+  "Compare according to SCORE-FUN HL-LEFT and HL-RIGHT.
+SCORE-FUN should be a function returning a score relative to an HEADLINE.
+The higher the score the most prioritary."
+  (let* ((default-score most-negative-fixnum)
+         (score-left (or (funcall score-fun hl-left) default-score))
+         (score-right (or (funcall score-fun hl-right) default-score)))
+    (< (- score-left) (- score-right))))
+
+(defun mugu-orgw-cmp-headlines (hl-left hl-right)
+  "Return non-nil if HL-LEFT is more prioritary than HL-RIGHT."
+  (or (mugu-orgw--cmp-headlines #'mugu-orgw--cmp-score-deadline hl-left hl-right)
+      (mugu-orgw--cmp-headlines #'mugu-orgw--cmp-score-scheduled hl-left hl-right)
+      (mugu-orgw--cmp-headlines #'mugu-orgw--cmp-score-todo-state hl-left hl-right)
+      (mugu-orgw--cmp-headlines #'mugu-orgw--cmp-score-priority hl-left hl-right)))
 
 (defun mugu-orgw-capture-todo (find-loc-find)
   "Capture a todo headline and store it in the headline selected by FIND-LOC-FIND.
@@ -239,9 +292,20 @@ The hack with noflet is to prevent fucking orgmode to sabotage the windows confi
                                     entry (function ,(lambda () (mugu-orgu-action-headline-goto headline))) "* TODO %i %?"))))
       (org-capture nil "x"))))
 
+(defun mugu-orgw-schedulable-headline-p (headline)
+  "Determine if a HEADLINE is schedulable.
+A HEADLINE is schedulable if all conditions are met:
+- it has a TODO keyword
+- it has a scheduled/deadline entry or has no TODO parent
+- it has no scheduled/deadline children"
+  (and
+   (mugu-orgw-todo-p headline)
+   (or (mugu-orgw-todo-date-p headline) (not (mugu-orgu-has-parent-p headline #'mugu-orgw-todo-p)))
+   (not (mugu-orgu-has-child-p headline #'mugu-orgw-scheduled-task-p))))
+
 (defun mugu-orgw-capture-note (file)
-  "Build a capture template for a note type headline and store it into FILE."
-  (let ((org-capture-templates `(("x" "capture a note"
+    "Build a capture template for a note type headline and store it into FILE."
+    (let ((org-capture-templates `(("x" "capture a note"
                                   entry (file+datetree ,file) "* %U %i %?"))))
     (org-capture nil "x")))
 
@@ -343,11 +407,11 @@ applied to now."
 
 (defun mugu-orgw-current-task ()
   "Retrieve the current active task."
-  (-first-item (-sort #'mugu-orgw-sort-cmp-headlines (mugu-orgw-list-headlines 'mugu-orgw-task-headline-p))))
+  (-first-item (-sort #'mugu-orgw-sort-headlines (mugu-orgw-list-headlines 'mugu-orgw-task-headline-p))))
 
 (defun mugu-orgw-current-project ()
   "Retrieve the current active project."
-  (-first-item (-sort #'mugu-orgw-sort-cmp-headlines (mugu-orgw-list-headlines 'mugu-orgw-project-headline-p))))
+  (-first-item (-sort #'mugu-orgw-sort-headlines (mugu-orgw-list-headlines 'mugu-orgw-project-headline-p))))
 
 (defun mugu-orgw-list-subtasks (task-headline)
   "Return a list of subtask for the given TASK-HEADLINE."
@@ -361,7 +425,7 @@ applied to now."
   "Return the first active child of HEADLINE.
 If there is none, return HEADLINE.
 If there is several, the first one returned is the most prioritary."
-  (or (-first-item (-sort 'mugu-orgw-sort-cmp-headlines (mugu-orgu-headline-get-childs headline 'mugu-orgw-active-headline-p)))
+  (or (-first-item (-sort 'mugu-orgw-sort-headlines (mugu-orgu-headline-get-childs headline 'mugu-orgw-active-headline-p)))
       headline))
 
 (defun mugu-orgw-delete-timestamp (headline)

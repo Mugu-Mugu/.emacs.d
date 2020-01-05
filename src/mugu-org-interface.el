@@ -46,11 +46,11 @@ ORIG-FUN and ARGS are not read."
   "Format HEADLINES to ivy expected format of a list of (candidate . object).
 Also sort the collection by urgency."
   (--map (cons (mugu-orgi--display-headline it) it)
-         (-sort 'mugu-orgw-sort-cmp-headlines headlines)))
+         (-sort 'mugu-orgw-cmp-headlines headlines)))
 
 (defun mugu-orgi--display-headline (headline)
   "Return a string describing HEADLINE."
-  (let* ((first-active-child (mugu-orgw-get-first-active-child headline))
+  (let* ((first-active-child  headline)
          (outline (mapconcat (lambda (h) (org-element-property :raw-value h))
                              (reverse (org-element-lineage first-active-child nil 'with-self))
                              " > "))
@@ -361,9 +361,9 @@ action is performed."
   ("d" org-cut-subtree "cut subtree")
   ("p" org-paste-subtree "paste subtree")
   ("t" org-toggle-heading "morph headline/list" :column "Transform")
-  ("s" (progn (mugu-orgu-sort-subtree 'mugu-orgw-sort-cmp-headlines)
+  ("s" (progn (mugu-orgu-sort-subtree 'mugu-orgw-sort-headlines)
               (mugu-orgi-menu-org-major-mode)) "entry sort" :color blue)
-  ("S" (progn (mugu-orgu-sort-subtree 'mugu-orgw-sort-cmp-headlines 'recursive)
+  ("S" (progn (mugu-orgu-sort-subtree 'mugu-orgw-sort-headlines 'recursive)
               (mugu-orgi-menu-org-major-mode)) "recursive subtree sort" :color blue)
   ("a" org-archive-subtree "archive subtree")
   ("/" org-sparse-tree "search" :color blue :column "Search")
