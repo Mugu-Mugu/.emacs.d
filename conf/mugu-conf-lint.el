@@ -12,9 +12,9 @@
   :hook (prog-mode . flycheck-mode)
   :custom
   (flycheck-display-errors-delay 0.5)
-  (flycheck-idle-buffer-switch-delay 0.2)
-  (flycheck-idle-change-delay 0.5)
-  (flycheck-check-syntax-automatically '(save idle-change mode-enabled idle-buffer-switch new-line))
+  (flycheck-idle-buffer-switch-delay 2.0)
+  (flycheck-idle-change-delay 2.0)
+  (flycheck-check-syntax-automatically '(save idle-change mode-enabled))
   (flycheck-emacs-lisp-load-path 'inherit))
 
 (use-package mugu-flycheck
