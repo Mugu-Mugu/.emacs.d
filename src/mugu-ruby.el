@@ -7,7 +7,7 @@
 (require 'mugu-lang)
 (require 'rspec-mode)
 
-(defvar mugu-ruby-prettify-cmd "rubocop -x" "Base command to prettify a file.")
+(defvar-local mugu-ruby-prettify-cmd "rubocop -x" "Base command to prettify a file.")
 
 (defun mugu-ruby-toggle-spec-and-target ()
   "Try to toggle method spec and implem."
@@ -21,7 +21,9 @@
   "Prettify FILE."
   (interactive (list buffer-file-truename))
   (if (eq major-mode 'ruby-mode)
-      (shell-command (format "%s %s" mugu-ruby-prettify-cmd file))
+      (progn
+        (shell-command (format "%s %s" mugu-ruby-prettify-cmd file))
+        (revert-buffer 'ignore-auto 'no-confirm))
     (message "Can only prettify ruby file")))
 
 (defun mugu-ruby-verify-method ()
