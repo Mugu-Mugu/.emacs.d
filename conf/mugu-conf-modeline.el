@@ -8,7 +8,6 @@
 (require 'use-package)
 
 (use-package doom-modeline
-  :disabled
   :hook (after-init . doom-modeline-mode)
   :custom
   (doom-modeline-irc nil)
@@ -20,6 +19,7 @@
 (use-package mugu-telephone-line
   :after telephone-line
   :straight nil
+  :disabled
   :config
   (mugu-telephone-line-configure)
   (mugu-telephone-line-set-nocti-theme)
