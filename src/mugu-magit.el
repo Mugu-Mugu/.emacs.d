@@ -6,6 +6,11 @@
 (require 'magit)
 (require 'mugu-menu)
 
+(defun mugu-magit-yank-branch ()
+  "Self explanotary."
+  (interactive)
+  (kill-new (magit-get-current-branch)))
+
 (defhydra mugu-magit-visibility-hydra (:color red :hint nil)
   " visibility hydra"
   ("<tab>" magit-section-toggle "toggle at point" :column "Visibility - Section")
@@ -85,7 +90,8 @@ That is: bind SPC SPC for the mode and autoload the menu on first buffer enterin
 
 (defun mugu-magit-configure ()
   "Set various magit settings."
-  (setq magit-display-buffer-function #'magit-display-buffer-fullframe-status-topleft-v1))
+  (setq magit-display-buffer-function #'magit-display-buffer-fullframe-status-topleft-v1)
+  (magit-define-popup-switch 'magit-log-popup ?b "First parent" "--first-parent"))
 
 (provide 'mugu-magit)
 ;;; mugu-magit ends here
