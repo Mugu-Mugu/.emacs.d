@@ -73,12 +73,29 @@
                                -- MAGIT STATUS --
 ")
 
+(defun mugu-magit-ediff-stage ()
+  "Show ediff for staged in a tweaked ediff view.
+In this view the buffers are presented in a more layout like one commonly used
+for merge."
+  (interactive)
+  (let* ((mugu-unstage (lambda () (interactive)
+                         (ediff-restore-diff nil ?b)
+                         (ediff-copy-A-to-B)))
+         (ediff-set-keymap (lambda ()
+                             (define-key ediff-mode-map "s" 'ediff-copy-C-to-B)
+                             (define-key ediff-mode-map "u" mugu-unstage)))
+         (ediff-window-setup-function (lambda (buffer-A buffer-B buffer-C control-buffer)
+                                        (ediff-setup-windows-plain-merge
+                                         buffer-A buffer-C buffer-B control-buffer)))
+         (ediff-keymap-setup-hook (list ediff-set-keymap)))
+    (call-interactively 'magit-ediff-stage)))
+
 (defun mugu-magit-register-menu-mode (the-magit-mode the-menu)
-  "Register for THE-MAGIT-MODE THE-MENU.
+    "Register for THE-MAGIT-MODE THE-MENU.
 That is: bind SPC SPC for the mode and autoload the menu on first buffer entering"
-  (mugu-menu-register-mode-menu `,the-magit-mode `,the-menu)
-  (let ((the-hook (intern-soft (concat (symbol-name the-magit-mode) "-hook"))))
-    (add-hook `,the-hook (lambda () (run-with-timer 0.1 nil the-menu)))))
+    (mugu-menu-register-mode-menu `,the-magit-mode `,the-menu)
+    (let ((the-hook (intern-soft (concat (symbol-name the-magit-mode) "-hook"))))
+      (add-hook `,the-hook (lambda () (run-with-timer 0.1 nil the-menu)))))
 
 (defun mugu-magit-enable-menus ()
   "Activate autoloding of magit menu."

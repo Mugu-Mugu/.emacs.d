@@ -35,7 +35,23 @@
   :custom
   (git-messenger:use-magit-popup t))
 
+(use-package vdiff
+  :disabled
+  :defer)
+
+(use-package vdiff-magit
+  :after magit
+  :disabled
+  :config
+  (define-key magit-mode-map "e" 'vdiff-magit-dwim)
+  (define-key magit-mode-map "E" 'vdiff-magit)
+  (transient-suffix-put 'magit-dispatch "e" :description "vdiff (dwim)")
+  (transient-suffix-put 'magit-dispatch "e" :command 'vdiff-magit-dwim)
+  (transient-suffix-put 'magit-dispatch "E" :description "vdiff")
+  (transient-suffix-put 'magit-dispatch "E" :command 'vdiff-magit))
+
 (use-package forge
+  :disabled
   :after magit)
 
 (provide 'mugu-conf-git)
