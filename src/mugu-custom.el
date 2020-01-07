@@ -283,26 +283,26 @@
  '(web-mode-markup-indent-offset 2)
  '(web-mode-sql-indent-offset 2)
  '(whitespace-line-column 0))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(flycheck-info ((t (:underline nil))))
- '(flycheck-warning ((t (:underline nil))))
- '(helm-swoop-target-line-block-face ((t (:inherit helm-swoop-target-line-face))))
- '(helm-swoop-target-line-face ((t (:background "#2B2B2B" :foreground "#F0DFAF"))))
- '(helm-swoop-target-word-face ((t (:background "#2B2B2B" :foreground "#F0DFAF"))))
- '(highlight-indentation-face ((t (:background "#3E3E3E"))))
- '(info-title-1 ((t (:inherit info-title-2 :height 1.1))))
- '(info-title-2 ((t (:inherit info-title-3 :height 0.9))))
- '(mode-line-highlight ((t (:box nil))))
- '(org-block-background ((t (:background "gray23"))))
- '(org-block-begin-line ((t (:inherit org-meta-line :background "gray21"))))
- '(org-block-end-line ((t (:inherit org-meta-line :background "gray21"))))
- '(org-level-4 ((t (:inherit outline-5))))
- '(org-level-5 ((t (:inherit outline-6))))
- '(org-level-6 ((t (:inherit outline-8))))
- '(org-level-7 ((t (:inherit outline-7))))
- '(tooltip ((t (:inherit default :background "lightyellow" :foreground "black"))))
- '(variable-pitch ((t (:height 1.0 :family "Courier")))))
+;; (custom-set-faces
+;;  ;; custom-set-faces was added by Custom.
+;;  ;; If you edit it by hand, you could mess it up, so be careful.
+;;  ;; Your init file should contain only one such instance.
+;;  ;; If there is more than one, they won't work right.
+;;  '(flycheck-info ((t (:underline nil))))
+;;  '(flycheck-warning ((t (:underline nil))))
+;;  '(helm-swoop-target-line-block-face ((t (:inherit helm-swoop-target-line-face))))
+;;  '(helm-swoop-target-line-face ((t (:background "#2B2B2B" :foreground "#F0DFAF"))))
+;;  '(helm-swoop-target-word-face ((t (:background "#2B2B2B" :foreground "#F0DFAF"))))
+;;  '(highlight-indentation-face ((t (:background "#3E3E3E"))))
+;;  '(info-title-1 ((t (:inherit info-title-2 :height 1.1))))
+;;  '(info-title-2 ((t (:inherit info-title-3 :height 0.9))))
+;;  '(mode-line-highlight ((t (:box nil))))
+;;  '(org-block-background ((t (:background "gray23"))))
+;;  '(org-block-begin-line ((t (:inherit org-meta-line :background "gray21"))))
+;;  '(org-block-end-line ((t (:inherit org-meta-line :background "gray21"))))
+;;  '(org-level-4 ((t (:inherit outline-5))))
+;;  '(org-level-5 ((t (:inherit outline-6))))
+;;  '(org-level-6 ((t (:inherit outline-8))))
+;;  '(org-level-7 ((t (:inherit outline-7))))
+;;  '(tooltip ((t (:inherit default :background "lightyellow" :foreground "black"))))
+;;  '(variable-pitch ((t (:height 1.0 :family "Courier")))))

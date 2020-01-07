@@ -7,9 +7,28 @@
 
 ;; NICE THEMES
 (use-package noctilux-theme
+  :disabled "in favor of doom modes and because it has some caveat with some mode"
   :demand
-  :init (load-theme 'noctilux t)
-  )
+  :init (load-theme 'noctilux t))
+
+(use-package doom-themes
+  :demand
+  :custom
+  (doom-themes-enable-bold t)
+  (doom-themes-enable-italic t)
+  :config
+  (load-theme 'doom-city-lights t))
+  ;; very nice theme
+  ;; (load-theme 'doom-vibrant t)
+  ;; (load-theme 'doom-tomorrow-night t)
+  ;; nice themes
+  ;; (load-theme 'doom-palenight t)
+  ;; (load-theme 'doom-moonlight t)
+  ;; okeish themes
+  ;; (load-theme 'doom-oceanic-next t)
+  ;; (load-theme 'doom-spacegrey t)
+  ;; (load-theme 'doom-sourcerer t)
+  ;; (load-theme 'doom-wilmersdorf t))
 
 (use-package zenburn-theme
   :demand t

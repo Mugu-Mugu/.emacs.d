@@ -52,7 +52,7 @@ had chance to be loaded."
   (setq default-frame-alist (mugu-cosmetics-frame-params))
   (visual-line-mode 1)
   (global-hl-line-mode t)
-  (set-face-background 'hl-line "#3e4446")
+  ;; (set-face-background 'hl-line "#3e4446")
   (column-number-mode)
   (setq ring-bell-function 'ignore))
 

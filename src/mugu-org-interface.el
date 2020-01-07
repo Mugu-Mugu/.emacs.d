@@ -402,7 +402,6 @@ action is performed."
   (mugu-window-configure-side-window "\\*Org todo\\*" 'bottom 0.1)
   (mugu-window-configure-side-window "*.org$" 'bottom 0.6 t)
 
-  (set-face-attribute 'org-todo nil :foreground "#ff3333" :background nil)
   (advice-add #'org-switch-to-buffer-other-window :around #'mugu-orgi-switch-to-buffer-other-window)
   (mugu-orgi--configure-ivy))
 
