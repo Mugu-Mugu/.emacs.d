@@ -24,7 +24,7 @@
 (require 'ht)
 (eval-when-compile (require 'cl))
 
-;; * Functions
+;; Getter on headlines
 (defun mugu-orgu-get-tags (headline &optional inherit inherit-only)
   "Retrieve local tags of HEADLINE.
 When INHERIT is non-nil also fetch tags from its parents (recursively).
@@ -41,12 +41,6 @@ When INHERIT and INHERIT-ONLY are both non-nil retrieve only tags from parents."
                     (list))
                 headlines)))))))
 
-(defun mugu-orgu-has-tag? (headline tag &optional inherit inherit-only)
-  "Predicate indicating if HEADLINE contain TAG.
-When INHERIT is non-nil also fetch tags from its parents (recursively).
-When INHERIT and INHERIT-ONLY are both non-nil retrieve only tags from parents."
-  (-contains? (mugu-orgu-get-tags headline inherit inherit-only) tag))
-
 (defun mugu-orgu-get-priority (headline)
   "Retrieve the priority of the HEADLINE or the inherited one of its parents."
   (cond ((not headline) org-default-priority)
@@ -54,31 +48,10 @@ When INHERIT and INHERIT-ONLY are both non-nil retrieve only tags from parents."
               (org-element-property :priority headline)))
         ((mugu-orgu-get-priority (org-element-property :parent headline)))))
 
-(defmacro mugu-orgu-with-headline (headline &rest body)
-  "Go to HEADLINE and execute BODY.
-If HEADLINE is empty, tries to use the one at point.  This can happens for
-in capture headline."
-  (declare (indent 0) (debug t))
-  `(save-window-excursion
-     (when ,headline
-       (find-file (org-element-property :file ,headline))
-       (goto-char (org-element-property :begin ,headline)))
-     (progn ,@body)))
-
-(defun mugu-orgu--refile-to (target-headline)
-  "Refile headline at point to TARGET-HEADLINE."
-  (save-restriction
-    (org-narrow-to-element)
-    (let ((rfloc (list (org-element-property :raw-value target-headline)
-                       (org-element-property :file target-headline)
-                       nil
-                       (org-element-property :begin target-headline))))
-      (org-refile nil nil rfloc))))
-
-(defun mugu-orgu-action-headline-refile (headline target-headline)
-  "Refile HEADLINE to TARGET-HEADLINE.
-HEADLINE is a an org-element object generated from any mugu-orgu function."
-  (mugu-orgu-do-action #'mugu-orgu--refile-to headline target-headline))
+;; Actions on headlines
+(defun mugu-orgu--simulate-universal-arg-for-date (time)
+  "Simulate universal argument called for `org-deadline' bzsed on TIME value."
+  (if time nil '(4)))
 
 (defun mugu-orgu-put-property (headline property value)
   "Change in HEADLINE the choosen PROPERTY to a new VALUE.
@@ -111,6 +84,45 @@ ARGS are applied as is to ACTION-FUNCTION."
         (goto-char org-point)
         (apply action-function args)))))
 
+(defun mugu-orgu-schedule (headline time)
+  "Change the schedule time of HEADLINE to TIME."
+  (mugu-orgu-do-action #'org-schedule headline
+                       (mugu-orgu--simulate-universal-arg-for-date time)
+                       (mugu-orgu-time-to-timestamp time)))
+
+(defun mugu-orgu-set-deadline (headline time)
+  "Change the deadline time of HEADLINE to TIME."
+  (mugu-orgu-do-action #'org-deadline headline
+                       (mugu-orgu--simulate-universal-arg-for-date time)
+                       (mugu-orgu-time-to-timestamp time)))
+
+(defun mugu-orgu--refile-to (target-headline)
+  "Refile headline at point to TARGET-HEADLINE."
+  (save-restriction
+    (org-narrow-to-element)
+    (let ((rfloc (list (org-element-property :raw-value target-headline)
+                       (org-element-property :file target-headline)
+                       nil
+                       (org-element-property :begin target-headline))))
+      (org-refile nil nil rfloc))))
+
+(defun mugu-orgu-action-headline-refile (headline target-headline)
+  "Refile HEADLINE to TARGET-HEADLINE.
+HEADLINE is a an org-element object generated from any mugu-orgu function."
+  (mugu-orgu-do-action #'mugu-orgu--refile-to headline target-headline))
+
+;; Time utilities
+(defun mugu-orgu-timestamp-to-float (org-timestamp)
+  "Convert a ORG-TIMESTAMP to a number of seconds since epoch."
+  (and org-timestamp (float-time (org-timestamp-to-time org-timestamp))))
+
+(defun mugu-orgu-time-to-timestamp (time)
+  "Convert a TIME to a timestamp understood by org mode.
+TIME must be homogenous to `float-time'."
+  (org-timestamp-format (org-timestamp-from-time time 'with-time)
+                        (org-time-stamp-format 'long)))
+
+;; General headlines predicates
 (defun mugu-orgu-todo-headline-p (headline)
   "Predicicate for HEADLINE indicating if it's a TODO."
   (and (org-element-property :todo-type headline)
@@ -127,19 +139,6 @@ ARGS are applied as is to ACTION-FUNCTION."
                                             (funcall child-predicate hl)))))
     (org-element-map headline 'headline child-predicate-ignore-self nil 'first-match)))
 
-(defun mugu-orgu-timestamp-to-float (org-timestamp)
-  "Convert a ORG-TIMESTAMP to a number of seconds since epoch."
-  (and org-timestamp (float-time (org-timestamp-to-time org-timestamp))))
-
-(defun mugu-orgu-parent-todo-headline (headline)
-  "Retrieve the first todo headline parent of HEADLINE if it exists."
-  (-first-item (-filter 'mugu-orgu-todo-headline-p (org-element-lineage headline))))
-
-(defun mugu-orgu-headline-equals-p (headline other-headline)
-  "Return non-nil if both HEADLINE and OTHER-HEADLINE refers to same headline."
-  (and (equal (org-element-property :file headline) (org-element-property :file other-headline))
-       (equal (org-element-property :begin headline) (org-element-property :begin other-headline))))
-
 (defun mugu-orgu--position-visible-p (position)
   "Predicate indicting if POSITION is visible or not in current buffer."
   (and (<= position (point-max))
@@ -155,25 +154,13 @@ HEADLINE is a an org-element object generated from any mugu-orgu function."
       (widen))
     (goto-char headline-point)))
 
-(defun mugu-orgu-make-skip-function (select-headline-p)
-  "Build a skip function selecting only headlines satisfying SELECT-HEADLINE-P.
-The actual query given to `org-agenda' should not be more restrictive than the
-equivalent one generated from SELECT-HEADLINE-P."
-  (lexical-let* ((current-file nil)
-                 (headline-points nil)
-                 (select-headline-p select-headline-p))
-    (lambda ()
-      (unless (equal current-file (buffer-file-name))
-        (setq current-file (buffer-file-name))
-        (setq headline-points
-              (-concat (--map (org-element-property :begin it)
-                              (mugu-orgu-list-headlines-in-file current-file select-headline-p))
-                       `(,(point-max)))))
-      (while (> (point) (-first-item headline-points))
-        (pop headline-points))
-      (when (< (point) (-first-item headline-points))
-        (-first-item headline-points)))))
+(defun mugu-orgu-has-tag? (headline tag &optional inherit inherit-only)
+  "Predicate indicating if HEADLINE contain TAG.
+When INHERIT is non-nil also fetch tags from its parents (recursively).
+When INHERIT and INHERIT-ONLY are both non-nil retrieve only tags from parents."
+  (-contains? (mugu-orgu-get-tags headline inherit inherit-only) tag))
 
+;; List headline function
 (defun mugu-orgu--select-and-decorate-headline (select-headline-p)
   "Build a headline decorator function when SELECT-HEADLINE-P is fullfilled.
 If predicate is not respected, nil is returned, otherwise the headline is
@@ -213,34 +200,20 @@ file path to the headline as well as a :outline property which is an
 aggreagation of all parents headline description."
   (--mapcat (mugu-orgu-list-headlines-in-file it select-headline-p) (org-agenda-files)))
 
-(defun mugu-orgu-headline-has-child-with-todo-keywords (headline todo-keywords)
-  "Predicate indicating if given HEADLINE has any child with TODO-KEYWORDS."
-  (org-element-map headline 'headline
-    (lambda (hl)
-      (and (not (eq hl headline))
-           (-contains? todo-keywords (org-element-property :todo-keyword hl))))
-    nil t))
-
-(defun mugu-orgu-get-parent (headline)
-  "Return the parent of HEADLINE."
-  (org-element-property :parent headline))
-
-(defun mugu-orgu-headline-get-childs (headline select-headline-p)
-  "Return all child headlines of HEADLINE matiching SELECT-HEADLINE-P condition."
+(defun mugu-orgu-list-childs (headline select-headline-p &optional with-parent)
+  "Return all child headlines of HEADLINE matching SELECT-HEADLINE-P condition.
+If WITH-PARENT is non nil, also include HEADLINE."
   (let* ((parent-filename (org-element-property :file headline))
          (select-and-append-filename
           (lambda (headline)
             (when (funcall select-headline-p headline)
-              (org-element-put-property headline :file parent-filename)))))
-    (--remove-first (eq headline it)
-                    (org-element-map headline 'headline select-and-append-filename))))
+              (org-element-put-property headline :file parent-filename))))
+         (child-headlines (org-element-map headline 'headline select-and-append-filename)))
+    (if with-parent
+        child-headlines
+      (--remove-first (eq headline it) child-headlines))))
 
-(defun mugu-orgu-get-last-buffer-name ()
-    "Return the name of the last visited org buffer.
-If no org buffer was visited return scratch"
-    (--first (string-match-p ".*.org$" it)
-             (--map (buffer-name it) (buffer-list))))
-
+;; Agenda functions
 (defun mugu-org-utils/agenda-forward-block ()
   "Move point to the next block in agenda block.  Hackish..."
   (interactive)
@@ -264,27 +237,12 @@ If no org buffer was visited return scratch"
     (call-interactively #'org-agenda-goto-block-beginning)
     (call-interactively #'org-agenda-next-item)))
 
-(defun mugu-orgu-with-cached-org-element (wrapped-fun)
-  "Return a closure of WRAPPED-FUN where `org-element-at-point' use cached data.
-This allows to use `org-element-at-point' as if each element was generated from
-`org-element-parse-buffer' on current buffer.
-Thus use of `org-element-contents' and property :parent in `org-element-property'
- no longer return nil results.
-Of course, during the use of the function, the current org buffer must not be
-modified.
-The cache is actually made for all agenda files."
-  (lexical-let*
-      ((get-file-headlines (lambda (file)
-                             (with-current-buffer (or (find-buffer-visiting file) (find-file-noselect file))
-                               (org-element-map (org-element-parse-buffer 'headline) 'headline
-                                 (lambda (hl) (cons (format "%s%s" file (org-element-property :begin hl))
-                                                    hl))))))
-       (all-file-headlines-alist (-mapcat get-file-headlines (org-agenda-files)))
-       (headlines-map (ht<-alist all-file-headlines-alist))
-       (wrapped-fun wrapped-fun))
-    (cl-labels ((org-element-at-point () (ht-get headlines-map (format "%s%s" (buffer-file-name) (point)))))
-      (lambda (&rest args)
-        (apply wrapped-fun args)))))
+;; Misc function
+(defun mugu-orgu-get-last-buffer-name ()
+  "Return the name of the last visited org buffer.
+If no org buffer was visited return scratch"
+  (--first (string-match-p ".*.org$" it)
+           (--map (buffer-name it) (buffer-list))))
 
 (defmacro with-cached-org-element (&rest body)
   "Evaluate BODY as if `org-element-at-point' was global."
@@ -307,11 +265,6 @@ The cache is actually made for all agenda files."
    (save-excursion
      (beginning-of-line)
      (org-element-at-point))))
-
-(defun mugu-orgu-timestamp-str (time)
-  "Convert a TIME to a timestamp understood by org mode."
-  (org-timestamp-format (org-timestamp-from-time time 'with-time)
-                        (org-time-stamp-format 'long)))
 
 (defun mugu-orgu-sort-subtree (cmp-fun &optional recursive)
   "Sort the childs of headline at point according to order defined in CMP-FUN.
@@ -349,9 +302,24 @@ If RECURSIVE is non-nil, the sort is performed for every descendant."
         (insert (org-element-interpret-data ast))))
     (kill-line)))
 
-;; sort the ast
-;; for all children, sort ast
-;; the sort the children
+(defun mugu-orgu-make-skip-function (select-headline-p)
+  "Build a skip function selecting only headlines satisfying SELECT-HEADLINE-P.
+The actual query given to `org-agenda' should not be more restrictive than the
+equivalent one generated from SELECT-HEADLINE-P."
+  (lexical-let* ((current-file nil)
+                 (headline-points nil)
+                 (select-headline-p select-headline-p))
+    (lambda ()
+      (unless (equal current-file (buffer-file-name))
+        (setq current-file (buffer-file-name))
+        (setq headline-points
+              (-concat (--map (org-element-property :begin it)
+                              (mugu-orgu-list-headlines-in-file current-file select-headline-p))
+                       `(,(point-max)))))
+      (while (> (point) (-first-item headline-points))
+        (pop headline-points))
+      (when (< (point) (-first-item headline-points))
+        (-first-item headline-points)))))
 
 (provide 'mugu-org-utils)
 ;;; mugu-org-utils ends here
