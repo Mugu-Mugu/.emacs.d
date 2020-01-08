@@ -35,6 +35,23 @@
   :custom
   (git-messenger:use-magit-popup t))
 
+(use-package diff-hl
+  :disabled
+  :defer
+  :after magit
+  :config
+  (global-diff-hl-mode))
+
+(use-package git-gutter
+  :defer
+  :after magit
+  :config
+  (global-git-gutter-mode +1))
+
+(use-package mugu-git-gutter
+  :straight nil
+  :commands mugu-git-gutter-menu)
+
 (use-package vdiff
   :disabled
   :defer)

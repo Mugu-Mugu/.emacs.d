@@ -51,6 +51,7 @@
     ("o" mugu-orgi-menu-global "orgmode")
     ("z" mugu-window-menu "window")
     ("vh" mugu-git-tm-menu-or-activate "vc file history")
+    ("vv" mugu-git-gutter-menu "vc gutter")
     ("vm" git-messenger:popup-message "vc describe thing")
     ("q" nil "cancel hydra" :color blue :column nil))
 
