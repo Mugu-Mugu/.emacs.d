@@ -23,7 +23,7 @@
     ("dR" mugu-orgw-delete-timestamp "reset task" 'persistant)
     ("ri" ,(apply-partially #'mugu-orgi--action-refile-headline #'mugu-orgw-inbox-headline-p) "Refile to Inbox" 'persistant)
     ("rt" ,(apply-partially #'mugu-orgi--action-refile-headline #'mugu-orgw-scheduled-task-p) "Refile to Task" 'persistant)
-    ("C" mugu-orgw-capture-to-headline "capture to headline"))
+    ("c" mugu-orgw-capture-to-headline "capture to headline"))
   "A list of possible actions for a given headline.
 Each action has the form: hotkey function description persistance column.
 Absence of persistance indicates the action interrupts the ivy session upon
@@ -404,7 +404,7 @@ action is performed."
 
   (mugu-window-configure-side-window "CAPTURE*" 'bottom 0.2)
   (mugu-window-configure-side-window "\\*Org todo\\*" 'bottom 0.1)
-  (mugu-window-configure-side-window "*.org$" 'bottom 0.6 t)
+  (mugu-window-configure-side-window ".*.org$" 'bottom 0.6 t)
 
   (advice-add #'org-switch-to-buffer-other-window :around #'mugu-orgi-switch-to-buffer-other-window)
   (mugu-orgi--configure-ivy))
