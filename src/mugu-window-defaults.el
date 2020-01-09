@@ -9,6 +9,7 @@
   (mugu-window-configure-side-window "\\*Help\\*" 'right 80)
   (mugu-window-configure-side-window "\\*Warnings\\*" 'bottom 10)
   (mugu-window-configure-side-window "\\*lispy-help\\*" 'right 80)
+  (mugu-window-configure-side-window "\\*lispy-message\\*" 'right 80)
   (mugu-window-configure-side-window "\\*Apropos\\*" 'right 80)
   (mugu-window-configure-side-window "\\*Backtrace\\*" 'bottom 0.2)
   (mugu-window-configure-side-window "\\*Shell Command Output\\*" 'bottom 0.5)
