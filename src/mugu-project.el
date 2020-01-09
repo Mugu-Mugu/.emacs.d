@@ -149,7 +149,8 @@ If there was no saved for PROJECT-NAME, clear all windows."
          (new-project-name (if (projectile-project-p new-project)
                                (projectile-project-name new-project)
                              "-")))
-    (when (not (equal new-project-name old-project-name))
+    (when (and new-project
+               (not (equal new-project-name old-project-name)))
       (mugu-project-switch new-project))))
 
 (defun mugu-project-activate ()
