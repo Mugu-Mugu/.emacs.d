@@ -155,6 +155,9 @@ The last command session is resumed after if PERSISTANT is not nil."
 (mugu-orgi--make-command mugu-orgi-goto-any-headline
                          (mugu-orgi--make-query #'identity)
                          #'mugu-orgi--action-focus-headline)
+(mugu-orgi--make-command mugu-orgi-goto-standup-headline
+                         (mugu-orgi--make-query (apply-partially #'mugu-orgw-with-tag-p "@standup"))
+                         #'mugu-orgi--action-focus-headline)
 
 (defsubst mugu-orgi-goto-current-task ()
   "Goto the current task."

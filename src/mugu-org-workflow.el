@@ -115,12 +115,16 @@ A HEADLINE is schedulable if all conditions are met:
                                            (not (funcall mugu-orgw-forbidden-headline-p-function h))))))
     (mugu-orgu-list-headlines full-headline-p)))
 
+(defun mugu-orgw-with-tag-p (context-tag headline)
+  "Predicate indicating if CONTEXT-TAG is present in HEADLINE."
+  (mugu-orgu-has-tag? headline context-tag))
+
 ;; * Headlines sort
 (defun mugu-orgw--cmp-score-deadline (headline)
-  "Score HEADLINE according to deadline property.
+    "Score HEADLINE according to deadline property.
 Deadline makes sense for scheduling when it's past due.
 The earliest one is the most prioritary."
-  (let ((deadline-date (mugu-orgw-deadline-date headline)))
+    (let ((deadline-date (mugu-orgw-deadline-date headline)))
     (and (mugu-orgw-todo-p headline)
          deadline-date
          (<= deadline-date (float-time))
