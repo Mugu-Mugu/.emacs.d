@@ -60,7 +60,8 @@ Also sort the collection by urgency."
   "Select a headline from HEADLINES and apply it preselected DEFAULT-ACTION.
 DEFAULT-ACTION should accept an org-element headline as single argument.
 Headlines are displayed sorted according to their urgentness."
-  (let* ((action (or default-action 'identity)))
+  (let* ((action (or default-action 'identity))
+         (ivy-prescient-sort-commands))
     (ivy-read "select an headline: "
               (mugu-orgi--prepare-headlines-for-ivy headlines)
               :action (lambda (candidate) (funcall action (cdr candidate)))
