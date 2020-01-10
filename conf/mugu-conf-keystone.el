@@ -11,7 +11,12 @@
 
 (use-package no-littering :demand)
 
-(use-package hydra :demand)
+(use-package hydra
+  :demand
+  :config
+  ;; hack needed to solve flickering issue https://github.com/abo-abo/hydra/issues/349
+  (setq hydra--work-around-dedicated nil)
+  )
 
 (use-package undo-tree
   :custom (undo-tree-mode-lighter "")
