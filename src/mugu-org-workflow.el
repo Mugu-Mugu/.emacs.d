@@ -147,6 +147,16 @@ The earliest one is the most prioritary."
     ("CANCELLED" 2)
     (_ 1)))
 
+(defun mugu-orgw--cmp-score-habit-future (headline)
+  "Score HEADLINE according to habit property.
+An Habit in the future should not be selected."
+  (let* ((scheduled-date (mugu-orgw-scheduled-date headline))
+         (scheduled-in-future (> (or scheduled-date 0) (float-time)))
+         (is-habit (org-element-property :LAST_REPEAT headline)))
+    (if (and is-habit scheduled-in-future)
+        -1
+      1)))
+
 (defun mugu-orgw--cmp-score-priority (headline)
   "Score HEADLINE according to todo state."
   (- (mugu-orgu-get-priority headline)))
@@ -167,7 +177,8 @@ identical."
 
 (defun mugu-orgw-cmp-headlines (hl-left hl-right)
   "Return non-nil if HL-LEFT is more prioritary than HL-RIGHT."
-  (let ((result (or (mugu-orgw--cmp-headlines #'mugu-orgw--cmp-score-deadline hl-left hl-right)
+  (let ((result (or (mugu-orgw--cmp-headlines #'mugu-orgw--cmp-score-habit-future hl-left hl-right)
+                    (mugu-orgw--cmp-headlines #'mugu-orgw--cmp-score-deadline hl-left hl-right)
                     (mugu-orgw--cmp-headlines #'mugu-orgw--cmp-score-scheduled hl-left hl-right)
                     (mugu-orgw--cmp-headlines #'mugu-orgw--cmp-score-todo-state hl-left hl-right)
                     (mugu-orgw--cmp-headlines #'mugu-orgw--cmp-score-priority hl-left hl-right)
