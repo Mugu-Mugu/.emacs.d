@@ -55,13 +55,13 @@ The current INDEX vs TOTAL of the headline will also be displayed."
   (let* ((outline (mapconcat (lambda (h) (org-element-property :raw-value h))
                              (reverse (org-element-lineage headline nil 'with-self))
                              " > "))
-         (outline-max-width 150)
-         (truncated-outline (truncate-string-to-width (substring outline 3) (- outline-max-width 1) 0 ?\ ))
-         (format-string "[ %s ] %s > %s (%s/%s) ")
+         (filename (s-capitalize (file-name-base (mugu-orgu-get-file headline))))
+         (outline-with-file (s-concat filename " > " (substring outline 3)))
+         (truncated-outline (truncate-string-to-width outline-with-file 150 0 ?\ ))
+         (format-string "[ %s ] %s (%s/%s) ")
          (pretty-outline (format format-string
                                  (or (org-element-property :todo-keyword headline)
                                      "NONE")
-                                 (s-capitalize (file-name-base (mugu-orgu-get-file headline)))
                                  truncated-outline
                                  index
                                  total)))
