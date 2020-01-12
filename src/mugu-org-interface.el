@@ -43,17 +43,26 @@ ORIG-FUN and ARGS are not read."
 (defun mugu-orgi--prepare-headlines-for-ivy (headlines)
   "Format HEADLINES to ivy expected format of a list of (candidate . object).
 Also sort the collection by urgency."
-  (--map (cons (mugu-orgi--display-headline it) it)
-         (-sort 'mugu-orgw-cmp-headlines headlines)))
+  (let ((total-headlines (length headlines)))
+    (--map-indexed (cons (mugu-orgi--display-headline it it-index total-headlines) it)
+                   (-sort 'mugu-orgw-cmp-headlines headlines))))
 
-(defun mugu-orgi--display-headline (headline)
-  "Return a string describing HEADLINE."
+(defun mugu-orgi--display-headline (headline index total)
+  "Return a string describing HEADLINE.
+The current INDEX vs TOTAL of the headline will also be displayed."
   (let* ((outline (mapconcat (lambda (h) (org-element-property :raw-value h))
                              (reverse (org-element-lineage headline nil 'with-self))
                              " > "))
-         (pretty-outline (format "[ %s ] %s" (or (org-element-property :todo-keyword headline)
-                                                 "NONE")
-                                 (substring outline 3))))
+         (outline-max-width 150)
+         (truncated-outline (truncate-string-to-width (substring outline 3) (- outline-max-width 1) 0 ?\ ))
+         (format-string "[ %s ] %s > %s (%s/%s) ")
+         (pretty-outline (format format-string
+                                 (or (org-element-property :todo-keyword headline)
+                                     "NONE")
+                                 (s-capitalize (file-name-base (mugu-orgu-get-file headline)))
+                                 truncated-outline
+                                 index
+                                 total)))
     pretty-outline))
 
 (defun mugu-orgi--counsel-headlines (headlines default-action)

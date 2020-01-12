@@ -25,6 +25,10 @@
 (eval-when-compile (require 'cl))
 
 ;; Getter on headlines
+(defun mugu-orgu-get-file (headline)
+  "Get file where HEADLINE is located."
+  (org-element-property :file headline))
+
 (defun mugu-orgu-get-tags (headline &optional inherit inherit-only)
   "Retrieve local tags of HEADLINE.
 When INHERIT is non-nil also fetch tags from its parents (recursively).
@@ -74,7 +78,7 @@ Property refers to the native `org' one (not `org-element')."
 (defun mugu-orgu-do-action (action-function headline &rest args)
   "Apply ACTION-FUNCTION to HEADLINE or headline at point if it's nil.
 ARGS are applied as is to ACTION-FUNCTION."
-  (let* ((org-file (org-element-property :file headline))
+  (let* ((org-file (mugu-orgu-get-file headline))
          (org-buffer (if org-file
                          (or (find-buffer-visiting org-file) (find-file-noselect org-file))
                        (current-buffer)))
@@ -101,7 +105,7 @@ ARGS are applied as is to ACTION-FUNCTION."
   (save-restriction
     (org-narrow-to-element)
     (let ((rfloc (list (org-element-property :raw-value target-headline)
-                       (org-element-property :file target-headline)
+                       (mugu-orgu-get-file target-headline)
                        nil
                        (org-element-property :begin target-headline))))
       (org-refile nil nil rfloc))))
@@ -148,7 +152,7 @@ TIME must be homogenous to `float-time'."
   "Goto HEADLINE.
 HEADLINE is a an org-element object generated from any mugu-orgu function."
   (let* ((headline-point (org-element-property :begin headline))
-         (headline-filename (org-element-property :file headline)))
+         (headline-filename (mugu-orgu-get-file headline)))
     (find-file headline-filename)
     (unless (mugu-orgu--position-visible-p headline-point)
       (widen))
@@ -203,7 +207,7 @@ aggreagation of all parents headline description."
 (defun mugu-orgu-list-childs (headline select-headline-p &optional with-parent)
   "Return all child headlines of HEADLINE matching SELECT-HEADLINE-P condition.
 If WITH-PARENT is non nil, also include HEADLINE."
-  (let* ((parent-filename (org-element-property :file headline))
+  (let* ((parent-filename (mugu-orgu-get-file headline))
          (select-and-append-filename
           (lambda (headline)
             (when (funcall select-headline-p headline)
