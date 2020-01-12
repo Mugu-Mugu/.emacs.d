@@ -115,9 +115,13 @@ A HEADLINE is schedulable if all conditions are met:
                                            (not (funcall mugu-orgw-forbidden-headline-p-function h))))))
     (mugu-orgu-list-headlines full-headline-p)))
 
-(defun mugu-orgw-with-tag-p (context-tag headline)
-  "Predicate indicating if CONTEXT-TAG is present in HEADLINE."
-  (mugu-orgu-has-tag? headline context-tag))
+(defun mugu-orgw-with-tag-p (tag headline)
+  "Predicate indicating if TAG is present in HEADLINE."
+  (mugu-orgu-has-tag? headline tag))
+
+(defun mugu-orgw-global-tags-list (predicate)
+  "Return all tags respecting PREDICATE."
+  (-select predicate (-flatten (org-global-tags-completion-table (org-agenda-files)))))
 
 ;; * Headlines sort
 (defun mugu-orgw--cmp-score-deadline (headline)
@@ -272,15 +276,6 @@ each project file."
         (quote ((sequence "TODO(t)" "WAIT(w)" "NEXT(n)"  "|" "DONE(d)" "STOP(s)"))))
   (setq org-habit-show-habits-only-for-today t)
   (setq org-habit-graph-column 80)
-  (setq org-tag-persistent-alist '((:startgroup . nil)
-                                   ("@transport" . nil)
-                                   ("@travail" . nil)
-                                   ("fast_todo" . nil)
-                                   ("project" . nil)
-                                   ("need_review" . nil)
-                                   ("quicky" . nil)
-                                   ("refile" . nil)
-                                   (:endgroup . nil)))
   (setq org-lowest-priority ?F)
   (setq org-agenda-files `(,(expand-file-name "~/org/")))
   (setq calendar-week-start-day 1)

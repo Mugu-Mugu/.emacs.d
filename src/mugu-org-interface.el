@@ -105,9 +105,22 @@ The last command session is resumed after if PERSISTANT is not nil."
     (funcall headline-action (cdr headline))
     (when persistant (funcall mugu-orgi-last-command))))
 
+(defun mugu-orgi--select-tags (tag-or-predicate)
+  "Return TAG-OR-PREDICATE interactivly if needed."
+  (if (functionp tag-or-predicate)
+      (ivy-read "Select a tag"
+                (mugu-orgw-global-tags-list tag-or-predicate))
+    tag-or-predicate))
+
 (defun mugu-orgi--make-query (headlines-predicate)
   "Make a query returning headlines matching HEADLINES-PREDICATE."
   (lambda () (mugu-orgw-list-headlines headlines-predicate)))
+
+(defun mugu-orgi--make-query-by-tags (tag-or-predicate)
+  "Make a query returning headlines matching TAG-OR-PREDICATE."
+  (lambda () (mugu-orgw-list-headlines
+              (apply-partially #'mugu-orgw-with-tag-p
+                               (mugu-orgi--select-tags tag-or-predicate)))))
 
 ;;; Actions
 (defun mugu-orgi--action-focus-headline (headline)
@@ -146,6 +159,9 @@ The last command session is resumed after if PERSISTANT is not nil."
 (mugu-orgi--make-command mugu-orgi-goto-schedulable-task
                          (mugu-orgi--make-query #'mugu-orgw-schedulable-task-p)
                          #'mugu-orgi--action-focus-headline)
+(mugu-orgi--make-command mugu-orgi-goto-scheduled-task
+                         (mugu-orgi--make-query #'mugu-orgw-scheduled-task-p)
+                         #'mugu-orgi--action-focus-headline)
 (mugu-orgi--make-command mugu-orgi-goto-inbox-headline
                          (mugu-orgi--make-query #'mugu-orgw-inbox-headline-p)
                          #'mugu-orgi--action-focus-headline)
@@ -165,7 +181,16 @@ The last command session is resumed after if PERSISTANT is not nil."
                          (mugu-orgi--make-query #'identity)
                          #'mugu-orgi--action-focus-headline)
 (mugu-orgi--make-command mugu-orgi-goto-standup-headline
-                         (mugu-orgi--make-query (apply-partially #'mugu-orgw-with-tag-p "@standup"))
+                         (mugu-orgi--make-query-by-tags "@standup")
+                         #'mugu-orgi--action-focus-headline)
+(mugu-orgi--make-command mugu-orgi-goto-transport-headline
+                         (mugu-orgi--make-query-by-tags "@transport")
+                         #'mugu-orgi--action-focus-headline)
+(mugu-orgi--make-command mugu-orgi-goto-headline-by-tag
+                         (mugu-orgi--make-query-by-tags 'identity)
+                         #'mugu-orgi--action-focus-headline)
+(mugu-orgi--make-command mugu-orgi-goto-headline-by-context-tag
+                         (mugu-orgi--make-query-by-tags (apply-partially #'s-starts-with? "@"))
                          #'mugu-orgi--action-focus-headline)
 
 (defsubst mugu-orgi-goto-current-task ()
@@ -238,6 +263,7 @@ action is performed."
   ("gfa" (mugu-orgi-goto-agenda-file) "goto agenda files" :column "Goto File")
   ("gff" (switch-to-buffer (mugu-orgu-get-last-buffer-name)) "goto last visited")
   ("gg" (mugu-orgi-goto-schedulable-task) "goto task" :column "Goto important tasks")
+  ("gp" (mugu-orgi-goto-scheduled-task) "goto planified task")
   ("gw" (mugu-orgi-goto-wait-task) "goto a waiting task")
   ("gr" (mugu-orgi-goto-refilable-task) "goto a refilable task")
   ("gh" (mugu-orgi-goto-any-headline) "goto any headline" :column "Goto other tasks")
@@ -246,7 +272,10 @@ action is performed."
   ("ga" (mugu-orgi-goto-current-task) "goto current task" :column "Goto current task")
   ("gss" (mugu-orgi-goto-current-task-subheadlines) "goto sub headlines")
   ("gst" (mugu-orgi-goto-current-task-subtasks) "goto subtasks")
-  )
+  ("ss" (mugu-orgi-goto-headline-by-tag) "goto headline by tag" :column "Goto by tag")
+  ("sc" (mugu-orgi-goto-headline-by-context-tag) "goto headline by context tag")
+  ("st" (mugu-orgi-goto-transport-headline) "goto headline for transport")
+  ("sm" (mugu-orgi-goto-standup-headline) "goto headline for morning standup"))
 
 (defmenu mugu-orgi-menu-agenda-major-mode (:color amaranth :hint nil)
   "Mugu"
@@ -410,6 +439,7 @@ action is performed."
   (setq org-tags-column -120)
   (setq org-agenda-log-mode-add-notes nil)
   (setq org-log-reschedule nil)
+  (setq org-use-fast-todo-selection 'expert)
 
   (mugu-window-configure-side-window "CAPTURE*" 'bottom 0.2)
   (mugu-window-configure-side-window "\\*Org todo\\*" 'bottom 0.1)
