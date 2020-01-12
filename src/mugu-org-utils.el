@@ -132,7 +132,7 @@ TIME must be homogenous to `float-time'."
   (and (org-element-property :todo-type headline)
        headline))
 
-(defun mugu-orgu-has-parent-p (headline parent-predicate)
+(defun mugu-orgu-has-parent-p (parent-predicate headline)
   "Predicate indicating if HEADLINE has any parent meeting PARENT-PREDICATE."
   (-first-item (-filter parent-predicate (org-element-lineage headline))))
 

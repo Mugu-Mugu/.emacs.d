@@ -70,23 +70,20 @@ Those that are meant for transport but already affected won't be selected."
   "Predicate determining if HEADLINE is a inbox."
   (-contains? (mugu-orgu-get-tags headline) "inbox"))
 
+(defun mugu-orgw-task-p (headline)
+  "Predicate determining if HEADLINE is a task."
+  (and (mugu-orgu-todo-headline-p headline)
+       (not (mugu-orgu-has-parent-p #'mugu-orgu-todo-headline-p))))
+
 (defun mugu-orgw-wait-p (headline)
   "Predicate determining if HEADLINE is waiting."
   (equal (org-element-property :todo-keyword headline) "WAIT"))
-
-(defun mugu-orgw-task-p (headline)
-  "Predicate determining if HEADLINE is a task (has any todo)."
-  (org-element-property :todo-type headline))
 
 (defun mugu-orgw-todo-p (headline)
   "Predicate determining if HEADLINE is a TODO."
   (equal (org-element-property :todo-keyword headline) "TODO"))
 
-(defun mugu-orgw-scheduled-task-p (headline)
-  "Predicate determining if HEADLINE is a scheduled task."
-  (and (mugu-orgw-todo-p headline) (mugu-orgw-has-todo-date-p headline)))
-
-(defun mugu-orgw-has-todo-date-p (headline)
+(defun mugu-orgw-is-planified-p (headline)
   "Predicated determining if HEADLINE has a scheduled or deadline date."
   (or (mugu-orgw-scheduled-date headline) (mugu-orgw-deadline-date headline)))
 
@@ -98,15 +95,28 @@ Those that are meant for transport but already affected won't be selected."
   "Return the deadline date of HEADLINE if any."
   (mugu-orgu-timestamp-to-float (org-element-property :deadline headline)))
 
-(defun mugu-orgw-schedulable-task-p (headline)
+(defun mugu-orgw-with-tag-p (tag headline)
+  "Predicate indicating if TAG is present in HEADLINE."
+  (mugu-orgu-has-tag? headline tag))
+
+(defalias 'mugu-orgw-inbox-p (apply-partially #'mugu-orgw-with-tag-p "inbox"))
+(defalias 'mugu-orgw-icebox-p (apply-partially #'mugu-orgw-with-tag-p "icebox"))
+(defalias 'mugu-orgw-backlog-p (apply-partially #'mugu-orgw-with-tag-p "backlog"))
+(defalias 'mugu-orgw-archive-p (apply-partially #'mugu-orgw-with-tag-p "archive"))
+(defalias 'mugu-orgw-in-inbox-p (apply-partially #'mugu-orgu-has-parent-p #'mugu-orgw-inbox-p))
+(defalias 'mugu-orgw-in-icebox-p (apply-partially #'mugu-orgu-has-parent-p #'mugu-orgw-icebox-p))
+(defalias 'mugu-orgw-in-backlog-p (apply-partially #'mugu-orgu-has-parent-p #'mugu-orgw-backlog-p))
+
+(defalias 'mugu-orgw-in-archivea-p (apply-partially #'mugu-orgu-has-parent-p #'mugu-orgw-archive-p))
+
+(defun mugu-orgw-schedulable-p (headline)
   "Determine if a HEADLINE is schedulable.
-A HEADLINE is schedulable if all conditions are met:
-- it is a task
-- it has a scheduled/deadline entry or has no TODO parent
+A HEADLINE is schedulable if at all conditions are met:
+- it is either a task in backlog or a scheduled todo
 - it has no scheduled/deadline children"
   (and
-   (mugu-orgw-task-p headline)
-   (or (mugu-orgw-has-todo-date-p headline) (not (mugu-orgu-has-parent-p headline #'mugu-orgw-todo-p)))
+   (or (and (mugu-orgw-in-backlog-p headline) (mugu-orgw-task-p headline))
+       (and (mugu-orgw-todo-p headline) (mugu-orgw-is-planified-p headline)))
    (not (mugu-orgu-has-child-p headline #'mugu-orgw-scheduled-task-p))))
 
 (defun mugu-orgw-list-headlines (headline-p)
@@ -114,10 +124,6 @@ A HEADLINE is schedulable if all conditions are met:
   (let* ((full-headline-p (lambda (h) (and (funcall headline-p h)
                                            (not (funcall mugu-orgw-forbidden-headline-p-function h))))))
     (mugu-orgu-list-headlines full-headline-p)))
-
-(defun mugu-orgw-with-tag-p (tag headline)
-  "Predicate indicating if TAG is present in HEADLINE."
-  (mugu-orgu-has-tag? headline tag))
 
 (defun mugu-orgw-global-tags-list (predicate)
   "Return all tags respecting PREDICATE."
