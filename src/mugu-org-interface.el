@@ -14,6 +14,8 @@
 ;; variables
 (defvar mugu-orgi-last-command nil
   "Last org interface command invoked.")
+(defvar mugu-orgi-current-headline nil
+  "Current selected headline.")
 
 (defvar mugu-orgi-headline-actions
   `(("a" mugu-orgw-set-active "set Active" 'persistant "Basic actions")
@@ -419,6 +421,11 @@ action is performed."
                                 (mugu-orgi--to-ivy-action (-second-item it) (-fourth-item it))
                                 (-third-item it))
                           mugu-orgi-headline-actions)))
+
+(defun mugu-orgi-select-headline-at-point ()
+  "Store headline at point  in `mugu-orgi-current-headline'."
+  (interactive)
+  (setq mugu-orgi-current-headline (mugu-orgu-element-at-point)))
 
 (defun mugu-orgi-set-configuration ()
   "Set org config value relative to interface."
