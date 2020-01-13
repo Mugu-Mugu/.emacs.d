@@ -23,9 +23,12 @@
     ("t" mugu-orgu-change-todo-state "set Todo" 'persistant)
     ("ds" mugu-orgi-snooze-headline "snooze" 'persistant "Immediate scheduling")
     ("dR" mugu-orgw-delete-timestamp "reset task" 'persistant)
-    ("ri" ,(apply-partially #'mugu-orgi--action-refile-headline #'mugu-orgw-inbox-headline-p) "Refile to Inbox" 'persistant)
-    ("rt" ,(apply-partially #'mugu-orgi--action-refile-headline #'mugu-orgw-scheduled-task-p) "Refile to Task" 'persistant)
-    ("c" mugu-orgw-capture-to-headline "capture to headline"))
+    ("ri" ,(apply-partially #'mugu-orgi--action-refile-headline #'mugu-orgw-inbox-headline-p) "Refile to Inbox" 'persistant "Refiling")
+    ("rt" ,(apply-partially #'mugu-orgi--action-refile-headline #'mugu-orgw-is-planified-p) "Refile to Task" 'persistant)
+    ("mb" mugu-orgi-move-to-backlog "Move to backlog" 'persistant "Moving")
+    ("mi" mugu-orgi-move-to-icebox "Move to icebox" 'persistant)
+    ("ma" mugu-orgi-move-to-archive "Move to archive" 'persistant)
+    ("c" mugu-orgw-capture-to-headline "capture to headline" "Capturing to"))
   "A list of possible actions for a given headline.
 Each action has the form: hotkey function description persistance column.
 Absence of persistance indicates the action interrupts the ivy session upon
@@ -140,47 +143,81 @@ The last command session is resumed after if PERSISTANT is not nil."
   (interactive (list (mugu-orgu-element-at-point)))
   (mugu-orgi--action-snooze-headline headline))
 
+(defun mugu-orgi-move-to-icebox (headline)
+  "Move HEADLINE to its associated inbox."
+  (interactive (list (mugu-orgu-element-at-point)))
+  (mugu-orgw-move-to-box #'mugu-orgw-icebox-p headline))
+
+(defun mugu-orgi-move-to-archive (headline)
+  "Move HEADLINE to its associated archive."
+  (interactive (list (mugu-orgu-element-at-point)))
+  (mugu-orgw-move-to-box #'mugu-orgw-archive-p headline))
+
+(defun mugu-orgi-move-to-backlog (headline)
+  "Move HEADLINE to its associated backlog."
+  (interactive (list (mugu-orgu-element-at-point)))
+  (mugu-orgw-move-to-box #'mugu-orgw-backlog-p headline))
+
 (defun mugu-orgi--action-refile-headline (target-headline-p headline)
   "Refile HEADLINE to another headline matching predicate TARGET-HEADLINE-P."
   (mugu-orgu-action-headline-refile headline
                                     (mugu-orgi-counsel--pick-headlines (mugu-orgw-list-headlines target-headline-p))))
 
+(defmacro mugu-orgi--make-headline-list (name predicate)
+  "Make a function with NAME returning a list of all headlines matching PREDICATE."
+  `(defun ,name ()
+     ,(format "Return all headlines matching %s." predicate)
+     (mugu-orgw-list-headlines ,predicate)))
+
+;; Headlines list selectors
+(mugu-orgi--make-headline-list mugu-orgi-inbox-headlines #'mugu-orgw-inbox-p)
+(mugu-orgi--make-headline-list mugu-orgi-icebox-headlines #'mugu-orgw-icebox-p)
+(mugu-orgi--make-headline-list mugu-orgi-backlog-headlines #'mugu-orgw-backlog-p)
+(mugu-orgi--make-headline-list mugu-orgi-archive-headlines #'mugu-orgw-archive-p)
+(mugu-orgi--make-headline-list mugu-orgi-in-inbox-tasks (apply-partially #'mugu-orgu-all-p
+                                                                         #'mugu-orgw-in-inbox-p
+                                                                         #'mugu-orgw-task-p))
+(mugu-orgi--make-headline-list mugu-orgi-in-icebox-tasks (apply-partially #'mugu-orgu-all-p
+                                                                          #'mugu-orgw-in-icebox-p
+                                                                          #'mugu-orgw-task-p))
+(mugu-orgi--make-headline-list mugu-orgi-in-backlog-tasks (apply-partially #'mugu-orgu-all-p
+                                                                           #'mugu-orgw-in-backlog-p
+                                                                           #'mugu-orgw-task-p))
+(mugu-orgi--make-headline-list mugu-orgi-in-archive-tasks (apply-partially #'mugu-orgu-all-p
+                                                                           #'mugu-orgw-in-archive-p
+                                                                           #'mugu-orgw-task-p))
+(mugu-orgi--make-headline-list mugu-orgi-schedulable-tasks #'mugu-orgw-schedulable-p)
+(mugu-orgi--make-headline-list mugu-orgi-planified-tasks #'mugu-orgw-is-planified-p)
+(mugu-orgi--make-headline-list mugu-orgi-wait-tasks (apply-partially #'mugu-orgu-all-p #'mugu-orgw-task-p #'mugu-orgw-wait-p))
+(mugu-orgi--make-headline-list mugu-orgi-any-tasks #'mugu-orgu-todo-headline-p)
+(mugu-orgi--make-headline-list mugu-orgi-any-headlines #'identity)
+(defun mugu-orgi-current-task-subtasks ()
+  "List all subchilds task of current task."
+  (mugu-orgu-list-childs (mugu-orgw-current-task) #'mugu-orgu-todo-headline-p 'with-parent))
+
+(defun mugu-orgi-current-task-subheadings ()
+  "List all subchild headings of current task."
+  (mugu-orgu-list-childs (mugu-orgw-current-task) #'identity 'with-parent))
+
 ;;; Commands
+(mugu-orgi--make-command mugu-orgi-goto-inbox-headlines #'mugu-orgi-inbox-headlines #'mugu-orgi--action-focus-headline)
+(mugu-orgi--make-command mugu-orgi-goto-icebox-headlines #'mugu-orgi-icebox-headlines #'mugu-orgi--action-focus-headline)
+(mugu-orgi--make-command mugu-orgi-goto-backlog-headlines #'mugu-orgi-backlog-headlines #'mugu-orgi--action-focus-headline)
+(mugu-orgi--make-command mugu-orgi-goto-archive-headlines #'mugu-orgi-archive-headlines #'mugu-orgi--action-focus-headline)
+(mugu-orgi--make-command mugu-orgi-goto-in-inbox-tasks #'mugu-orgi-in-inbox-tasks #'mugu-orgi--action-focus-headline)
+(mugu-orgi--make-command mugu-orgi-goto-in-icebox-tasks #'mugu-orgi-in-icebox-tasks #'mugu-orgi--action-focus-headline)
+(mugu-orgi--make-command mugu-orgi-goto-in-backlog-tasks #'mugu-orgi-in-backlog-tasks #'mugu-orgi--action-focus-headline)
+(mugu-orgi--make-command mugu-orgi-goto-in-archive-tasks #'mugu-orgi-in-archive-tasks #'mugu-orgi--action-focus-headline)
+(mugu-orgi--make-command mugu-orgi-goto-schedulable-tasks #'mugu-orgi-schedulable-tasks #'mugu-orgi--action-focus-headline)
+(mugu-orgi--make-command mugu-orgi-goto-planified-tasks #'mugu-orgi-planified-tasks #'mugu-orgi--action-focus-headline)
+(mugu-orgi--make-command mugu-orgi-goto-wait-tasks #'mugu-orgi-wait-tasks #'mugu-orgi--action-focus-headline)
+(mugu-orgi--make-command mugu-orgi-goto-any-tasks #'mugu-orgi-any-tasks #'mugu-orgi--action-focus-headline)
+(mugu-orgi--make-command mugu-orgi-goto-any-headlines #'mugu-orgi-any-headlines #'mugu-orgi--action-focus-headline)
 (mugu-orgi--make-command mugu-orgi-goto-current-task-subtasks
-                         (apply-partially #'mugu-orgu-list-childs (mugu-orgw-current-task) #'mugu-orgw-task-p 'with-parent)
+                         #'mugu-orgi-current-task-subtasks
                          #'mugu-orgi--action-focus-headline)
 (mugu-orgi--make-command mugu-orgi-goto-current-task-subheadlines
-                         (apply-partially #'mugu-orgu-list-childs (mugu-orgw-current-task) #'identity 'with-parent)
-                         #'mugu-orgi--action-focus-headline)
-(mugu-orgi--make-command mugu-orgi-goto-wait-task
-                         (mugu-orgi--make-query #'mugu-orgw-wait-p)
-                         #'mugu-orgi--action-focus-headline)
-(mugu-orgi--make-command mugu-orgi-goto-todo-task
-                         (mugu-orgi--make-query #'mugu-orgw-todo-p)
-                         #'mugu-orgi--action-focus-headline)
-(mugu-orgi--make-command mugu-orgi-goto-schedulable-task
-                         (mugu-orgi--make-query #'mugu-orgw-schedulable-task-p)
-                         #'mugu-orgi--action-focus-headline)
-(mugu-orgi--make-command mugu-orgi-goto-scheduled-task
-                         (mugu-orgi--make-query #'mugu-orgw-scheduled-task-p)
-                         #'mugu-orgi--action-focus-headline)
-(mugu-orgi--make-command mugu-orgi-goto-inbox-headline
-                         (mugu-orgi--make-query #'mugu-orgw-inbox-headline-p)
-                         #'mugu-orgi--action-focus-headline)
-(mugu-orgi--make-command mugu-orgi-goto-inbox-for-capture-headline
-                         (mugu-orgi--make-query #'mugu-orgw-inbox-for-capture-headline-p)
-                         #'mugu-orgi--action-focus-headline)
-(mugu-orgi--make-command mugu-orgi-goto-refilable-task
-                         (mugu-orgi--make-query #'mugu-orgw-refilable-headline-p)
-                         #'mugu-orgi--action-focus-headline)
-(mugu-orgi--make-command mugu-orgi-goto-refilable-to-mobile-headline
-                         (mugu-orgi--make-query #'mugu-orgw-refilable-to-mobile-headline-p)
-                         #'mugu-orgi--action-focus-headline)
-(mugu-orgi--make-command mugu-orgi-goto-any-task
-                         (mugu-orgi--make-query #'mugu-orgw-task-p)
-                         #'mugu-orgi--action-focus-headline)
-(mugu-orgi--make-command mugu-orgi-goto-any-headline
-                         (mugu-orgi--make-query #'identity)
+                         #'mugu-orgi-current-task-subheadings
                          #'mugu-orgi--action-focus-headline)
 (mugu-orgi--make-command mugu-orgi-goto-standup-headline
                          (mugu-orgi--make-query-by-tags "@standup")
@@ -256,28 +293,36 @@ action is performed."
 ;; Menus
 (defmenu mugu-orgi-menu-global (:color blue :hint nil)
   "Org mode external interface"
-  ("aa" (mugu-orgw-agenda-future-overview) "global agenda" :column "Agenda")
-  ("at" (mugu-orgw-agenda-today-overview) "global agenda" :column "Agenda")
-  ("ci" (mugu-orgw-capture-todo #'mugu-orgi-goto-inbox-for-capture-headline) "todo to inbox" :column "Capture")
-  ("cc" (mugu-orgw-capture-todo #'mugu-orgi-goto-schedulable-task) "any schedulable task")
-  ("ca" (mugu-orgw-capture-todo #'mugu-orgi-goto-any-headline) "any headline")
-  ("cs" (mugu-orgw-capture-todo #'mugu-orgi-goto-current-task-subtasks) "any subtask of current tasks")
-  ("gfa" (mugu-orgi-goto-agenda-file) "goto agenda files" :column "Goto File")
-  ("gff" (switch-to-buffer (mugu-orgu-get-last-buffer-name)) "goto last visited")
-  ("gg" (mugu-orgi-goto-schedulable-task) "goto task" :column "Goto important tasks")
-  ("gp" (mugu-orgi-goto-scheduled-task) "goto planified task")
-  ("gw" (mugu-orgi-goto-wait-task) "goto a waiting task")
-  ("gr" (mugu-orgi-goto-refilable-task) "goto a refilable task")
-  ("gh" (mugu-orgi-goto-any-headline) "goto any headline" :column "Goto other tasks")
-  ("gt" (mugu-orgi-goto-any-task) "goto any task")
-  ("gm" (mugu-orgi-goto-refilable-to-mobile-headline) "goto mobile task")
+  ("Aa" (mugu-orgw-agenda-future-overview) "global agenda" :column "Agenda")
+  ("At" (mugu-orgw-agenda-today-overview) "global agenda" :column "Agenda")
+  ("cc" (mugu-orgw-capture-todo #'mugu-orgi-goto-inbox-headlines) "to inbox" :column "Capture")
+  ("cb" (mugu-orgw-capture-todo #'mugu-orgi-goto-backlog-headlines) "to backlog")
+  ("ci" (mugu-orgw-capture-todo #'mugu-orgi-goto-icebox-headlines) "to icebox")
+  ("cs" (mugu-orgw-capture-todo #'mugu-orgi-goto-current-task-subtasks) "to current task")
+  ("ca" (mugu-orgw-capture-todo #'mugu-orgi-goto-schedulable-tasks) "to active task")
+  ("fa" (mugu-orgi-goto-agenda-file) "goto agenda files" :column "Goto File")
+  ("ff" (switch-to-buffer (mugu-orgu-get-last-buffer-name)) "goto last visited")
+  ("gg" (mugu-orgi-goto-schedulable-tasks) "schedulable" :column "Goto important tasks")
+  ("gp" (mugu-orgi-goto-planified-tasks) "planified")
+  ("gw" (mugu-orgi-goto-wait-tasks) "waiting")
+  ("gr" (mugu-orgi-goto-in-inbox-tasks) "refilable")
   ("ga" (mugu-orgi-goto-current-task) "goto current task" :column "Goto current task")
   ("gss" (mugu-orgi-goto-current-task-subheadlines) "goto sub headlines")
   ("gst" (mugu-orgi-goto-current-task-subtasks) "goto subtasks")
-  ("ss" (mugu-orgi-goto-headline-by-tag) "goto headline by tag" :column "Goto by tag")
-  ("sc" (mugu-orgi-goto-headline-by-context-tag) "goto headline by context tag")
-  ("st" (mugu-orgi-goto-transport-headline) "goto headline for transport")
-  ("sm" (mugu-orgi-goto-standup-headline) "goto headline for morning standup"))
+  ("ss" (mugu-orgi-goto-inbox-headlines) "inbox" :column "Goto a box")
+  ("sb" (mugu-orgi-goto-backlog-headlines) "backlog" )
+  ("si" (mugu-orgi-goto-icebox-headlines) "icebox" )
+  ("sa" (mugu-orgi-goto-archive-headlines) "archive")
+  ("ll" (mugu-orgi-goto-in-inbox-tasks) "inbox" :column "Goto tasks in box")
+  ("li" (mugu-orgi-goto-in-backlog-tasks) "icebox" )
+  ("lb" (mugu-orgi-goto-in-icebox-tasks) "backlog" )
+  ("la" (mugu-orgi-goto-in-archive-tasks) "archive" )
+  ("at" (mugu-orgi-goto-any-tasks) "task" :column "Goto any")
+  ("ah" (mugu-orgi-goto-any-headlines) "goto any task")
+  ("ts" (mugu-orgi-goto-headline-by-tag) "goto headline by tag" :column "Goto by tag")
+  ("tc" (mugu-orgi-goto-headline-by-context-tag) "goto headline by context tag")
+  ("tt" (mugu-orgi-goto-transport-headline) "goto headline for transport")
+  ("tm" (mugu-orgi-goto-standup-headline) "goto headline for morning standup"))
 
 (defmenu mugu-orgi-menu-agenda-major-mode (:color amaranth :hint nil)
   "Mugu"

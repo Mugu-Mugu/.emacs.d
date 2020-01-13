@@ -127,6 +127,13 @@ TIME must be homogenous to `float-time'."
                         (org-time-stamp-format 'long)))
 
 ;; General headlines predicates
+(defun mugu-orgu-all-p (&rest predicates-and-headline)
+  "Predicate determining if headline match all given predicates.
+PREDICATES-AND-HEADLINE should be a list of predicates following by an headline."
+  (let ((predicates (-butlast predicates-and-headline))
+        (headline (-last-item predicates-and-headline)))
+    (--all? (funcall it headline) predicates)))
+
 (defun mugu-orgu-todo-headline-p (headline)
   "Predicicate for HEADLINE indicating if it's a TODO."
   (and (org-element-property :todo-type headline)
@@ -194,6 +201,13 @@ aggreagation of all parents headline description."
       (widen)
       (org-element-map (org-element-parse-buffer 'headline) 'headline
         (mugu-orgu--select-and-decorate-headline select-headline-p)))))
+
+(defun mugu-orgu-list-headlines-in-same-file (select-headline-p headline)
+  "Return a list of headlines satisfying SELECT-HEADLINE-P.
+Only the headlines in the same file of HEADLINE will be selected."
+  (message "%s" (mugu-orgu-get-file headline))
+  (message "%s" headline)
+  (mugu-orgu-list-headlines-in-file (mugu-orgu-get-file headline) select-headline-p))
 
 (defun mugu-orgu-list-headlines (select-headline-p)
   "Return a list of headlines satisfying SELECT-HEADLINE-P.
@@ -327,3 +341,11 @@ equivalent one generated from SELECT-HEADLINE-P."
 
 (provide 'mugu-org-utils)
 ;;; mugu-org-utils ends here
+
+(defun mugu-orgu-list-headlines-in-same-file (select-headline-p headline)
+  "Return a list of headlines satisfying SELECT-HEADLINE-P.
+Only the headlines in the same file of HEADLINE will be selecte.")
+
+(defun mugu-orgu-list-headlines-in-same-file (select-headline-p headline)
+  "Return a list of headlines satisfying SELECT-HEADLINE-P.
+Only the headlines in the same file of HEADLINE will be selecte.")

@@ -73,7 +73,7 @@ Those that are meant for transport but already affected won't be selected."
 (defun mugu-orgw-task-p (headline)
   "Predicate determining if HEADLINE is a task."
   (and (mugu-orgu-todo-headline-p headline)
-       (not (mugu-orgu-has-parent-p #'mugu-orgu-todo-headline-p))))
+       (not (mugu-orgu-has-parent-p #'mugu-orgu-todo-headline-p headline))))
 
 (defun mugu-orgw-wait-p (headline)
   "Predicate determining if HEADLINE is waiting."
@@ -99,25 +99,37 @@ Those that are meant for transport but already affected won't be selected."
   "Predicate indicating if TAG is present in HEADLINE."
   (mugu-orgu-has-tag? headline tag))
 
-(defalias 'mugu-orgw-inbox-p (apply-partially #'mugu-orgw-with-tag-p "inbox"))
-(defalias 'mugu-orgw-icebox-p (apply-partially #'mugu-orgw-with-tag-p "icebox"))
-(defalias 'mugu-orgw-backlog-p (apply-partially #'mugu-orgw-with-tag-p "backlog"))
-(defalias 'mugu-orgw-archive-p (apply-partially #'mugu-orgw-with-tag-p "archive"))
-(defalias 'mugu-orgw-in-inbox-p (apply-partially #'mugu-orgu-has-parent-p #'mugu-orgw-inbox-p))
-(defalias 'mugu-orgw-in-icebox-p (apply-partially #'mugu-orgu-has-parent-p #'mugu-orgw-icebox-p))
-(defalias 'mugu-orgw-in-backlog-p (apply-partially #'mugu-orgu-has-parent-p #'mugu-orgw-backlog-p))
-
-(defalias 'mugu-orgw-in-archivea-p (apply-partially #'mugu-orgu-has-parent-p #'mugu-orgw-archive-p))
-
 (defun mugu-orgw-schedulable-p (headline)
   "Determine if a HEADLINE is schedulable.
 A HEADLINE is schedulable if at all conditions are met:
-- it is either a task in backlog or a scheduled todo
+- it is either a task (not in icebox) or a scheduled todo
 - it has no scheduled/deadline children"
   (and
-   (or (and (mugu-orgw-in-backlog-p headline) (mugu-orgw-task-p headline))
+   (or (and (not (mugu-orgw-in-icebox-p headline)) (mugu-orgw-task-p headline))
        (and (mugu-orgw-todo-p headline) (mugu-orgw-is-planified-p headline)))
-   (not (mugu-orgu-has-child-p headline #'mugu-orgw-scheduled-task-p))))
+   (not (mugu-orgu-has-child-p headline #'mugu-orgw-is-planified-p))))
+
+(defun mugu-orgw-box-p (box)
+  "Build a predicate indicating if an headline is a BOX (icebox, backlog etc...)."
+  (apply-partially #'mugu-orgw-with-tag-p box))
+
+(defalias 'mugu-orgw-inbox-p (mugu-orgw-box-p "inbox"))
+(defalias 'mugu-orgw-icebox-p (mugu-orgw-box-p "icebox"))
+(defalias 'mugu-orgw-backlog-p (mugu-orgw-box-p "backlog"))
+(defalias 'mugu-orgw-archive-p (mugu-orgw-box-p "archive"))
+(defalias 'mugu-orgw-in-inbox-p (apply-partially #'mugu-orgu-has-parent-p #'mugu-orgw-inbox-p))
+(defalias 'mugu-orgw-in-icebox-p (apply-partially #'mugu-orgu-has-parent-p #'mugu-orgw-icebox-p))
+(defalias 'mugu-orgw-in-backlog-p (apply-partially #'mugu-orgu-has-parent-p #'mugu-orgw-backlog-p))
+(defalias 'mugu-orgw-in-archive-p (apply-partially #'mugu-orgu-has-parent-p #'mugu-orgw-archive-p))
+
+(defun mugu-orgw-get-box (box-p headline)
+  "Get the box corresponding to BOX-P applicable for HEADLINE."
+  (-first-item
+   (mugu-orgu-list-headlines-in-same-file box-p headline)))
+
+(defun mugu-orgw-move-to-box (box-p headline)
+  "Move HEADLINE to a headline satisfying BOX-P."
+  (mugu-orgu-action-headline-refile headline (mugu-orgw-get-box box-p headline)))
 
 (defun mugu-orgw-list-headlines (headline-p)
   "List headlines satisfying HEADLINE-P and not FORBIDDEN-HEADLINE-P."
@@ -271,7 +283,7 @@ Its scheduled date will be set to now + the given delay."
 ;; * Misc
 (defun mugu-orgw-current-task ()
   "Retrieve the current active task."
-  (-first-item (-sort #'mugu-orgw-cmp-headlines (mugu-orgw-list-headlines 'mugu-orgw-schedulable-task-p))))
+  (-first-item (-sort #'mugu-orgw-cmp-headlines (mugu-orgw-list-headlines 'mugu-orgw-schedulable-p))))
 
 (defun mugu-orgw-set-configuration ()
   "Activate the workflow.
@@ -279,7 +291,7 @@ Will modify several key variables of Org mode and create dynamic bindings for
 each project file."
   (push 'org-habit org-modules)
   (setq org-todo-keywords
-        (quote ((sequence "TODO(t)" "WAIT(w)" "NEXT(n)"  "|" "DONE(d)" "STOP(s)"))))
+        (quote ((sequence "TODO(t)" "WAIT(w)" "|" "DONE(d)"))))
   (setq org-habit-show-habits-only-for-today t)
   (setq org-habit-graph-column 80)
   (setq org-lowest-priority ?F)
