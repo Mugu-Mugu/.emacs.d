@@ -81,7 +81,7 @@
 (use-package ivy-hydra
   :after ivy
   :config
-  (setq ivy-read-action-function 'ivy-hydra-read-action))
+  (setq ivy-read-action-function 'ivy-read-action-ivy))
 
 (use-package company-prescient)
 
