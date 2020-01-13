@@ -446,7 +446,7 @@ action is performed."
  `(defmenu mugu-orgi-submenu-headline-action
     (:color blue :hint nil :after-exit (mugu-orgi-menu-org-major-mode))
    ,@(--map (list (-first-item it)
-                  (lambda () (interactive) (funcall (-second-item it) nil))
+                  (lambda () (interactive) (funcall (-second-item it) (mugu-orgu-element-at-point)))
                   (-third-item it)
                   (when (-fifth-item it) :column)
                   (when (-fifth-item it) (-fifth-item it)))
