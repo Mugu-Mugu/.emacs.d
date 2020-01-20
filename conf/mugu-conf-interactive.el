@@ -78,11 +78,6 @@
   :config
   (ivy-prescient-mode))
 
-(use-package ivy-hydra
-  :after ivy
-  :config
-  (setq ivy-read-action-function 'ivy-read-action-ivy))
-
 (use-package company-prescient)
 
 (provide 'mugu-conf-interactive)

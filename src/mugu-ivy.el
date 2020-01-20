@@ -28,6 +28,7 @@
 (defun mugu-ivy-set-config ()
   "Gather all ivy configuration."
   (mugu-window-configure-side-window "\\*ivy-occur*" 'bottom 0.8)
+  (setq ivy-read-action-function 'ivy-read-action-by-key)
   (setq ivy-use-virtual-buffers t
         ivy-count-format "(%d/%d) "
         ivy-height 20
