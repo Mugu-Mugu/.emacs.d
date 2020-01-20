@@ -204,6 +204,9 @@ If `mugu-orgi-is-local' is non-nil, restrict search to current file."
 (mugu-orgi--make-headline-list mugu-orgi-wait-tasks (apply-partially #'mugu-orgu-all-p #'mugu-orgw-task-p #'mugu-orgw-wait-p))
 (mugu-orgi--make-headline-list mugu-orgi-any-tasks #'mugu-orgu-todo-headline-p)
 (mugu-orgi--make-headline-list mugu-orgi-any-headlines #'identity)
+(mugu-orgi--make-headline-list mugu-orgi-done-yesterday-headlines (apply-partially #'mugu-orgu-all-p
+                                                                                   #'mugu-orgw-done-yesterday-p
+                                                                                   #'mugu-orgw-task-p))
 
 (defun mugu-orgi-current-task-subtasks ()
   "List all subchilds task of current task."
@@ -227,6 +230,7 @@ If `mugu-orgi-is-local' is non-nil, restrict search to current file."
 (mugu-orgi--make-command mugu-orgi-goto-wait-tasks #'mugu-orgi-wait-tasks #'mugu-orgi--action-focus-headline)
 (mugu-orgi--make-command mugu-orgi-goto-any-tasks #'mugu-orgi-any-tasks #'mugu-orgi--action-focus-headline)
 (mugu-orgi--make-command mugu-orgi-goto-any-headlines #'mugu-orgi-any-headlines #'mugu-orgi--action-focus-headline)
+(mugu-orgi--make-command mugu-orgi-goto-done-yesterday #'mugu-orgi-done-yesterday-headlines #'mugu-orgi--action-focus-headline)
 (mugu-orgi--make-command mugu-orgi-goto-current-task-subtasks
                          #'mugu-orgi-current-task-subtasks
                          #'mugu-orgi--action-focus-headline)

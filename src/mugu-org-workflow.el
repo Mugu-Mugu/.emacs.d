@@ -79,6 +79,10 @@ Those that are meant for transport but already affected won't be selected."
   "Predicate determining if HEADLINE is waiting."
   (equal (org-element-property :todo-keyword headline) "WAIT"))
 
+(defun mugu-orgw-done-p (headline)
+  "Predicate determining if HEADLINE is a DONE."
+  (equal (org-element-property :todo-keyword headline) "DONE"))
+
 (defun mugu-orgw-todo-p (headline)
   "Predicate determining if HEADLINE is a TODO."
   (equal (org-element-property :todo-keyword headline) "TODO"))
@@ -86,6 +90,10 @@ Those that are meant for transport but already affected won't be selected."
 (defun mugu-orgw-is-planified-p (headline)
   "Predicated determining if HEADLINE has a scheduled or deadline date."
   (or (mugu-orgw-scheduled-date headline) (mugu-orgw-deadline-date headline)))
+
+(defun mugu-orgw-done-date (headline)
+  "Return the done date of HEADLINE if any."
+  (mugu-orgu-timestamp-to-float (org-element-property :closed headline)))
 
 (defun mugu-orgw-scheduled-date (headline)
   "Return the schedule date of HEADLINE if any."
@@ -114,10 +122,16 @@ A HEADLINE is schedulable if at all conditions are met:
   (and (mugu-orgw-icebox-p headline)
        (mugu-orgw-with-tag-p "@transport" headline)))
 
+(defun mugu-orgw-done-yesterday-p (headline)
+  "Predicate indicating if HEADLINE was done yesterday."
+  (let ((yesterday (round (- (float-time) (mod (float-time) (* 24 3600)) (* 24 3600))))
+        (done-date (mugu-orgw-done-date headline)))
+    (and done-date (> done-date yesterday))))
+
 (defmacro mugu-orgw--make-box-predicate (box-name-predicate box-name)
-  "Small macro to build predicate for BOX-NAME.
+    "Small macro to build predicate for BOX-NAME.
 Predicate will be called BOX-NAME-PREDICATE."
-  `(defun ,box-name-predicate (headline)
+    `(defun ,box-name-predicate (headline)
      ,(format "Predicated determing if HEADLINE is a %s." box-name)
      (mugu-orgw-with-tag-p ,box-name headline)))
 
