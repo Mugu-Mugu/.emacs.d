@@ -113,6 +113,7 @@ A HEADLINE is schedulable if at all conditions are met:
 - it is either a task (not in icebox) or a scheduled todo
 - it has no scheduled/deadline children"
   (and
+   (not (mugu-orgw-done-p headline))
    (or (and (not (mugu-orgw-in-icebox-p headline)) (mugu-orgw-task-p headline))
        (and (mugu-orgw-todo-p headline) (mugu-orgw-is-planified-p headline)))
    (not (mugu-orgu-has-child-p headline #'mugu-orgw-is-planified-p))))
