@@ -115,6 +115,12 @@ ARGS are applied as is to ACTION-FUNCTION."
 HEADLINE is a an org-element object generated from any mugu-orgu function."
   (mugu-orgu-do-action #'mugu-orgu--refile-to headline target-headline))
 
+(defun mugu-orgu-action-headline-copy (headline target-headline)
+  "Copy HEADLINE to TARGET-HEADLINE.
+HEADLINE is a an org-element object generated from any mugu-orgu function."
+  (let ((org-refile-keep t))
+    (mugu-orgu-do-action #'mugu-orgu--refile-to headline target-headline)))
+
 ;; Time utilities
 (defun mugu-orgu-timestamp-to-float (org-timestamp)
   "Convert a ORG-TIMESTAMP to a number of seconds since epoch."
@@ -205,8 +211,6 @@ aggreagation of all parents headline description."
 (defun mugu-orgu-list-headlines-in-same-file (select-headline-p headline)
   "Return a list of headlines satisfying SELECT-HEADLINE-P.
 Only the headlines in the same file of HEADLINE will be selected."
-  (message "%s" (mugu-orgu-get-file headline))
-  (message "%s" headline)
   (mugu-orgu-list-headlines-in-file (mugu-orgu-get-file headline) select-headline-p))
 
 (defun mugu-orgu-list-headlines (select-headline-p)

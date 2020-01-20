@@ -109,18 +109,33 @@ A HEADLINE is schedulable if at all conditions are met:
        (and (mugu-orgw-todo-p headline) (mugu-orgw-is-planified-p headline)))
    (not (mugu-orgu-has-child-p headline #'mugu-orgw-is-planified-p))))
 
-(defun mugu-orgw-box-p (box)
-  "Build a predicate indicating if an headline is a BOX (icebox, backlog etc...)."
-  (apply-partially #'mugu-orgw-with-tag-p box))
+(defun mugu-orgw-for-transport-box-p (headline)
+  "Predicate detemining if HEADLINE is a box for transport."
+  (and (mugu-orgw-icebox-p headline)
+       (mugu-orgw-with-tag-p "@transport" headline)))
 
-(defalias 'mugu-orgw-inbox-p (mugu-orgw-box-p "inbox"))
-(defalias 'mugu-orgw-icebox-p (mugu-orgw-box-p "icebox"))
-(defalias 'mugu-orgw-backlog-p (mugu-orgw-box-p "backlog"))
-(defalias 'mugu-orgw-archive-p (mugu-orgw-box-p "archive"))
-(defalias 'mugu-orgw-in-inbox-p (apply-partially #'mugu-orgu-has-parent-p #'mugu-orgw-inbox-p))
-(defalias 'mugu-orgw-in-icebox-p (apply-partially #'mugu-orgu-has-parent-p #'mugu-orgw-icebox-p))
-(defalias 'mugu-orgw-in-backlog-p (apply-partially #'mugu-orgu-has-parent-p #'mugu-orgw-backlog-p))
-(defalias 'mugu-orgw-in-archive-p (apply-partially #'mugu-orgu-has-parent-p #'mugu-orgw-archive-p))
+(defmacro mugu-orgw--make-box-predicate (box-name-predicate box-name)
+  "Small macro to build predicate for BOX-NAME.
+Predicate will be called BOX-NAME-PREDICATE."
+  `(defun ,box-name-predicate (headline)
+     ,(format "Predicated determing if HEADLINE is a %s." box-name)
+     (mugu-orgw-with-tag-p ,box-name headline)))
+
+(defmacro mugu-orgw--make-inbox-predicate (box-name-predicate box-name)
+  "Small macro to build predicate for in BOX-NAME.
+Predicate will be called BOX-NAME-PREDICATE."
+  `(defun ,box-name-predicate (headline)
+     ,(format "Predicated determing if HEADLINE is a %s." box-name)
+     (mugu-orgu-has-tag? headline ',box-name 'inherit)))
+
+(mugu-orgw--make-box-predicate mugu-orgw-inbox-p "inbox")
+(mugu-orgw--make-box-predicate mugu-orgw-icebox-p "icebox")
+(mugu-orgw--make-box-predicate mugu-orgw-backlog-p "backlog")
+(mugu-orgw--make-box-predicate mugu-orgw-archive-p "archive")
+(mugu-orgw--make-inbox-predicate mugu-orgw-in-inbox-p "inbox")
+(mugu-orgw--make-inbox-predicate mugu-orgw-in-icebox-p "icebox")
+(mugu-orgw--make-inbox-predicate mugu-orgw-in-backlog-p "backlog")
+(mugu-orgw--make-inbox-predicate mugu-orgw-in-archive-p "archive")
 
 (defun mugu-orgw-get-box (box-p headline)
   "Get the box corresponding to BOX-P applicable for HEADLINE."
@@ -131,11 +146,19 @@ A HEADLINE is schedulable if at all conditions are met:
   "Move HEADLINE to a headline satisfying BOX-P."
   (mugu-orgu-action-headline-refile headline (mugu-orgw-get-box box-p headline)))
 
-(defun mugu-orgw-list-headlines (headline-p)
-  "List headlines satisfying HEADLINE-P and not FORBIDDEN-HEADLINE-P."
+(defun mugu-orgw-select-for-transport (headline)
+  "Select HEADLINE for transport scheduling.
+It will be copied to a special inbox which is not scheduled but readily accessible from mobile."
+  (mugu-orgu-action-headline-copy headline (-first-item (mugu-orgu-list-headlines #'mugu-orgw-for-transport-box-p))))
+
+(defun mugu-orgw-list-headlines (headline-p &optional local)
+  "List headlines satisfying HEADLINE-P and not FORBIDDEN-HEADLINE-P.
+If LOCAL is non-nil, the search is restricted to local file."
   (let* ((full-headline-p (lambda (h) (and (funcall headline-p h)
                                            (not (funcall mugu-orgw-forbidden-headline-p-function h))))))
-    (mugu-orgu-list-headlines full-headline-p)))
+    (if local
+        (mugu-orgu-list-headlines-in-file (buffer-file-name (current-buffer)) full-headline-p)
+      (mugu-orgu-list-headlines full-headline-p))))
 
 (defun mugu-orgw-global-tags-list (predicate)
   "Return all tags respecting PREDICATE."
@@ -143,10 +166,10 @@ A HEADLINE is schedulable if at all conditions are met:
 
 ;; * Headlines sort
 (defun mugu-orgw--cmp-score-deadline (headline)
-    "Score HEADLINE according to deadline property.
+  "Score HEADLINE according to deadline property.
 Deadline makes sense for scheduling when it's past due.
 The earliest one is the most prioritary."
-    (let ((deadline-date (mugu-orgw-deadline-date headline)))
+  (let ((deadline-date (mugu-orgw-deadline-date headline)))
     (and (mugu-orgw-todo-p headline)
          deadline-date
          (<= deadline-date (float-time))
@@ -263,12 +286,11 @@ The hack with noflet is to prevent fucking orgmode to sabotage the windows confi
     (org-agenda nil "o")))
 
 ;; * Scheduling
-(defun mugu-orgw-snooze (headline delay)
-  "Snooze the given HEADLINE by given DELAY.
-Its scheduled date will be set to now + the given delay."
+(defun mugu-orgw-snooze (headline time)
+  "Snooze the given HEADLINE until given TIME."
   (interactive (list (mugu-orgu-element-at-point) 0))
   (mugu-orgu-set-deadline headline nil)
-  (mugu-orgu-schedule headline (+ delay (float-time))))
+  (mugu-orgu-schedule headline (float-time time)))
 
 (defun mugu-orgw-set-active (headline)
   "Set HEADLINE active by settings its deadline to now."

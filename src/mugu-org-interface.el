@@ -3,6 +3,7 @@
 ;;; Commentary:
 ;;; Code:
 
+(require 'mugu-buffer)
 (require 'mugu-org-utils)
 (require 'mugu-org-workflow)
 (require 'mugu-menu)
@@ -10,12 +11,15 @@
 (require 'mugu-lisp-libs)
 (require 'mugu-misc)
 (require 'evil)
+(require 'mugu-date-utils)
 
 ;; variables
 (defvar mugu-orgi-last-command nil
   "Last org interface command invoked.")
 (defvar mugu-orgi-current-headline nil
-  "Current selected headline.")
+  "Current selected headline for debug purposes.")
+(defvar mugu-orgi-is-local nil
+  "Indicates if opeartions and searchs consider all agenda files or current one.")
 
 (defvar mugu-orgi-headline-actions
   `(("a" mugu-orgw-set-active "set Active" 'persistant "Basic actions")
@@ -25,6 +29,7 @@
     ("dR" mugu-orgw-delete-timestamp "reset task" 'persistant)
     ("ri" ,(apply-partially #'mugu-orgi--action-refile-headline #'mugu-orgw-inbox-headline-p) "Refile to Inbox" 'persistant "Refiling")
     ("rt" ,(apply-partially #'mugu-orgi--action-refile-headline #'mugu-orgw-is-planified-p) "Refile to Task" 'persistant)
+    ("ft" mugu-orgw-select-for-transport "for transport" 'persistant)
     ("mb" mugu-orgi-move-to-backlog "Move to backlog" 'persistant "Moving")
     ("mi" mugu-orgi-move-to-icebox "Move to icebox" 'persistant)
     ("ma" mugu-orgi-move-to-archive "Move to archive" 'persistant)
@@ -96,7 +101,7 @@ upon selection."
   `(defun ,name ()
      ,(format "Automatically generated function to select headline.
 headline predicate : %s
-headline action : %s" headlines-query default-action)
+headline action : %s." headlines-query default-action)
      (interactive)
      (setq mugu-orgi-last-command ',name)
      (mugu-orgi--counsel-headlines (funcall ,headlines-query) ,default-action)))
@@ -119,13 +124,14 @@ The last command session is resumed after if PERSISTANT is not nil."
 
 (defun mugu-orgi--make-query (headlines-predicate)
   "Make a query returning headlines matching HEADLINES-PREDICATE."
-  (lambda () (mugu-orgw-list-headlines headlines-predicate)))
+  (lambda () (mugu-orgw-list-headlines headlines-predicate mugu-orgi-is-local)))
 
 (defun mugu-orgi--make-query-by-tags (tag-or-predicate)
   "Make a query returning headlines matching TAG-OR-PREDICATE."
   (lambda () (mugu-orgw-list-headlines
               (apply-partially #'mugu-orgw-with-tag-p
-                               (mugu-orgi--select-tags tag-or-predicate)))))
+                               (mugu-orgi--select-tags tag-or-predicate))
+              mugu-orgi-is-local)))
 
 ;;; Actions
 (defun mugu-orgi--action-focus-headline (headline)
@@ -136,7 +142,7 @@ The last command session is resumed after if PERSISTANT is not nil."
 
 (defun mugu-orgi--action-snooze-headline (headline)
   "Snooze HEADLINE by applying a delay to it's active timestamp."
-  (mugu-orgw-snooze headline (mugu-orgi--pick-delay)))
+  (mugu-orgw-snooze headline (mugu-date-utils-read-date)))
 
 (defsubst mugu-orgi-snooze-headline (headline)
   "Snooze the HEADLINE or the task at point if called interractively."
@@ -163,11 +169,18 @@ The last command session is resumed after if PERSISTANT is not nil."
   (mugu-orgu-action-headline-refile headline
                                     (mugu-orgi-counsel--pick-headlines (mugu-orgw-list-headlines target-headline-p))))
 
+(defun mugu-orgi--action-copy-headline (target-headline-p headline)
+  "Copy HEADLINE to another headline matching predicate TARGET-HEADLINE-P."
+  (mugu-orgu-action-headline-copy headline
+                                    (mugu-orgi-counsel--pick-headlines (mugu-orgw-list-headlines target-headline-p))))
+
 (defmacro mugu-orgi--make-headline-list (name predicate)
-  "Make a function with NAME returning a list of all headlines matching PREDICATE."
+  "Make a function with NAME returning a list of headlines matching PREDICATE.
+If `mugu-orgi-is-local' is non-nil, restrict search to current file."
   `(defun ,name ()
      ,(format "Return all headlines matching %s." predicate)
-     (mugu-orgw-list-headlines ,predicate)))
+     (mugu-orgw-list-headlines ,predicate mugu-orgi-is-local)))
+
 
 ;; Headlines list selectors
 (mugu-orgi--make-headline-list mugu-orgi-inbox-headlines #'mugu-orgw-inbox-p)
@@ -191,6 +204,7 @@ The last command session is resumed after if PERSISTANT is not nil."
 (mugu-orgi--make-headline-list mugu-orgi-wait-tasks (apply-partially #'mugu-orgu-all-p #'mugu-orgw-task-p #'mugu-orgw-wait-p))
 (mugu-orgi--make-headline-list mugu-orgi-any-tasks #'mugu-orgu-todo-headline-p)
 (mugu-orgi--make-headline-list mugu-orgi-any-headlines #'identity)
+
 (defun mugu-orgi-current-task-subtasks ()
   "List all subchilds task of current task."
   (mugu-orgu-list-childs (mugu-orgw-current-task) #'mugu-orgu-todo-headline-p 'with-parent))
@@ -264,24 +278,6 @@ The last command session is resumed after if PERSISTANT is not nil."
       (org-overview))
     (org-cycle)))
 
-(defun mugu-orgi--pick-delay ()
-  "Choose a delay interactively and return it in seconds."
-  (let ((delay 0)
-        (delay-choices '(("5 minutes" . 300)
-                         ("10 minutes" . 600)
-                         ("20 minutes" . 900)
-                         ("1 hour" . 3600)
-                         ("2 hours" . 7200)
-                         ("4 hours" . 14400)
-                         ("8 hours" . 28800)
-                         ("1 days" . 86400)
-                         ("2 days" . 172800))))
-    (ivy-read "select a delay: "
-              delay-choices
-              :initial-input ""
-              :action (lambda (candidate) (setq delay (cdr candidate))))
-    delay))
-
 (defun mugu-orgi-counsel-agenda-files (&optional default-action)
   "Select an agenda file and apply it DEFAULT-ACTION.
 DEFAULT-ACTION should be a mugu-orgu-action-afile-*.  If it isnt defined, no
@@ -291,17 +287,8 @@ action is performed."
               :action action)))
 
 ;; Menus
-(defmenu mugu-orgi-menu-global (:color blue :hint nil)
-  "Org mode external interface"
-  ("Aa" (mugu-orgw-agenda-future-overview) "global agenda" :column "Agenda")
-  ("At" (mugu-orgw-agenda-today-overview) "global agenda" :column "Agenda")
-  ("cc" (mugu-orgw-capture-todo #'mugu-orgi-goto-inbox-headlines) "to inbox" :column "Capture")
-  ("cb" (mugu-orgw-capture-todo #'mugu-orgi-goto-backlog-headlines) "to backlog")
-  ("ci" (mugu-orgw-capture-todo #'mugu-orgi-goto-icebox-headlines) "to icebox")
-  ("cs" (mugu-orgw-capture-todo #'mugu-orgi-goto-current-task-subtasks) "to current task")
-  ("ca" (mugu-orgw-capture-todo #'mugu-orgi-goto-schedulable-tasks) "to active task")
-  ("fa" (mugu-orgi-goto-agenda-file) "goto agenda files" :column "Goto File")
-  ("ff" (switch-to-buffer (mugu-orgu-get-last-buffer-name)) "goto last visited")
+(defmenu mugu-orgi-menu-goto-headlines (:color blue :hint nil)
+  "Virtual hydra to select and go to an headline"
   ("gg" (mugu-orgi-goto-schedulable-tasks) "schedulable" :column "Goto important tasks")
   ("gp" (mugu-orgi-goto-planified-tasks) "planified")
   ("gw" (mugu-orgi-goto-wait-tasks) "waiting")
@@ -314,8 +301,8 @@ action is performed."
   ("si" (mugu-orgi-goto-icebox-headlines) "icebox" )
   ("sa" (mugu-orgi-goto-archive-headlines) "archive")
   ("ll" (mugu-orgi-goto-in-inbox-tasks) "inbox" :column "Goto tasks in box")
-  ("li" (mugu-orgi-goto-in-backlog-tasks) "icebox" )
-  ("lb" (mugu-orgi-goto-in-icebox-tasks) "backlog" )
+  ("lb" (mugu-orgi-goto-in-backlog-tasks) "backlog")
+  ("li" (mugu-orgi-goto-in-icebox-tasks) "icebox" )
   ("la" (mugu-orgi-goto-in-archive-tasks) "archive" )
   ("at" (mugu-orgi-goto-any-tasks) "task" :column "Goto any")
   ("ah" (mugu-orgi-goto-any-headlines) "goto any task")
@@ -323,6 +310,20 @@ action is performed."
   ("tc" (mugu-orgi-goto-headline-by-context-tag) "goto headline by context tag")
   ("tt" (mugu-orgi-goto-transport-headline) "goto headline for transport")
   ("tm" (mugu-orgi-goto-standup-headline) "goto headline for morning standup"))
+
+(defmenu mugu-orgi-menu-global (:color blue :hint nil
+                                       :inherit (mugu-orgi-menu-goto-headlines-hydra/heads)
+                                       :body-pre (setq mugu-orgi-is-local nil))
+  "Org mode external interface"
+  ("Aa" (mugu-orgw-agenda-future-overview) "global agenda" :column "Agenda")
+  ("At" (mugu-orgw-agenda-today-overview) "global agenda" :column "Agenda")
+  ("cc" (mugu-orgw-capture-todo #'mugu-orgi-goto-inbox-headlines) "to inbox" :column "Capture")
+  ("cb" (mugu-orgw-capture-todo #'mugu-orgi-goto-backlog-headlines) "to backlog")
+  ("ci" (mugu-orgw-capture-todo #'mugu-orgi-goto-icebox-headlines) "to icebox")
+  ("cs" (mugu-orgw-capture-todo #'mugu-orgi-goto-current-task-subtasks) "to current task")
+  ("ca" (mugu-orgw-capture-todo #'mugu-orgi-goto-schedulable-tasks) "to active task")
+  ("fa" (mugu-orgi-goto-agenda-file) "goto agenda files" :column "Goto File")
+  ("ff" (mugu-buffer-switch (mugu-orgu-get-last-buffer-name)) "goto last visited"))
 
 (defmenu mugu-orgi-menu-agenda-major-mode (:color amaranth :hint nil)
   "Mugu"
@@ -439,8 +440,13 @@ action is performed."
   ("p" (org-priority) "set priority")
   ("P" org-set-property "set property")
   ("RET" org-insert-heading "insert" :column "Terminate")
-  ("o" (mugu-orgi-menu-global) "global org menu")
+  ("o" (mugu-orgi-org-file-menu) "file wide operation")
   ("q" nil "exit"))
+
+(defmenu mugu-orgi-org-file-menu
+  (:color blue :hint nil :inherit (mugu-orgi-menu-goto-headlines-hydra/heads)
+          :body-pre (setq mugu-orgi-is-local t))
+  "Org mode file wide operation")
 
 (eval
  `(defmenu mugu-orgi-submenu-headline-action
@@ -503,14 +509,7 @@ action is performed."
 (defun mugu-orgi-configure-keys ()
   "Gather keys binding in one place."
   ;; (setq org-agenda-ignore-drawer-properties '(effort appt category))
-  (define-key org-read-date-minibuffer-local-map (kbd "M-l")
-    (lambda () (interactive) (org-eval-in-calendar '(calendar-forward-day 1))))
-  (define-key org-read-date-minibuffer-local-map (kbd "M-h")
-    (lambda () (interactive) (org-eval-in-calendar '(calendar-backward-day 1))))
-  (define-key org-read-date-minibuffer-local-map (kbd "M-j")
-    (lambda () (interactive) (org-eval-in-calendar '(calendar-forward-week 1))))
-  (define-key org-read-date-minibuffer-local-map (kbd "M-k")
-    (lambda () (interactive) (org-eval-in-calendar '(calendar-backward-week 1))))
+  (mugu-date-utils-configure)
   (general-def org-mode-map
     "M-j" 'org-move-subtree-down
     "M-k" 'org-move-subtree-up
@@ -523,7 +522,7 @@ action is performed."
   ".
 HEADLINE."
   (interactive (list (mugu-orgu-element-at-point)))
-  (if (mugu-orgw-task-headline-p headline)
+  (if (mugu-orgw-task-p headline)
       (message "It matches")
     (message "It does not matches")))
 
