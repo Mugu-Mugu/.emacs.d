@@ -211,7 +211,8 @@ aggreagation of all parents headline description."
 (defun mugu-orgu-list-headlines-in-same-file (select-headline-p headline)
   "Return a list of headlines satisfying SELECT-HEADLINE-P.
 Only the headlines in the same file of HEADLINE will be selected."
-  (mugu-orgu-list-headlines-in-file (mugu-orgu-get-file headline) select-headline-p))
+  (or (mugu-orgu-list-headlines-in-file (mugu-orgu-get-file headline) select-headline-p)
+      (list)))
 
 (defun mugu-orgu-list-headlines (select-headline-p)
   "Return a list of headlines satisfying SELECT-HEADLINE-P.
