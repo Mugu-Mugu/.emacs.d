@@ -183,7 +183,8 @@ If LOCAL is non-nil, the search is restricted to local file."
 (defun mugu-orgw--cmp-score-deadline (headline)
   "Score HEADLINE according to deadline property.
 Deadline makes sense for scheduling when it's past due.
-The earliest one is the most prioritary."
+The earliest one is the most prioritary.
+This is to prevent deadline from making scheduling irrelevant."
   (let ((deadline-date (mugu-orgw-deadline-date headline)))
     (and (mugu-orgw-todo-p headline)
          deadline-date
@@ -193,10 +194,14 @@ The earliest one is the most prioritary."
 (defun mugu-orgw--cmp-score-scheduled (headline)
   "Score HEADLINE according to scheduled property.
 The earliest one is the most prioritary."
-  (let ((scheduled-date (mugu-orgw-scheduled-date headline)))
-    (and (mugu-orgw-todo-p headline)
-         scheduled-date
-         (- scheduled-date))))
+  (let* ((scheduled-date (mugu-orgw-scheduled-date headline))
+         (scheduled-in-future (and scheduled-date (> scheduled-date (float-time))))
+         (icebox-task-in-future (and scheduled-in-future (mugu-orgw-in-icebox-p headline))))
+    (unless icebox-task-in-future
+      (and (mugu-orgw-todo-p headline)
+           (not icebox-task-in-future)
+           scheduled-date
+           (- scheduled-date)))))
 
 (defun mugu-orgw--cmp-score-todo-state (headline)
   "Score HEADLINE according to todo state."
