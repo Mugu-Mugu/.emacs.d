@@ -14,11 +14,11 @@
   (setq avy-all-windows t)
   (setq avy-background t)
   (setq avy-style 'at-full)
-  (setq avy-keys (number-sequence ?a ?z))
+  (setq avy-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l ?m ?z ?e ?r ?t ?u ?i ?o ?p ?v))
   (setq avy-timeout-seconds 0.5)
   (general-def 'motion
     "F" 'evil-avy-goto-line
-    "f" 'evil-avy-goto-char-timer))
+    "f" 'evil-avy-goto-char-2))
 
 (use-package mugu-motion
   :after avy
