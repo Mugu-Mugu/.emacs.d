@@ -346,11 +346,3 @@ equivalent one generated from SELECT-HEADLINE-P."
 
 (provide 'mugu-org-utils)
 ;;; mugu-org-utils ends here
-
-(defun mugu-orgu-list-headlines-in-same-file (select-headline-p headline)
-  "Return a list of headlines satisfying SELECT-HEADLINE-P.
-Only the headlines in the same file of HEADLINE will be selecte.")
-
-(defun mugu-orgu-list-headlines-in-same-file (select-headline-p headline)
-  "Return a list of headlines satisfying SELECT-HEADLINE-P.
-Only the headlines in the same file of HEADLINE will be selecte.")
