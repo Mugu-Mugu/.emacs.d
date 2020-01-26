@@ -14,7 +14,9 @@
   (mugu-vanilla-set-backup-settings)
   (mugu-vanilla-set-visual-settings)
   (mugu-vanilla-set-other-settings)
-  (mugu-vanilla-set-evil-initial-states))
+  (mugu-vanilla-set-evil-initial-states)
+  (superword-mode)
+  )
 
 (use-package diminish)
 
