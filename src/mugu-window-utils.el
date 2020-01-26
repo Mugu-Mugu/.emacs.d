@@ -1,7 +1,13 @@
 ;;; mugu-window-utils --- Utilities related to window management -*- lexical-binding: t -*-
 ;;; Commentary:
 
+(require 'mugu-buffer)
+
 ;;; Code:
+(defvar mugu-window-last-side-buffer-dismissed
+  nil
+  "Refer to the last side buffer that was dismissed.")
+
 (defun mugu-window-configure-side-window (buffer-name-or-predicate direction size &optional dont-bury)
   "Add a rule to `display-buffer-alist' to display a buffer as side window.
 The rule will be assigned to BUFFER-NAME-OR-PREDICATE.
@@ -30,6 +36,7 @@ Default to `selected-window'."
 
 (defun mugu-window-bury-buffer-delete-window (window)
   "Delete WINDOW and bury its buffer."
+  (setq mugu-window-last-side-buffer-dismissed (window-buffer window))
   (unless (window-parameter window 'dont-bury) (bury-buffer (window-buffer window)))
   (delete-window  window))
 
@@ -39,7 +46,8 @@ Default to `selected-window'."
   (let ((next-side-window (window-with-parameter 'window-side)))
     (if next-side-window
         (mugu-window-bury-buffer-delete-window next-side-window)
-      (message "There is no side window open."))))
+      (if mugu-window-last-side-buffer-dismissed (mugu-buffer-switch mugu-window-last-side-buffer-dismissed)
+        (message "There is no side window open.")))))
 
 (defun mugu-window-delete-all-windows ()
   "Delete all window but the main one."
