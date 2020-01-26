@@ -33,6 +33,7 @@
 (require 'mugu-conf-temp)
 (require 'mugu-conf-site-lisp)
 (require 'mugu-conf-fold)
+(require 'mugu-conf-text)
 
 ;;; languages features
 (require 'mugu-conf-lisp)
