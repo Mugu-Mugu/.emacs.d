@@ -70,16 +70,20 @@ Those that are meant for transport but already affected won't be selected."
   "Predicate determining if HEADLINE is a inbox."
   (-contains? (mugu-orgu-get-tags headline) "inbox"))
 
+(defun mugu-orgw-action-p (headline)
+  "Predicate determining if HEADLINE is an action (a todo headline)."
+  (org-element-property :todo-type headline))
+
 (defun mugu-orgw-task-p (headline)
-  "Predicate determining if HEADLINE is a task."
-  (and (mugu-orgu-todo-headline-p headline)
-       (not (mugu-orgu-has-parent-p #'mugu-orgu-todo-headline-p headline))))
+  "Predicate determining if HEADLINE is a task.  It is a top level action."
+  (and (mugu-orgw-action-p headline)
+       (not (mugu-orgu-has-parent-p #'mugu-orgw-action-p headline))))
 
 (defun mugu-orgw-wait-p (headline)
   "Predicate determining if HEADLINE is waiting."
   (equal (org-element-property :todo-keyword headline) "WAIT"))
 
-(defun mugu-orgw-done-p (headline)
+(defun mugu-orgw-closed-p (headline)
   "Predicate determining if HEADLINE is a DONE."
   (equal (org-element-property :todo-keyword headline) "DONE"))
 
@@ -87,9 +91,10 @@ Those that are meant for transport but already affected won't be selected."
   "Predicate determining if HEADLINE is a TODO."
   (equal (org-element-property :todo-keyword headline) "TODO"))
 
-(defun mugu-orgw-is-planified-p (headline)
-  "Predicated determining if HEADLINE has a scheduled or deadline date."
-  (or (mugu-orgw-scheduled-date headline) (mugu-orgw-deadline-date headline)))
+(defun mugu-orgw-scheduled-p (headline)
+  "Predicated determining if HEADLINE has a scheduled date and is still active."
+  (and (not (mugu-orgw-closed-p headline))
+       (mugu-orgw-scheduled-date headline)))
 
 (defun mugu-orgw-done-date (headline)
   "Return the done date of HEADLINE if any."
@@ -113,10 +118,10 @@ A HEADLINE is schedulable if at all conditions are met:
 - it is either a task (not in icebox) or a scheduled todo
 - it has no scheduled/deadline children"
   (and
-   (not (mugu-orgw-done-p headline))
+   (not (mugu-orgw-closed-p headline))
    (or (and (not (mugu-orgw-in-icebox-p headline)) (mugu-orgw-task-p headline))
-       (and (mugu-orgw-todo-p headline) (mugu-orgw-is-planified-p headline)))
-   (not (mugu-orgu-has-child-p headline #'mugu-orgw-is-planified-p))))
+       (and (mugu-orgw-action-p headline) (mugu-orgw-scheduled-p headline)))
+   (not (mugu-orgu-has-child-p headline #'mugu-orgw-scheduled-p))))
 
 (defun mugu-orgw-for-transport-box-p (headline)
   "Predicate detemining if HEADLINE is a box for transport."
@@ -180,17 +185,6 @@ If LOCAL is non-nil, the search is restricted to local file."
   (-select predicate (-flatten (org-global-tags-completion-table (org-agenda-files)))))
 
 ;; * Headlines sort
-(defun mugu-orgw--cmp-score-deadline (headline)
-  "Score HEADLINE according to deadline property.
-Deadline makes sense for scheduling when it's past due.
-The earliest one is the most prioritary.
-This is to prevent deadline from making scheduling irrelevant."
-  (let ((deadline-date (mugu-orgw-deadline-date headline)))
-    (and (mugu-orgw-todo-p headline)
-         deadline-date
-         (<= deadline-date (float-time))
-         (- deadline-date))))
-
 (defun mugu-orgw--cmp-score-scheduled (headline)
   "Score HEADLINE according to scheduled property.
 The earliest one is the most prioritary."
@@ -198,7 +192,7 @@ The earliest one is the most prioritary."
          (scheduled-in-future (and scheduled-date (> scheduled-date (float-time))))
          (icebox-task-in-future (and scheduled-in-future (mugu-orgw-in-icebox-p headline))))
     (unless icebox-task-in-future
-      (and (mugu-orgw-todo-p headline)
+      (and (mugu-orgw-action-p headline)
            (not icebox-task-in-future)
            scheduled-date
            (- scheduled-date)))))
@@ -206,6 +200,7 @@ The earliest one is the most prioritary."
 (defun mugu-orgw--cmp-score-todo-state (headline)
   "Score HEADLINE according to todo state."
   (pcase (org-element-property :todo-keyword headline)
+    ("NEXT" 6)
     ("TODO" 5)
     ("WAIT" 4)
     ("DONE" 3)
@@ -242,10 +237,9 @@ identical."
 
 (defun mugu-orgw-cmp-headlines (hl-left hl-right)
   "Return non-nil if HL-LEFT is more prioritary than HL-RIGHT."
-  (let ((result (or (mugu-orgw--cmp-headlines #'mugu-orgw--cmp-score-habit-future hl-left hl-right)
-                    (mugu-orgw--cmp-headlines #'mugu-orgw--cmp-score-deadline hl-left hl-right)
+  (let ((result (or (mugu-orgw--cmp-headlines #'mugu-orgw--cmp-score-todo-state hl-left hl-right)
+                    (mugu-orgw--cmp-headlines #'mugu-orgw--cmp-score-habit-future hl-left hl-right)
                     (mugu-orgw--cmp-headlines #'mugu-orgw--cmp-score-scheduled hl-left hl-right)
-                    (mugu-orgw--cmp-headlines #'mugu-orgw--cmp-score-todo-state hl-left hl-right)
                     (mugu-orgw--cmp-headlines #'mugu-orgw--cmp-score-priority hl-left hl-right)
                     0)))
     (< result 0)))
@@ -313,9 +307,10 @@ The hack with noflet is to prevent fucking orgmode to sabotage the windows confi
   (mugu-orgu-schedule headline (float-time time)))
 
 (defun mugu-orgw-set-active (headline)
-  "Set HEADLINE active by settings its deadline to now."
+  "Set HEADLINE active by scheduling it to now and changing its status to NEXT."
   (interactive (list (mugu-orgu-element-at-point)))
-  (mugu-orgu-set-deadline headline (float-time)))
+  (mugu-orgu-change-todo-state headline "NEXT")
+  (mugu-orgu-schedule headline (float-time)))
 
 (defun mugu-orgw-delete-timestamp (headline)
   "Reset timestamps on HEADLINE."
@@ -333,7 +328,7 @@ Will modify several key variables of Org mode and create dynamic bindings for
 each project file."
   (push 'org-habit org-modules)
   (setq org-todo-keywords
-        (quote ((sequence "TODO(t)" "WAIT(w)" "|" "DONE(d)"))))
+        (quote ((sequence "TODO(t)" "NEXT(n)" "WAIT(w)" "|" "DONE(d)"))))
   (setq org-habit-show-habits-only-for-today t)
   (setq org-habit-graph-column 80)
   (setq org-lowest-priority ?F)

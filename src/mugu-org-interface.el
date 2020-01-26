@@ -25,8 +25,9 @@
   `(("a" mugu-orgw-set-active "set Active" 'persistant "Basic actions")
     ("p" mugu-orgu-set-priority "set Priority" 'persistant)
     ("t" mugu-orgu-change-todo-state "set Todo" 'persistant)
-    ("ds" mugu-orgi-snooze-headline "snooze" 'persistant "Immediate scheduling")
-    ("dR" mugu-orgw-delete-timestamp "reset task" 'persistant)
+    ("ds" mugu-orgi-schedule "schedule" 'persistant "Scheduling")
+    ("dd" mugu-orgi-deadline "deadline" 'persistant)
+    ("dr" mugu-orgw-delete-timestamp "reset task" 'persistant)
     ("ri" ,(apply-partially #'mugu-orgi--action-refile-headline #'mugu-orgw-inbox-headline-p) "Refile to Inbox" 'persistant "Refiling")
     ("rt" ,(apply-partially #'mugu-orgi--action-refile-headline #'mugu-orgw-is-planified-p) "Refile to Task" 'persistant)
     ("ft" mugu-orgw-select-for-transport "for transport" 'persistant)
@@ -144,14 +145,15 @@ The last command session is resumed after if PERSISTANT is not nil."
   (mugu-orgu-action-headline-goto headline)
   (mugu-orgi-focus-headline))
 
-(defun mugu-orgi--action-snooze-headline (headline)
-  "Snooze HEADLINE by applying a delay to it's active timestamp."
-  (mugu-orgw-snooze headline (mugu-date-utils-read-date)))
-
-(defsubst mugu-orgi-snooze-headline (headline)
-  "Snooze the HEADLINE or the task at point if called interractively."
+(defsubst mugu-orgi-schedule (headline)
+  "Schedule the HEADLINE or the task at point if called interractively."
   (interactive (list (mugu-orgu-element-at-point)))
-  (mugu-orgi--action-snooze-headline headline))
+  (mugu-orgu-schedule headline (mugu-date-utils-read-date)))
+
+(defsubst mugu-orgi-deadline (headline)
+  "Define deadline for the HEADLINE or the task at point if called interractively."
+  (interactive (list (mugu-orgu-element-at-point)))
+  (mugu-orgu-deadline headline (mugu-date-utils-read-date)))
 
 (defun mugu-orgi-move-to-icebox (headline)
   "Move HEADLINE to its associated inbox."
