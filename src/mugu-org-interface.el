@@ -65,14 +65,18 @@ The current INDEX vs TOTAL of the headline will also be displayed."
                              " > "))
          (filename (s-capitalize (file-name-base (mugu-orgu-get-file headline))))
          (outline-with-file (s-concat filename " > " (substring outline 3)))
-         (truncated-outline (truncate-string-to-width outline-with-file 150 0 ?\ ))
-         (format-string "[ %s ] %s (%s/%s) ")
-         (pretty-outline (format format-string
-                                 (or (org-element-property :todo-keyword headline)
-                                     "NONE")
-                                 truncated-outline
-                                 index
-                                 total)))
+         (todo-segment (format "[ %s ]" (or (org-element-property :todo-keyword headline)
+                                            "NONE")))
+         (outline-segment (truncate-string-to-width outline-with-file 150 0 ?\ ))
+         (tags-segment (truncate-string-to-width
+                        (s-join "/" (--map (format "@%s" it) (mugu-orgu-get-tags headline 'inherit)))
+                        20 0 ?\ ))
+         (index-segment (format "(%s/%s)" index total))
+         (pretty-outline (format "%s %s %s %s"
+                                 todo-segment
+                                 outline-segment
+                                 tags-segment
+                                 index-segment)))
     pretty-outline))
 
 (defun mugu-orgi--counsel-headlines (headlines default-action)
