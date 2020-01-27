@@ -59,7 +59,7 @@ had chance to be loaded."
 (defsubst mugu-vanilla-set-perf-settings ()
   "."
   (setq-default bidi-display-reordering nil)
-  (setq gc-cons-threshold (* 1024 1024 4))
+  (setq gc-cons-threshold (* 1024 1024 200))
   (setq after-focus-change-function #'mugu-vanilla--gc)
   (setq auto-window-vscroll nil)
   (setq inhibit-compacting-font-caches t)
