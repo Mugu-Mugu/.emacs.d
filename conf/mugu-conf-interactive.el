@@ -72,11 +72,14 @@
 
 (use-package prescient
   :custom
-  (prescient-persist-mode t))
+  (prescient-persist-mode t)
+  )
 
 (use-package ivy-prescient
   :config
-  (ivy-prescient-mode))
+  (ivy-prescient-mode)
+  :custom
+  (ivy-prescient-sort-commands '(:not swiper ivy-switch-buffer mugu-counsel-fzf-file)))
 
 (use-package company-prescient)
 
