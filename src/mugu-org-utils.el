@@ -41,6 +41,7 @@ When INHERIT and INHERIT-ONLY are both non-nil retrieve only tags from parents."
       (-uniq
        (-flatten
         (-concat
+         org-file-tags
          (--map (or (org-element-property :tags it)
                     (list))
                 headlines)))))))
