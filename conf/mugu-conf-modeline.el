@@ -14,7 +14,8 @@
   (doom-modeline-persp-name nil)
   (doom-modeline-buffer-file-name-style 'buffer-name))
 
-(use-package telephone-line)
+(use-package telephone-line
+  :disabled)
 
 (use-package mugu-telephone-line
   :after telephone-line
