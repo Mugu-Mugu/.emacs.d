@@ -192,7 +192,7 @@ If LOCAL is non-nil, the search is restricted to local file."
 (defun mugu-orgw--cmp-score-scheduled (headline)
   "Score HEADLINE according to scheduled property.
 The earliest one is the most prioritary."
-  (let* ((scheduled-date (mugu-orgw-scheduled-date headline))
+  (let* ((scheduled-date (or (mugu-orgw-scheduled-date headline) (float-time)))
          (scheduled-in-future (and scheduled-date (> scheduled-date (float-time))))
          (icebox-task-in-future (and scheduled-in-future (mugu-orgw-in-icebox-p headline))))
     (unless icebox-task-in-future
