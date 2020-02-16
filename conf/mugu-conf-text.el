@@ -7,7 +7,7 @@
 (use-package drag-stuff
   :hook (prog-mode . drag-stuff-global-mode)
   :custom
-  (drag-stuff-except-modes '(org-mode emacs-lisp-mode))
+  (drag-stuff-except-modes '(org-mode emacs-lisp-mode minibuffer-inactive-mode))
   :general
   (:keymaps 'drag-stuff-mode-map
             "M-j" #'drag-stuff-down
