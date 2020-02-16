@@ -50,6 +50,10 @@
   "Reject HEADLINE with private tag."
   (-contains? (mugu-orgu-get-tags headline t) "private"))
 
+(defun mugu-orgw-work-headline-p (headline)
+  "Reject HEADLINE with work tag."
+  (-contains? (mugu-orgu-get-tags headline t) "work"))
+
 (defun mugu-orgw-refilable-headline-p (headline)
   "Predicate determining if HEADLINE is refilable."
   (and (mugu-orgw-task-p headline)

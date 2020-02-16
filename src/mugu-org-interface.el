@@ -471,9 +471,16 @@ action is performed."
 (defun mugu-orgi-toggle-private ()
   "Activate or deactivate private task."
   (interactive)
-  (if (eq mugu-orgw-forbidden-headline-p-function #'ignore)
-      (setq mugu-orgw-forbidden-headline-p-function #'mugu-orgw-private-headline-p)
-    (setq mugu-orgw-forbidden-headline-p-function #'ignore)))
+  (if (eq mugu-orgw-forbidden-headline-p-function #'mugu-orgw-private-headline-p)
+      (setq mugu-orgw-forbidden-headline-p-function #'ignore)
+    (setq mugu-orgw-forbidden-headline-p-function #'mugu-orgw-private-headline-p)))
+
+(defun mugu-orgi-toggle-work ()
+  "Activate or deactivate private task."
+  (interactive)
+  (if (eq mugu-orgw-forbidden-headline-p-function #'mugu-orgw-work-headline-p)
+      (setq mugu-orgw-forbidden-headline-p-function #'ignore)
+    (setq mugu-orgw-forbidden-headline-p-function #'mugu-orgw-work-headline-p)))
 
 (defun mugu-orgi--configure-ivy ()
   "Customize Ivy experience."
