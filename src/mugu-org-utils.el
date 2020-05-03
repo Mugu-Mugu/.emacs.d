@@ -168,7 +168,7 @@ HEADLINE is a an org-element object generated from any mugu-orgu function."
   (let* ((headline-point (org-element-property :begin headline))
          (headline-filename (mugu-orgu-get-file headline)))
     (find-file-noselect headline-filename)
-    (mugu-buffer-switch (get-file-buffer headline-filename))
+    (switch-to-buffer (get-file-buffer headline-filename))
     (unless (mugu-orgu--position-visible-p headline-point)
       (widen))
     (goto-char headline-point)))

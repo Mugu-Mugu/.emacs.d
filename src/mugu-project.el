@@ -16,6 +16,10 @@
 (require 'ht)
 
 ;; * Code
+(defun mugu-project-buffer-in-project-p (buffer project)
+  "Predicate indicating if BUFFER is in PROJECT."
+  (projectile-project-buffer-p buffer project))
+
 (defun mugu-project-buffer-selector (project)
   "Return a predicate to identify buffer in project with PROJECT."
   (let ((default-directory project))
@@ -32,7 +36,11 @@
             (-map 'buffer-name
                   (-remove-first 'identity
                                  (mugu-project-buffers (mugu-project-current-root))))
-            :action 'mugu-buffer-switch))
+            :action 'switch-to-buffer))
+
+(defun mugu-project-name (project)
+  "Return the name of the PROJECT."
+  (projectile-project-name project))
 
 (defun mugu-project-name-of-buffer (buffer)
   "Return the project name of BUFFER.
@@ -54,12 +62,16 @@ If there is none, return the last project visited."
   "Return the current project name."
   (projectile-project-name (mugu-project-current-root)))
 
+(defun mugu-project-assign-buffer (buffer project)
+  "Assign BUFFER to PROJECT."
+  (with-current-buffer buffer (setq projectile-project-root project)))
+
 (defun mugu-project-generate-scratch-buffer (project)
   "Create a scratch buffer for the PROJECT and return it."
   (let* ((project-name (projectile-project-name project))
          (scratch-buffer (get-buffer-create (format "scratch (%s)" project-name))))
     (with-current-buffer scratch-buffer
-      (setq projectile-project-root project))
+      (mugu-project-assign-buffer scratch-buffer project))
     scratch-buffer))
 
 (defun mugu-project-cd ()
@@ -101,8 +113,8 @@ If there is none, return the last project visited."
 (defun mugu-project-load-buffer-after-switch ()
   "Switch to NEW-PROJECT changing wconf and projectile internal."
   ;; (message "project buffers: %s" (mugu-project-buffers (projectile-project-name default-directory)))
-  (mugu-buffer-switch (or (-second-item (mugu-project-buffers default-directory))
-                          (mugu-project-generate-scratch-buffer default-directory))))
+  (switch-to-buffer (or (-second-item (mugu-project-buffers default-directory))
+                        (mugu-project-generate-scratch-buffer default-directory))))
 
 
 (defun mugu-project-activate ()

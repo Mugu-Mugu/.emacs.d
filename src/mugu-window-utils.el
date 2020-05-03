@@ -53,7 +53,7 @@ Default to `selected-window'."
   (let ((next-side-window (get-window-with-predicate 'mugu-window-side-managed-p)))
     (if next-side-window
         (mugu-window-bury-buffer-delete-window next-side-window)
-      (if mugu-window-last-side-buffer-dismissed (mugu-buffer-switch mugu-window-last-side-buffer-dismissed)
+      (if mugu-window-last-side-buffer-dismissed (switch-to-buffer mugu-window-last-side-buffer-dismissed)
         (message "There is no side window open.")))))
 
 (defun mugu-window-delete-all-windows ()

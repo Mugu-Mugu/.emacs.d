@@ -123,9 +123,9 @@ If SELECT-FIRST is non-nil, select the first buffer in the list `mugu-vterm-list
                        (mugu-vterm-list-buffer))))
     (pcase (length vterm-list)
       (0 (mugu-vterm-create))
-      (1 (mugu-buffer-switch (-first-item vterm-list)))
-      (_ (mugu-buffer-switch (get-buffer
-                              (mugu-vterm--select-terminal 'select-other)))))))
+      (1 (switch-to-buffer (-first-item vterm-list)))
+      (_ (switch-to-buffer (get-buffer
+                            (mugu-vterm--select-terminal 'select-other)))))))
 
 (defun mugu-vterm-toggle ()
   "Switch to a vterm buffer or hide one if already displayed."
@@ -139,7 +139,7 @@ If SELECT-FIRST is non-nil, select the first buffer in the list `mugu-vterm-list
 (defun mugu-vterm-create (&optional name)
   "Create a new vterm with NAME if given."
   (interactive (list (read-string "Vterm name? ")))
-  (mugu-buffer-switch
+  (switch-to-buffer
    (save-window-excursion
      (vterm (if name
                 (format "vterm (%s)" name)

@@ -1,5 +1,9 @@
-;;; mugu-wconf --- #{Summary} -*- lexical-binding: t -*-
+;;; mugu-wconf --- Provides automatic window configuration management -*- lexical-binding: t -*-
 ;;; Commentary:
+;;  TODO add a wrapper to add buffer-alist so customization can be managed
+;;  TODO or add a function that automatically modifiy this variable to provide the feature
+;;  TODO remove the configuration on mode exit
+;;  TODO add customizable pattern to exclude some buffer from it
 (require 'ht)
 (require 'dash)
 (require 'asoc)
@@ -16,6 +20,8 @@ evaluated.  The first rule that returns a non-nil value is the one that will be
 applied.")
 (defvar mugu-wconf-history (list)
   "An historic of visited vconf.")
+(defvar mugu-wconf-mode nil
+  "The mode variable for wconf.")
 
 (defun mugu-wconf-current ()
   "Return the name of the current wconf."
@@ -59,13 +65,19 @@ See `mugu-wconf-rules' for details about format of PRIORITY and BUFFER-RULE-FUNC
    (-non-nil
     (--map (funcall it buffer) (asoc-values (asoc-sort-keys mugu-wconf-rules '>))))))
 
-(defun mugu-wconf-update-wconf (buffer)
-  "Reload the wconf associated to the BUFFER according to `mugu-wconf-rules'."
-  (unless (mugu-window-side-managed-p (get-buffer-window buffer))
-    (let ((old-wconf-name (mugu-wconf-current))
-          (new-wconf-name (mugu-wconf-of-buffer buffer)))
-      (unless (eq old-wconf-name new-wconf-name)
-        (mugu-wconf-switch new-wconf-name)))))
+(defun mugu-wconf-update (buffer _alist)
+  "Fake `display-buffer' action.
+Change the window configuration according to `mugu-wconf-rules'.
+BUFFER and ALIST are as in `display-buffer'."
+  (when mugu-wconf-mode
+    (unless (mugu-window-side-managed-p (get-buffer-window buffer))
+      (when (buffer-file-name buffer)
+        (message "buffer %s with true name %s"  buffer buffer-file-truename)
+        (let ((old-wconf-name (mugu-wconf-current))
+              (new-wconf-name (mugu-wconf-of-buffer buffer)))
+          (unless (eq old-wconf-name new-wconf-name)
+            (mugu-wconf-switch new-wconf-name))))))
+  nil)
 
 (define-minor-mode mugu-wconf-mode
   "A minor mode to automatically manage windows configuration according to
@@ -74,9 +86,7 @@ Use `mugu-wconf-add-rule' to define more rule."
   :global t
   (cond
    (mugu-wconf-mode
-    (add-hook 'mugu-buffer-before-switch-functions #'mugu-wconf-update-wconf))
-   (t
-    (remove-hook 'mugu-buffer-before-switch-functions #'mugu-wconf-update-wconf))))
+    (add-to-list 'display-buffer-alist '("*" (mugu-wconf-update))))))
 
 (provide 'mugu-wconf)
 ;;; mugu-wconf ends here

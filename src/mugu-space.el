@@ -20,7 +20,7 @@
   -> File    Dir : %s(mugu-directory-pwd-file)
   -> Current Dir : %s(mugu-directory-pwd)
 "
-    ("b" mugu-buffer-switch "previous buffer" :column "Change File")
+    ("b" switch-to-buffer "previous buffer" :column "Change File")
     ("ff" (with-mugu-dir (counsel-find-file)) "find files")
     ("fr" (mugu-counsel-fzf-file mugu-directory) "find files recursively")
     ("fa" (mugu-counsel-fzf-any mugu-directory) "find any recursively")
