@@ -10,6 +10,7 @@
 (setq custom-file (concat user-emacs-directory "conf/" "mugu-conf-custom.el"))
 (when (file-exists-p custom-file) (load custom-file))
 
+(require 'mugu-conf-use-package-ext)
 (require 'mugu-conf-keystone)
 (require 'mugu-conf-lib)
 (require 'mugu-conf-vanilla)
