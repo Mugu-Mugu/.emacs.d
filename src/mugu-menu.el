@@ -48,6 +48,13 @@ HEADS is a list of head expected to be understood by `defhydra'."
   (interactive)
   (message "No menu registered for this mode [%s]" major-mode))
 
+(defmacro define-mugu-menu-command (name)
+  "Define a mugu-menu stub command named mugu-menu- NAME."
+  `(defun ,(intern (format "mugu-menu-%s" name)) ()
+     (interactive)
+     "A stub command that should be remapped."
+     (message "feature %s not defined" ,(symbol-name name))))
+
 (defun mugu-menu-call-mode-menu ()
   "This function will display the menu applicable for the current mode.
 If no menu has been registered for the registered for this mode"
