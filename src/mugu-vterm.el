@@ -100,11 +100,12 @@ synched"
   (with-current-buffer vterm-buffer
     (rename-buffer (format "Vterm - %s" new-name) 'unique)))
 
-(defun mugu-vterm--select-terminal ()
-  "Interractively select a terminal and return it's name."
+(defun mugu-vterm--select-terminal (&optional select-other)
+  "Interractively select a terminal and return it's name.
+When SELECT-OTHER is non-nil, the preselected terminal is the next one."
   (ivy-read (format "Select a terminal: ")
             (-map #'buffer-name (mugu-vterm-list-buffer))
-            :preselect 1))
+            :preselect (if select-other 1 0)))
 
 (defun mugu-vterm-kill (term-name)
   "Kill vterm TERM-NAME or select one to kill."
@@ -124,7 +125,7 @@ If SELECT-FIRST is non-nil, select the first buffer in the list `mugu-vterm-list
       (0 (mugu-vterm-create))
       (1 (mugu-buffer-switch (-first-item vterm-list)))
       (_ (mugu-buffer-switch (get-buffer
-                              (mugu-vterm--select-terminal)))))))
+                              (mugu-vterm--select-terminal 'select-other)))))))
 
 (defun mugu-vterm-toggle ()
   "Switch to a vterm buffer or hide one if already displayed."
