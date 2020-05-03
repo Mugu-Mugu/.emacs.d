@@ -79,7 +79,7 @@
   :config
   (ivy-prescient-mode)
   :custom
-  (ivy-prescient-sort-commands '(:not swiper ivy-switch-buffer mugu-counsel-fzf-file)))
+  (ivy-prescient-sort-commands '(:not swiper ivy-switch-buffer mugu-counsel-fzf-file mugu-project-find-file counsel-fzf)))
 
 (use-package company-prescient)
 
