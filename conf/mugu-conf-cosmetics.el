@@ -60,6 +60,7 @@
   (smooth-scrolling-mode))
 
 (use-package rainbow-delimiters
+  :disabled "not really usefull and probably a problem for long or deeply nested file"
   :hook (prog-mode . rainbow-delimiters-mode)
   :config)
 
