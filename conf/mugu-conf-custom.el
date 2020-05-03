@@ -62,6 +62,8 @@
  '(doom-modeline-buffer-file-name-style 'buffer-name)
  '(doom-modeline-irc nil)
  '(doom-modeline-persp-name nil)
+ '(doom-themes-enable-bold t)
+ '(doom-themes-enable-italic t)
  '(dumb-jump-confirm-jump-to-modified-file nil)
  '(dumb-jump-selector 'ivy)
  '(ediff-diff-options "-w")
@@ -98,7 +100,7 @@
      (62 "<" . ">")
      (116 . evil-surround-read-tag)
      (60 . evil-surround-read-tag)
-     (102 . evil-surround-function)) t)
+     (102 . evil-surround-function)))
  '(evil-symbol-word-search t)
  '(evil-toggle-key "C-z" nil nil "maybe to do")
  '(evil-vsplit-window-right t)
@@ -130,6 +132,7 @@
  '(helm-autoresize-max-height 70)
  '(helm-autoresize-min-height 20)
  '(helm-autoresize-mode t)
+ '(hydra-hint-display-type 'lv)
  '(hydra-look-for-remap t)
  '(ido-everywhere t)
  '(indent-tabs-mode nil)
@@ -138,6 +141,8 @@
  '(ivy-extra-directories '("./"))
  '(ivy-height 20)
  '(ivy-mode t)
+ '(ivy-prescient-sort-commands
+   '(:not swiper ivy-switch-buffer mugu-counsel-fzf-file mugu-project-find-file counsel-fzf))
  '(ivy-use-virtual-buffers t)
  '(ivy-wrap t)
  '(js-indent-level 2 t)
@@ -232,6 +237,7 @@
  '(straight-use-package-mode t)
  '(swiper-action-recenter t)
  '(swiper-stay-on-quit t)
+ '(switch-to-buffer-obey-display-actions t)
  '(sx-default-site "stackoverflow")
  '(tab-always-indent 'complete)
  '(tab-width 4)
@@ -297,3 +303,9 @@
 ;;  '(persp-selected-face ((t (:foreground "royal blue" :weight bold))))
 ;;  '(tooltip ((t (:inherit default :background "lightyellow" :foreground "black"))))
 ;;  '(variable-pitch ((t (:height 1.0 :family "Courier")))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
