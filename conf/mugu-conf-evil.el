@@ -12,9 +12,12 @@
   (evil-want-C-i-jump t)
   (evil-jumps-cross-buffers nil)
   (evil-overriding-maps nil)
+  (evil-symbol-word-search t)
   :hook (evil-jumps-post-jump . recenter)
   :config
-  (evil-mode 1))
+  (evil-mode 1)
+  (defalias #'forward-evil-word #'forward-evil-symbol)
+  )
 
 (use-package evil-surround
   :custom

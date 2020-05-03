@@ -22,7 +22,7 @@
   ("P" evil-mc-skip-and-goto-prev-cursor "mc-skip-and-goto-prev-cursor")
   ("h" evil-mc-make-cursor-here "mc-make-cursor-here" :column "without match")
   ("k" evil-mc-make-cursor-move-prev-line "mc-make-cursor-move-prev-line" :color red)
-  ("j" evil-mc-make-cursor-move-next-line "mc-make-cursor-move-next-line")
+  ("j" evil-mc-make-cursor-move-next-line "mc-make-cursor-move-next-line" :color red)
   ("q" nil "exit" :column nil)
   ("," nil "exit"))
 
