@@ -3,7 +3,6 @@
 ;;; Commentary:
 
 ;;; Code:
-(require 'mugu-window-utils)
 (require 'mugu-lang)
 (require 'rspec-mode)
 
@@ -35,23 +34,7 @@
                                      (rspec-toggle-spec-and-target-find-example)))
     (rspec-verify-method)))
 
-(defun mugu-ruby-activate ()
-  "Activate ruby configuration."
-  (mugu-window-configure-side-window "\\*rspec-compilation\\*" 'top 0.7)
-  (mugu-ruby-activate-rspec-binding))
-
-(defalias 'mugu-ruby-lang-menu #'mugu-lang-menu)
-
-(defun mugu-ruby-activate-rspec-binding ()
-  "."
-  (general-define-key :keymaps 'ruby-mode-map
-                      [remap mugu-lang-format-buffer] #'mugu-ruby-prettify
-                      [remap mugu-lang-test-file] #'rspec-verify
-                      [remap mugu-lang-test-rerun-last] #'rspec-rerun
-                      [remap mugu-lang-test-toggle-goto] #'mugu-ruby-toggle-spec-and-target
-                      [remap mugu-lang-test-method] #'mugu-ruby-verify-method
-                      [remap mugu-lang-test-single-at-point] #'rspec-verify-single
-                      [remap mugu-lang-test-all-in-project] #'rspec-verify-all))
+(mugu-define-lang-mode "ruby" "")
 
 (provide 'mugu-ruby)
 ;;; mugu-ruby ends here

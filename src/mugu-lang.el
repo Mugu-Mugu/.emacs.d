@@ -52,5 +52,26 @@
   (general-define-key :keymaps (intern (format "%s-mode-map" mode))
                       [remap mugu-menu-call-mode-menu] #'mugu-lang-menu))
 
+
+(defun mugu-lang--make-keymap ()
+  "Build a keymap for the minor lang mode."
+  (let ((map (make-sparse-keymap)))
+    (define-key map [remap mugu-menu-call-mode-menu] #'mugu-lang-menu)
+    map))
+
+(defmacro mugu-define-lang-mode (lang doc)
+  "Define a minor mode to provide bindings to interract with a language.
+LANG is exepect to be the name of a major mode for a language.
+DOC will be forwarded to the language minor mode documenation.
+The created minor mode will contains:
+* An interactive menu with predifined command with a set binding
+* Eventually a default implementation for some commands.
+Predifined command are usually stub that should be defined and remapped
+according to capability of the defined language This ensure all language have
+the same user interface."
+  (let* ((mode-symbol (intern (format "mugu-%s-minor-mode" lang))))
+    `(define-minor-mode ,mode-symbol ,(format "%s" doc)
+       :keymap (mugu-lang--make-keymap))))
+
 (provide 'mugu-lang)
 ;;; mugu-lang ends here

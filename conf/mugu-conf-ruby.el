@@ -22,16 +22,29 @@
 (use-package mugu-ruby
   :straight nil
   :general
-  (:keymaps 'ruby-mode-map
-            [remap mugu-lang-goto-def] #'dumb-jump-go
-            [remap mugu-menu-call-mode-menu] #'mugu-ruby-lang-menu)
+  (:keymaps 'mugu-ruby-minor-mode-map
+            [remap mugu-lang-format-buffer] #'mugu-ruby-prettify
+            [remap mugu-lang-test-file] #'rspec-verify
+            [remap mugu-lang-test-rerun-last] #'rspec-rerun
+            [remap mugu-lang-test-toggle-goto] #'mugu-ruby-toggle-spec-and-target
+            [remap mugu-lang-test-method] #'mugu-ruby-verify-method
+            [remap mugu-lang-test-single-at-point] #'rspec-verify-single
+            [remap mugu-lang-test-all-in-project] #'rspec-verify-all
+            [remap mugu-lang-goto-def] #'dumb-jump-go)
+  :hook
+  (ruby-mode . mugu-ruby-minor-mode)
   :config
-  (mugu-ruby-activate))
+  (mugu-window-configure-side-window "\\*rspec-compilation\\*" 'top 0.7))
+
 
 (use-package robe
-  :disabled "because it doesn't support multi project in same emacs version"
+  :disabled "does not work with docker file"
   :hook
   (ruby-mode . robe-mode))
+
+(use-package docker-robe
+  :disabled
+  :straight (:host github :repo "aki2o/emacs-docker-robe"))
 
 (provide 'mugu-conf-ruby)
 ;;; mugu-conf-ruby ends here
