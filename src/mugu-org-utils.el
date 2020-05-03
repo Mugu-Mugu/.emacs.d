@@ -167,7 +167,8 @@ PREDICATES-AND-HEADLINE should be a list of predicates following by an headline.
 HEADLINE is a an org-element object generated from any mugu-orgu function."
   (let* ((headline-point (org-element-property :begin headline))
          (headline-filename (mugu-orgu-get-file headline)))
-    (find-file headline-filename)
+    (find-file-noselect headline-filename)
+    (mugu-buffer-switch (get-file-buffer headline-filename))
     (unless (mugu-orgu--position-visible-p headline-point)
       (widen))
     (goto-char headline-point)))

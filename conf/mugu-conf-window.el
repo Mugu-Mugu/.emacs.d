@@ -27,6 +27,11 @@
   (setq golden-ratio-auto-scale t)
   (golden-ratio-mode 1))
 
+(use-package mugu-wconf
+  :straight nil
+  :config (mugu-wconf-mode))
+
+
 ;;; Code:
 ;; -*- lexical-binding: t -*-
 (provide 'mugu-conf-window)

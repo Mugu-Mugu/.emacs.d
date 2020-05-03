@@ -12,6 +12,9 @@
 (use-package ht :defer)
 (use-package noflet :defer)
 (use-package transient :config (transient-bind-q-to-quit))
+(use-package asoc
+  :straight (:host github :repo "troyp/asoc.el")
+  :demand)
 
 (provide 'mugu-conf-lib)
 ;;; mugu-conf-lib ends here

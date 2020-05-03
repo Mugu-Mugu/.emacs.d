@@ -15,7 +15,8 @@ The side window will be open from DIRECTION which should be top, bottom, right
 or left.
 The SIZE of the window determine how much room it takes.  It must be a float
 between 0.0 and 1.0.
-If DONT-BURY is not nil, it will not bury the associated buffer on fast close."
+If DONT-BURY is not nil, it will not bury the associated buffer on fast close.
+Side window not declared by this mean won't be managed."
   (let* ((height-or-width (if (or (eq direction 'top)
                                   (eq direction 'bottom))
                               'window-height
@@ -26,13 +27,19 @@ If DONT-BURY is not nil, it will not bury the associated buffer on fast close."
                            (slot . 1)
                            (,height-or-width . ,size)
                            (inhibit-switch-frame . t)
-                           (window-parameters (dont-bury ,dont-bury)))))
+                           (window-parameters (dont-bury ,dont-bury)
+                                              (mugu-window ,t)))))
     (add-to-list 'display-buffer-alist display-params)))
 
 (defun mugu-window-side-p (&optional window)
   "Predicate determining if WINDOW is a side window.
 Default to `selected-window'."
   (window-parameter (or window (selected-window)) 'window-side))
+
+(defun mugu-window-side-managed-p (&optional window)
+  "Predicate determining if WINDOW is a a side window managed by this package."
+  (let ((window (or window (selected-window))))
+    (and (mugu-window-side-p window) (window-parameter window 'mugu-window))))
 
 (defun mugu-window-bury-buffer-delete-window (window)
   "Delete WINDOW and bury its buffer."
@@ -43,7 +50,7 @@ Default to `selected-window'."
 (defun mugu-window-delete-next-side ()
   "Delete the next side window."
   (interactive)
-  (let ((next-side-window (window-with-parameter 'window-side)))
+  (let ((next-side-window (get-window-with-predicate 'mugu-window-side-managed-p)))
     (if next-side-window
         (mugu-window-bury-buffer-delete-window next-side-window)
       (if mugu-window-last-side-buffer-dismissed (mugu-buffer-switch mugu-window-last-side-buffer-dismissed)

@@ -49,5 +49,33 @@
 (use-package org-bullets
   :hook (org-mode . org-bullets-mode))
 
+(use-package org-roam
+  :straight (:host github :repo "jethrokuan/org-roam")
+      :hook
+      (after-init . org-roam-mode)
+      :custom
+      (org-roam-directory "~/org/roam")
+      :bind (:map org-roam-mode-map
+              (("C-c n l" . org-roam)
+               ("C-c n f" . org-roam-find-file)
+               ("C-c n j" . org-roam-jump-to-index)
+               ("C-c n b" . org-roam-switch-to-buffer)
+               ("C-c n g" . org-roam-graph))
+              :map org-mode-map
+              (("C-c n i" . org-roam-insert))))
+
+(use-package company-org-roam
+  :straight (:host github :repo "jethrokuan/company-org-roam")
+  :config
+  (push 'company-org-roam company-backends))
+
+(use-package mugu-wconf
+  :straight nil
+  :after mugu-org-utils
+  :config (mugu-wconf-add-rule 100 (lambda (buffer)
+                                     (when buffer
+                                       (with-current-buffer buffer
+                                         (when (eq major-mode 'org-mode) "org"))))))
+
 (provide 'mugu-conf-org)
 ;;; mugu-conf-org ends here

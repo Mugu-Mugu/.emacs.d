@@ -35,5 +35,10 @@
   :config
   (mugu-pvterm-activate))
 
+(use-package mugu-wconf
+  :straight nil
+  :after mugu-project
+  :config (mugu-wconf-add-rule 0 #'mugu-project-name-of-buffer))
+
 (provide 'mugu-conf-project)
 ;;; mugu-conf-project ends here
