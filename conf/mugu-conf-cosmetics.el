@@ -37,7 +37,7 @@
 (use-package dimmer
   ;; :defer 3
   :custom
-  (dimmer-fraction 0.15)
+  (dimmer-fraction 0.35)
   :config
   (dimmer-mode))
 

@@ -132,6 +132,10 @@ A HEADLINE is schedulable if at all conditions are met:
   (and (mugu-orgw-icebox-p headline)
        (mugu-orgw-with-tag-p "@transport" headline)))
 
+(defun mugu-orgw-fast-task-p (headline)
+  "Predicates determining if HEADLINE is a fast task."
+  (and (mugu-orgu-has-tag? headline "fast" 'inherit) (mugu-orgw-task-p headline)))
+
 (defun mugu-orgw-done-yesterday-p (headline)
   "Predicate indicating if HEADLINE was done yesterday."
   (let ((yesterday (round (- (float-time) (mod (float-time) (* 24 3600)) (* 24 3600))))
@@ -189,11 +193,12 @@ If LOCAL is non-nil, the search is restricted to local file."
   (-select predicate (-flatten (org-global-tags-completion-table (org-agenda-files)))))
 
 ;; * Headlines sort
-(defun mugu-orgw--cmp-score-scheduled (headline)
+(defun mugu-orgw--cmp-score-scheduled (headline time)
   "Score HEADLINE according to scheduled property.
+TIME will be frozen and will be used if HEADLINE does not define it.
 The earliest one is the most prioritary."
-  (let* ((scheduled-date (or (mugu-orgw-scheduled-date headline) (float-time)))
-         (scheduled-in-future (and scheduled-date (> scheduled-date (float-time))))
+  (let* ((scheduled-date (or (mugu-orgw-scheduled-date headline) time))
+         (scheduled-in-future (and scheduled-date (> scheduled-date time)))
          (icebox-task-in-future (and scheduled-in-future (mugu-orgw-in-icebox-p headline))))
     (unless icebox-task-in-future
       (and (mugu-orgw-action-p headline)
@@ -225,6 +230,12 @@ An Habit in the future should not be selected."
   "Score HEADLINE according to todo state."
   (- (mugu-orgu-get-priority headline)))
 
+(defun mugu-orgw--cmp-score-fast-p (headline)
+  "Fast HEADLINE should be treated first."
+  (if (mugu-orgw-fast-task-p headline)
+      100
+    -100))
+
 (defun mugu-orgw--cmp-headlines (score-fun hl-left hl-right)
   "Compare according to SCORE-FUN HL-LEFT and HL-RIGHT.
 SCORE-FUN should be a function returning a score relative to an HEADLINE.
@@ -235,41 +246,36 @@ identical."
          (score-left (or (funcall score-fun hl-left) default-score))
          (score-right (or (funcall score-fun hl-right) default-score))
          (result (- score-right score-left)))
-    (if (eq result 0)
+    (if (eq (round result) 0)
         nil
       result)))
 
 (defun mugu-orgw-cmp-headlines (hl-left hl-right)
   "Return non-nil if HL-LEFT is more prioritary than HL-RIGHT."
-  (let ((result (or (mugu-orgw--cmp-headlines #'mugu-orgw--cmp-score-todo-state hl-left hl-right)
-                    (mugu-orgw--cmp-headlines #'mugu-orgw--cmp-score-habit-future hl-left hl-right)
-                    (mugu-orgw--cmp-headlines #'mugu-orgw--cmp-score-scheduled hl-left hl-right)
-                    (mugu-orgw--cmp-headlines #'mugu-orgw--cmp-score-priority hl-left hl-right)
-                    0)))
+  (let* ((cmd-scheduled (lambda (hl) (mugu-orgw--cmp-score-scheduled hl (float-time))))
+         (result (or (mugu-orgw--cmp-headlines #'mugu-orgw--cmp-score-fast-p hl-left hl-right)
+                     (mugu-orgw--cmp-headlines #'mugu-orgw--cmp-score-todo-state hl-left hl-right)
+                     (mugu-orgw--cmp-headlines #'mugu-orgw--cmp-score-habit-future hl-left hl-right)
+                     (mugu-orgw--cmp-headlines cmd-scheduled hl-left hl-right)
+                     (mugu-orgw--cmp-headlines #'mugu-orgw--cmp-score-priority hl-left hl-right)
+                     0)))
     (< result 0)))
 
 ;; * Capture
-(defun mugu-orgw-capture-todo (find-loc-find)
+(defun mugu-orgw-capture-todo (find-loc-find &optional capture-form)
   "Capture a todo headline and store it in the headline selected by FIND-LOC-FIND.
+CAPTURE-FORM is to define a custom capture template.
 The hack with noflet is to prevent fucking orgmode to sabotage the windows configuration."
   (noflet ((delete-other-windows (&optional _window) (set-window-configuration (org-capture-get :return-to-wconf))))
-    (let ((org-capture-templates `(("x" "capture a task todo"
-                                    entry (function ,find-loc-find) "* TODO %i %?"))))
+    (let* ((capture-form (or capture-form "* TODO %i %?"))
+           (org-capture-templates `(("x" "capture a task todo"
+                                     entry (function ,find-loc-find) ,capture-form
+                                     :unnarrowed t))))
       (org-capture nil "x"))))
 
-(defun mugu-orgw-capture-to-headline (headline)
-  "Capture a todo and store it in the given HEADLINE as child.
-The hack with noflet is to prevent fucking orgmode to sabotage the windows configuration."
-  (noflet ((delete-other-windows (&optional _window) (set-window-configuration (org-capture-get :return-to-wconf))))
-    (let ((org-capture-templates `(("x" "capture a task todo"
-                                    entry (function ,(lambda () (mugu-orgu-action-headline-goto headline))) "* TODO %i %?"))))
-      (org-capture nil "x"))))
-
-(defun mugu-orgw-capture-note (file)
-    "Build a capture template for a note type headline and store it into FILE."
-    (let ((org-capture-templates `(("x" "capture a note"
-                                  entry (file+datetree ,file) "* %U %i %?"))))
-    (org-capture nil "x")))
+(defun mugu-orgw-capture-link (find-loc-find)
+  "Capture a link in the form of a todo at location selected by FIND-LOC-FIND."
+  (mugu-orgw-capture-todo find-loc-find "* TODO %i %? \n %l"))
 
 ;; * Agenda
 (defun mugu-orgw-agenda-future-overview ()
@@ -336,7 +342,7 @@ each project file."
   (setq org-habit-show-habits-only-for-today t)
   (setq org-habit-graph-column 80)
   (setq org-lowest-priority ?F)
-  (setq org-agenda-files `(,(expand-file-name "~/org/")))
+  (setq org-agenda-files `(,(expand-file-name "~/org/") ,(expand-file-name "~/org/roam")))
   (setq calendar-week-start-day 1)
   (org-mode-restart))
 

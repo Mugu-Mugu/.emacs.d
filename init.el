@@ -49,5 +49,7 @@
 ;;; mugu
 (require 'mugu-keys)
 
+(server-start)
+
 (provide 'init)
 ;;; init ends here

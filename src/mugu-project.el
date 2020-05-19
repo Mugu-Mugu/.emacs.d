@@ -49,10 +49,12 @@ If there is none, return the one of the  last project visited."
     (when buffer-project (projectile-project-name buffer-project))))
 
 (defun mugu-project-of-buffer (buffer)
-  "Return the project of BUFFER.
-If there is none, return the last project visited."
-  (when buffer
-    (with-current-buffer buffer (projectile-project-root))))
+  "Return the project of BUFFER or nil if it does not exists."
+  (when  buffer
+    (with-current-buffer buffer
+      (or
+       projectile-project-root
+       (and buffer-file-truename (projectile-project-root))))))
 
 (defun mugu-project-current-root ()
   "Return the current project."

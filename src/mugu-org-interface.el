@@ -8,7 +8,6 @@
 (require 'mugu-org-workflow)
 (require 'mugu-menu)
 (require 'ivy)
-(require 'mugu-lisp-libs)
 (require 'mugu-misc)
 (require 'evil)
 (require 'mugu-date-utils)
@@ -21,6 +20,9 @@
 (defvar mugu-orgi-is-local nil
   "Indicates if opeartions and searchs consider all agenda files or current one.")
 
+(define-mugu-menu-command org-note)
+(define-mugu-menu-command org-insert-note-link)
+
 (defvar mugu-orgi-headline-actions
   `(("a" mugu-orgw-set-active "set Active" 'persistant "Basic actions")
     ("p" mugu-orgu-set-priority "set Priority" 'persistant)
@@ -29,7 +31,7 @@
     ("dd" mugu-orgi-deadline "deadline" 'persistant)
     ("dr" mugu-orgw-delete-timestamp "reset task" 'persistant)
     ("ri" ,(apply-partially #'mugu-orgi--action-refile-headline #'mugu-orgw-inbox-headline-p) "Refile to Inbox" 'persistant "Refiling")
-    ("rt" ,(apply-partially #'mugu-orgi--action-refile-headline #'mugu-orgw-is-planified-p) "Refile to Task" 'persistant)
+    ("rt" ,(apply-partially #'mugu-orgi--action-refile-headline #'mugu-orgw-scheduled-p) "Refile to Task" 'persistant)
     ("ft" mugu-orgw-select-for-transport "for transport" 'persistant)
     ("mb" mugu-orgi-move-to-backlog "Move to backlog" 'persistant "Moving")
     ("mi" mugu-orgi-move-to-icebox "Move to icebox" 'persistant)
@@ -206,7 +208,7 @@ If `mugu-orgi-is-local' is non-nil, restrict search to current file."
                                                                            #'mugu-orgw-in-archive-p
                                                                            #'mugu-orgw-task-p))
 (mugu-orgi--make-headline-list mugu-orgi-schedulable-tasks #'mugu-orgw-schedulable-p)
-(mugu-orgi--make-headline-list mugu-orgi-planified-tasks #'mugu-orgw-is-planified-p)
+(mugu-orgi--make-headline-list mugu-orgi-scheduled-tasks #'mugu-orgw-scheduled-p)
 (mugu-orgi--make-headline-list mugu-orgi-wait-tasks (apply-partially #'mugu-orgu-all-p #'mugu-orgw-task-p #'mugu-orgw-wait-p))
 (mugu-orgi--make-headline-list mugu-orgi-any-tasks #'mugu-orgu-todo-headline-p)
 (mugu-orgi--make-headline-list mugu-orgi-any-headlines #'identity)
@@ -232,7 +234,7 @@ If `mugu-orgi-is-local' is non-nil, restrict search to current file."
 (mugu-orgi--make-command mugu-orgi-goto-in-backlog-tasks #'mugu-orgi-in-backlog-tasks #'mugu-orgi--action-focus-headline)
 (mugu-orgi--make-command mugu-orgi-goto-in-archive-tasks #'mugu-orgi-in-archive-tasks #'mugu-orgi--action-focus-headline)
 (mugu-orgi--make-command mugu-orgi-goto-schedulable-tasks #'mugu-orgi-schedulable-tasks #'mugu-orgi--action-focus-headline)
-(mugu-orgi--make-command mugu-orgi-goto-planified-tasks #'mugu-orgi-planified-tasks #'mugu-orgi--action-focus-headline)
+(mugu-orgi--make-command mugu-orgi-goto-scheduled-tasks #'mugu-orgi-scheduled-tasks #'mugu-orgi--action-focus-headline)
 (mugu-orgi--make-command mugu-orgi-goto-wait-tasks #'mugu-orgi-wait-tasks #'mugu-orgi--action-focus-headline)
 (mugu-orgi--make-command mugu-orgi-goto-any-tasks #'mugu-orgi-any-tasks #'mugu-orgi--action-focus-headline)
 (mugu-orgi--make-command mugu-orgi-goto-any-headlines #'mugu-orgi-any-headlines #'mugu-orgi--action-focus-headline)
@@ -300,7 +302,7 @@ action is performed."
 (defmenu mugu-orgi-menu-goto-headlines (:color blue :hint nil)
   "Virtual hydra to select and go to an headline"
   ("gg" (mugu-orgi-goto-schedulable-tasks) "schedulable" :column "Goto important tasks")
-  ("gp" (mugu-orgi-goto-planified-tasks) "planified")
+  ("gp" (mugu-orgi-goto-scheduled-tasks) "scheduled")
   ("gw" (mugu-orgi-goto-wait-tasks) "waiting")
   ("gr" (mugu-orgi-goto-in-inbox-tasks) "refilable")
   ("ga" (mugu-orgi-goto-current-task) "goto current task" :column "Goto current task")
@@ -327,13 +329,20 @@ action is performed."
   "Org mode external interface"
   ("Aa" (mugu-orgw-agenda-future-overview) "global agenda" :column "Agenda")
   ("At" (mugu-orgw-agenda-today-overview) "global agenda" :column "Agenda")
-  ("cc" (mugu-orgw-capture-todo #'mugu-orgi-goto-inbox-headlines) "to inbox" :column "Capture")
+  ("cc" (mugu-roam-capture-daily-todo) "to journal" :column "Capture")
   ("cb" (mugu-orgw-capture-todo #'mugu-orgi-goto-backlog-headlines) "to backlog")
-  ("ci" (mugu-orgw-capture-todo #'mugu-orgi-goto-icebox-headlines) "to icebox")
+  ("ci" (mugu-orgw-capture-todo #'mugu-orgi-goto-inbox-headlines) "to inbox")
   ("cs" (mugu-orgw-capture-todo #'mugu-orgi-goto-current-task-subtasks) "to current task")
   ("ca" (mugu-orgw-capture-todo #'mugu-orgi-goto-schedulable-tasks) "to active task")
+  ("cn" (mugu-roam-capture-daily-note) "a note")
+  ("cla" (mugu-orgw-capture-link #'mugu-orgi-goto-current-task) "to current task" :column "Capture a link")
+  ("cll" (mugu-roam-capture-daily-todo-with-link) "to active task")
   ("fa" (mugu-orgi-goto-agenda-file) "goto agenda files" :column "Goto File")
-  ("ff" (mugu-buffer-switch (mugu-orgu-get-last-buffer-name)) "goto last visited"))
+  ("ff" (switch-to-buffer (mugu-orgu-get-last-buffer-name)) "goto last visited")
+  ("ft" org-roam-dailies-tomorrow "goto today note")
+  ("fj" org-roam-dailies-today "goto today note")
+  ("fy" org-roam-dailies-yesterday "goto yesterday note")
+  ("n" mugu-menu-org-note "interface to org notes"))
 
 (defmenu mugu-orgi-menu-agenda-major-mode (:color amaranth :hint nil)
   "Mugu"
@@ -435,13 +444,15 @@ action is performed."
   ("dd" org-deadline "set deadline")
   ("r" org-refile "refile subtree" :column "Misc")
   ("t" org-todo "change TODO status")
-  ("c" org-ctrl-c-ctrl-c "ctrl-c²")
+  ("cc" org-ctrl-c-ctrl-c "ctrl-c²")
+  ("cl" org-insert-link "insert link")
   ("f" (mugu-orgi-focus-headline) "focus")
   ("ii" org-insert-todo-heading "todo" :column "insert")
   ("is" org-insert-todo-subheading "sub-todo")
   ("ip" org-insert-heading "plain heading")
   ("ic" mugu-orgi-insert-checkbox "checkbox")
-  ("il" mugu-orgi-insert-list-item "item")
+  ("iu" mugu-orgi-insert-list-item "item")
+  ("il" mugu-menu-org-insert-link-note "link to note")
   ;; ("a" org-attach "attach interface" :column "Insert")
   ;; ("*" org-insert-heading "insert heading")
   ;; ("l" org-insert-link "insert link")
@@ -517,8 +528,6 @@ action is performed."
   (setq org-use-fast-todo-selection 'expert)
 
   (mugu-window-configure-side-window "CAPTURE*" 'bottom 0.2)
-  (mugu-window-configure-side-window "\\*Org todo\\*" 'bottom 0.1)
-  (mugu-window-configure-side-window ".*.org$" 'bottom 0.6 t)
 
   (advice-add #'org-switch-to-buffer-other-window :around #'mugu-orgi-switch-to-buffer-other-window)
   (mugu-orgi--configure-ivy))
@@ -528,10 +537,10 @@ action is performed."
   ;; (setq org-agenda-ignore-drawer-properties '(effort appt category))
   (mugu-date-utils-configure)
   (general-def org-mode-map
-    "M-j" 'org-move-subtree-down
-    "M-k" 'org-move-subtree-up
-    "M-h" 'org-do-promote
-    "M-l" 'org-do-demote
+    "M-j" 'org-metadown
+    "M-k" 'org-metaup
+    "M-h" 'org-metaleft
+    "M-l" 'org-metaright
     "M-g" 'org-promote-subtree
     "M-m" 'org-demote-subtree))
 

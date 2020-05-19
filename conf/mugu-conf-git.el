@@ -52,6 +52,11 @@
   :straight nil
   :commands mugu-git-gutter-menu)
 
+(use-package git-gutter
+  :after mugu-window
+  :config
+   (mugu-window-configure-side-window "\\*git-gutter:diff\\*" 'bottom 30))
+
 (use-package vdiff
   :disabled
   :defer)

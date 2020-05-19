@@ -9,6 +9,7 @@
 (require 'ace-window)
 (require 'mugu-window-utils)
 
+
 (defmenu mugu-window-resize-menu
   (:color red :hint nil)
   "
@@ -34,7 +35,10 @@
                                -- WINDOW MENU --
 
 "
-  ("z" ace-window "ace" :color blue :column "1-Switch")
+  ("z" (progn
+         (other-window 1)
+         (when (<= (length (window-list)) 3)
+           (setq hydra-deactivate t))) "switch" :column "1-Switch")
   ("h" windmove-left "← window")
   ("j" windmove-down "↓ window")
   ("k" windmove-up "↑ window")

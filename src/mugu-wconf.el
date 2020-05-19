@@ -20,8 +20,8 @@ evaluated.  The first rule that returns a non-nil value is the one that will be
 applied.")
 (defvar mugu-wconf-history (list)
   "An historic of visited vconf.")
-(defvar mugu-wconf-mode nil
-  "The mode variable for wconf.")
+;; (defvar mugu-wconf-mode nil
+;;   "The mode variable for wconf.")
 
 (defun mugu-wconf-current ()
   "Return the name of the current wconf."
@@ -40,10 +40,10 @@ applied.")
 (defun mugu-wconf-load (wconf-name)
   "Restore window configuration saved under WCONF-NAME."
   (when wconf-name
-    (message "before load history %s" mugu-wconf-history)
+    ;(message "before load history %s" mugu-wconf-history)
     (push wconf-name mugu-wconf-history)
     (setq mugu-wconf-history (-uniq mugu-wconf-history))
-    (message "after load history %s" mugu-wconf-history)
+    ;; (message "after load history %s" mugu-wconf-history)
     (if (ht-contains? mugu-wconf-map wconf-name)
         (set-window-configuration (ht-get mugu-wconf-map wconf-name))
       (mugu-wconf-make-new))))
@@ -65,18 +65,22 @@ See `mugu-wconf-rules' for details about format of PRIORITY and BUFFER-RULE-FUNC
    (-non-nil
     (--map (funcall it buffer) (asoc-values (asoc-sort-keys mugu-wconf-rules '>))))))
 
+(defun mugu-wconf-ignored-buffer-p (buffer)
+  "Predicate determing if BUFFER should be ignored by automatic wconf."
+  (or (mugu-window-side-managed-p (get-buffer-window buffer))
+      (equal (buffer-name buffer) " *LV*")))
+
 (defun mugu-wconf-update (buffer _alist)
   "Fake `display-buffer' action.
 Change the window configuration according to `mugu-wconf-rules'.
 BUFFER and ALIST are as in `display-buffer'."
-  (when mugu-wconf-mode
-    (unless (mugu-window-side-managed-p (get-buffer-window buffer))
-      (when (buffer-file-name buffer)
-        (message "buffer %s with true name %s"  buffer buffer-file-truename)
-        (let ((old-wconf-name (mugu-wconf-current))
-              (new-wconf-name (mugu-wconf-of-buffer buffer)))
-          (unless (eq old-wconf-name new-wconf-name)
-            (mugu-wconf-switch new-wconf-name))))))
+  (unless (mugu-wconf-ignored-buffer-p buffer)
+    ;; (message "buffer %s with true name %s" buffer buffer-file-truename)
+    (let ((old-wconf-name (mugu-wconf-current))
+          (new-wconf-name (mugu-wconf-of-buffer buffer)))
+      ;; (message "old wconf %s but new wconf %s" old-wconf-name new-wconf-name)
+      (unless (eq old-wconf-name new-wconf-name)
+        (mugu-wconf-switch new-wconf-name))))
   nil)
 
 (define-minor-mode mugu-wconf-mode
@@ -86,7 +90,8 @@ Use `mugu-wconf-add-rule' to define more rule."
   :global t
   (cond
    (mugu-wconf-mode
-    (add-to-list 'display-buffer-alist '("*" (mugu-wconf-update))))))
+    ;; HACK TODO this is not the correct way (in therory)
+    (setq display-buffer-overriding-action  '(mugu-wconf-update)))))
 
 (provide 'mugu-wconf)
 ;;; mugu-wconf ends here

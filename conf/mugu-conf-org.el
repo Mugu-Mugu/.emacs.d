@@ -52,24 +52,53 @@
 (use-package org-roam
   :straight (:host github :repo "jethrokuan/org-roam")
   :after org
-  :custom
-  (org-roam-directory "~/org/roam")
-  :general
-  (:keymaps 'global
-            [remap mugu-menu-org-note] #'org-roam-find-file))
+  :config
+  (org-roam-mode)
+  (require 'org-roam-protocol)
+  :custom (org-roam-directory "~/org/roam")
+  :general (:keymaps 'global
+                     [remap mugu-menu-org-note] #'org-roam-find-file))
+
+(use-package mugu-roam
+  :straight nil
+  :after org-roam
+  :commands mugu-roam-capture-daily-note mugu-roam-capture-daily-todo-with-link mugu-roam-capture-daily-todo mugu-roam-daily-filename
+  :general (:keymaps 'global
+                     [remap mugu-menu-org-insert-link-note] #'mugu-roam-insert))
 
 (use-package company-org-roam
   :straight (:host github :repo "jethrokuan/company-org-roam")
+  :after org-roam
   :config
   (push 'company-org-roam company-backends))
 
 (use-package mugu-wconf
   :straight nil
   :after mugu-org-utils
-  :config (mugu-wconf-add-rule 100 (lambda (buffer)
-                                     (when buffer
-                                       (with-current-buffer buffer
-                                         (when (eq major-mode 'org-mode) "org"))))))
+  :config
+  (add-to-list 'display-buffer-alist '(".*org" (display-buffer-same-window
+                                                display-buffer-reuse-window
+                                                display-buffer-reuse-mode-window
+                                                display-buffer-use-some-window)))
+  (mugu-wconf-add-rule 100 (lambda (buffer)
+                             (when buffer
+                               (with-current-buffer buffer
+                                 (when (eq major-mode 'org-mode) "org"))))))
+
+(use-package org-journal
+  :after org
+  :custom
+  (org-journal-dir "~/org/journal/")
+  (org-journal-date-format "%A, %d %B %Y")
+  :config
+  (mugu-window-configure-side-window (lambda (buffer _action)
+                                       (eq (buffer-local-value 'major-mode (get-buffer buffer)) 'org-journal-mode))
+                                     'bottom 0.3))
+
+(use-package ox-reveal
+  :after org
+  :custom
+  (org-reveal-root "https://cdn.jsdelivr.net/npm/reveal.js"))
 
 (provide 'mugu-conf-org)
 ;;; mugu-conf-org ends here

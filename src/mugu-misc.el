@@ -82,5 +82,15 @@ HOOK-FUNCTION will be temporarily added to VAR-HOOK."
            ,@body)
        (setq ,var-hook original-hook))))
 
+(defun mugu-eval-and-replace ()
+  "Replace the preceding sexp with its value."
+  (interactive)
+  (backward-kill-sexp)
+  (condition-case nil
+      (prin1 (eval (read (current-kill 0)))
+             (current-buffer))
+    (error (message "Invalid expression")
+           (insert (current-kill 0)))))
+
 (provide 'mugu-misc)
 ;;; mugu-misc ends here

@@ -30,5 +30,6 @@
   :config
   (mugu-lang-activate-for-mode 'sql))
 
+
 (provide 'mugu-conf-temp)
 ;;; mugu-conf-temp ends here

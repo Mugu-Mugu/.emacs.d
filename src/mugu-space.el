@@ -43,6 +43,7 @@
     ("l" ace-link "link" :color blue)
     ("x" counsel-M-x "execute" :column "Execute")
     ("r" ivy-resume "ivy resume")
+    ("ee" mugu-eval-and-replace "eval and replace selection")
     (":" eval-expression "eval expression")
     ("SPC" mugu-menu-call-mode-menu "major mode" :column "Submenu")
     ("p" mugu-project-menu "project")
@@ -76,7 +77,12 @@
     ("ad" apropos-documentation "documentation")
     ("q" nil "quit" :column nil))
 
-  (general-def '(motion emacs) "SPC" #'mugu-space-main-menu))
+ (general-def '(motion emacs) "SPC" #'mugu-space-main-menu)
+ (general-def '(insert visual) "M-SPC" #'mugu-space-main-menu)
+  (general-def '(motion emacs) "M-SPC" (lambda () (interactive)
+                                        (forward-char)
+                                        (insert " ")
+                                        (backward-char))))
 
 (provide 'mugu-space)
 ;;; mugu-space ends here

@@ -29,6 +29,10 @@
   "Get file where HEADLINE is located."
   (org-element-property :file headline))
 
+(defun mugu-orgu-get-filetags (headline)
+  "Retrieve tags defined at file level of HEADLINE."
+  (-map 'substring-no-properties (buffer-local-value 'org-file-tags (get-file-buffer (mugu-orgu-get-file headline)))))
+
 (defun mugu-orgu-get-tags (headline &optional inherit inherit-only)
   "Retrieve local tags of HEADLINE.
 When INHERIT is non-nil also fetch tags from its parents (recursively).
@@ -41,7 +45,7 @@ When INHERIT and INHERIT-ONLY are both non-nil retrieve only tags from parents."
       (-uniq
        (-flatten
         (-concat
-         org-file-tags
+         (mugu-orgu-get-filetags headline)
          (--map (or (org-element-property :tags it)
                     (list))
                 headlines)))))))

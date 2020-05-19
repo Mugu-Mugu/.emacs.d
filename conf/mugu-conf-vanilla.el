@@ -16,6 +16,7 @@
   (mugu-vanilla-set-other-settings)
   (mugu-vanilla-set-evil-initial-states)
   (superword-mode)
+  (global-so-long-mode)
   )
 
 (use-package diminish)
