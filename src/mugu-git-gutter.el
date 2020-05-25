@@ -32,6 +32,7 @@
   ("k" (mugu-git-gutter-move-with-popup git-gutter:previous-hunk) "previous hunk")
   ("s" (mugu-git-gutter-action-and-close git-gutter:stage-hunk) "stage" :column "Actions on hunk")
   ("u" (mugu-git-gutter-action-and-close git-gutter:revert-hunk) "unstage")
+  ("d" (mugu-git-gutter-action-and-close git-gutter:revert-hunk) "discard")
   ("U" (mugu-git-gutter-action-and-close git-gutter:set-start-revision) "discard")
   ("v" magit-status "magit" :color blue :column nil)
   ("q" nil "quit" :color blue))

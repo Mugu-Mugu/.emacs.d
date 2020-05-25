@@ -72,16 +72,28 @@
 
 (use-package prescient
   :custom
-  (prescient-persist-mode t)
-  )
+  (prescient-persist-mode t))
 
 (use-package ivy-prescient
   :config
   (ivy-prescient-mode)
   :custom
-  (ivy-prescient-sort-commands '(:not swiper ivy-switch-buffer mugu-counsel-fzf-file mugu-project-find-file counsel-fzf)))
+  (ivy-prescient-sort-commands
+   '(:not swiper
+          ivy-switch-buffer
+          mugu-counsel-fzf-file
+          mugu-project-find-file
+          counsel-fzf
+          counsel-yank-pop
+          mugu-orgi-headlines)))
 
 (use-package company-prescient)
+
+(use-package ivy-avy
+  :defer
+  :straight nil
+  :commands ivy-avy
+  :after ivy)
 
 (use-package ivy-posframe
   :after ivy
