@@ -7,12 +7,6 @@
 (use-package yaml-mode :defer)
 (use-package web-mode :defer)
 (use-package restclient :defer)
-(use-package ivy-posframe
-  :defer
-  :config
-  (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-center)))
-  (setq posframe-inhibit-double-buffering t)
-  (ivy-posframe-mode))
 
 (use-package docker :defer)
 (use-package sqlformat :defer

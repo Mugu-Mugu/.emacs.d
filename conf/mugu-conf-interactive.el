@@ -83,5 +83,16 @@
 
 (use-package company-prescient)
 
+(use-package ivy-posframe
+  :after ivy
+  :config
+  (ivy-posframe-mode)
+  :custom
+  (posframe-inhibit-double-buffering t)
+  (ivy-posframe-display-functions-alist '((swiper . ivy-posframe-display-at-frame-bottom-window-center)
+                                          (t . ivy-posframe-display-at-frame-center)))
+  (ivy-posframe-height-alist '((swiper . 20)
+                               (t . 20))))
+
 (provide 'mugu-conf-interactive)
 ;;; mugu-conf-interactive ends here
