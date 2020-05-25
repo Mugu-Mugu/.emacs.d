@@ -34,11 +34,13 @@
   :straight nil
   :general
   (:keymaps 'org-mode-map
-           [remap mugu-menu-call-mode-menu] #'mugu-orgi-menu-org-major-mode)
+            [remap mugu-menu-call-mode-menu] #'mugu-orgi-menu-org-major-mode)
   :commands mugu-orgi-menu-global
   :config
   (mugu-orgi-set-configuration)
-  (mugu-orgi-configure-keys))
+  (mugu-orgi-configure-keys)
+  (mugu-orgi-define-ivy-actions)
+  )
 
 (use-package mugu-org-workflow
   :after org
@@ -71,6 +73,19 @@
   :after org-roam
   :config
   (push 'company-org-roam company-backends))
+
+(use-package org-sql
+  :defer
+  :custom
+  (org-sql-use-tag-inheritance t)
+  :config
+  (setq org-sql-files org-agenda-files))
+
+(use-package mugu-org-sql
+  :straight nil
+  :defer
+  :config
+  (mugu-org-sql-mode))
 
 (use-package mugu-wconf
   :straight nil

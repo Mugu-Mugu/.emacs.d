@@ -11,7 +11,9 @@
 (use-package s :defer)
 (use-package ht :defer)
 (use-package noflet :defer)
+(use-package async :defer)
 (use-package transient :config (transient-bind-q-to-quit))
+(use-package request :defer)
 (use-package asoc
   :straight (:host github :repo "troyp/asoc.el")
   :demand)
