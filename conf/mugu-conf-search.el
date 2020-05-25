@@ -24,8 +24,11 @@
 can't search without inserting whatever shit is at point."
   :defer)
 
-(use-package engine-mode :defer)
+(use-package engine-mode :defer
+  :disabled "counsel search does this better.")
+
 (use-package mugu-search
+  :disabled "counsel search does this better"
   :straight nil
   :commands engine/search-google)
 
