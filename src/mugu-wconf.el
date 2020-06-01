@@ -67,7 +67,7 @@ See `mugu-wconf-rules' for details about format of PRIORITY and BUFFER-RULE-FUNC
 
 (defun mugu-wconf-ignored-buffer-p (buffer)
   "Predicate determing if BUFFER should be ignored by automatic wconf."
-  (or (mugu-window-side-managed-p (get-buffer-window buffer))
+  (or (and (get-buffer-window buffer) (mugu-window-side-managed-p (get-buffer-window buffer)))
       (equal (buffer-name buffer) " *LV*")))
 
 (defun mugu-wconf-update (buffer _alist)
@@ -75,10 +75,8 @@ See `mugu-wconf-rules' for details about format of PRIORITY and BUFFER-RULE-FUNC
 Change the window configuration according to `mugu-wconf-rules'.
 BUFFER and ALIST are as in `display-buffer'."
   (unless (mugu-wconf-ignored-buffer-p buffer)
-    ;; (message "buffer %s with true name %s" buffer buffer-file-truename)
     (let ((old-wconf-name (mugu-wconf-current))
           (new-wconf-name (mugu-wconf-of-buffer buffer)))
-      ;; (message "old wconf %s but new wconf %s" old-wconf-name new-wconf-name)
       (unless (eq old-wconf-name new-wconf-name)
         (mugu-wconf-switch new-wconf-name))))
   nil)

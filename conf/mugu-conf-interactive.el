@@ -100,7 +100,7 @@
   :config
   (ivy-posframe-mode)
   :custom
-  (posframe-inhibit-double-buffering t)
+  (posframe-inhibit-double-buffering nil)
   (ivy-posframe-display-functions-alist '((swiper . ivy-posframe-display-at-frame-bottom-window-center)
                                           (t . ivy-posframe-display-at-frame-center)))
   (ivy-posframe-height-alist '((swiper . 20)

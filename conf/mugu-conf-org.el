@@ -7,7 +7,6 @@
 ;; (require 'mugu-org-hack)
 (require 'mugu-misc)
 (require 'use-package)
-(require 'mugu-org-hack)
 
 (use-package org-agenda
   :after org
@@ -19,6 +18,12 @@
   :bind
   (:map org-agenda-mode-map
         ("SPC" . mugu-menu-main-menu)))
+
+(use-package mugu-org-hack
+  :straight nil
+  :after org
+  :config
+  (mugu-org-hack-mode))
 
 (use-package org
   :defer
@@ -63,7 +68,6 @@
 
 (use-package mugu-roam
   :straight nil
-  :after org-roam
   :commands mugu-roam-capture-daily-note mugu-roam-capture-daily-todo-with-link mugu-roam-capture-daily-todo mugu-roam-daily-filename
   :general (:keymaps 'global
                      [remap mugu-menu-org-insert-link-note] #'mugu-roam-insert))

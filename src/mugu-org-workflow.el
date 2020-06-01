@@ -209,11 +209,12 @@ The earliest one is the most prioritary."
 (defun mugu-orgw--cmp-score-todo-state (headline)
   "Score HEADLINE according to todo state."
   (pcase (org-element-property :todo-keyword headline)
+    ("ACTIVE" 7)
     ("NEXT" 6)
     ("TODO" 5)
     ("WAIT" 4)
     ("DONE" 3)
-    ("CANCELLED" 2)
+    ("STOP" 2)
     (_ 1)))
 
 (defun mugu-orgw--cmp-score-habit-future (headline)
@@ -252,11 +253,7 @@ identical."
 
 (defun mugu-orgw-cmp-headlines (hl-left hl-right)
   "Return non-nil if HL-LEFT is more prioritary than HL-RIGHT."
-  (let* ((cmd-scheduled (lambda (hl) (mugu-orgw--cmp-score-scheduled hl (float-time))))
-         (result (or (mugu-orgw--cmp-headlines #'mugu-orgw--cmp-score-fast-p hl-left hl-right)
-                     (mugu-orgw--cmp-headlines #'mugu-orgw--cmp-score-todo-state hl-left hl-right)
-                     (mugu-orgw--cmp-headlines #'mugu-orgw--cmp-score-habit-future hl-left hl-right)
-                     (mugu-orgw--cmp-headlines cmd-scheduled hl-left hl-right)
+  (let* ((result (or (mugu-orgw--cmp-headlines #'mugu-orgw--cmp-score-todo-state hl-left hl-right)
                      (mugu-orgw--cmp-headlines #'mugu-orgw--cmp-score-priority hl-left hl-right)
                      0)))
     (< result 0)))
@@ -327,10 +324,24 @@ The hack with noflet is to prevent fucking orgmode to sabotage the windows confi
   (mugu-orgu-set-deadline headline nil)
   (mugu-orgu-schedule headline nil))
 
+(defun mugu-orgw-after-todo-state-change ()
+  "Triggers action after todo state change.
+On WAIT ask for a new scheduled time."
+  (when (and (equal (org-get-todo-state) "WAIT"))
+    (call-interactively #'org-schedule)
+    (call-interactively #'org-add-note)))
+
 ;; * Misc
 (defun mugu-orgw-current-task ()
   "Retrieve the current active task."
   (-first-item (-sort #'mugu-orgw-cmp-headlines (mugu-orgw-list-headlines 'mugu-orgw-schedulable-p))))
+
+(defun mugu-orgw-sort-tasks ()
+  "Sort the arborescence by todo then priorities."
+  (interactive)
+  (mugu-orgu-sort-subtree #'mugu-orgw-cmp-headlines)
+  (org-cycle)
+  (org-cycle))
 
 (defun mugu-orgw-set-configuration ()
   "Activate the workflow.
@@ -338,12 +349,13 @@ Will modify several key variables of Org mode and create dynamic bindings for
 each project file."
   (push 'org-habit org-modules)
   (setq org-todo-keywords
-        (quote ((sequence "TODO(t)" "NEXT(n)" "WAIT(w)" "|" "DONE(d)"))))
+        (quote ((sequence "TODO(t)" "ACTIVE(a)" "NEXT(n)" "WAIT(w)" "|" "DONE(d)" "STOP(s@)"))))
   (setq org-habit-show-habits-only-for-today t)
   (setq org-habit-graph-column 80)
   (setq org-lowest-priority ?F)
   (setq org-agenda-files `(,(expand-file-name "~/org/") ,(expand-file-name "~/org/roam")))
   (setq calendar-week-start-day 1)
+  (add-hook 'org-after-todo-state-change-hook #'mugu-orgw-after-todo-state-change)
   (org-mode-restart))
 
 (provide 'mugu-org-workflow)

@@ -11,6 +11,7 @@
 (require 'mugu-misc)
 (require 'evil)
 (require 'mugu-date-utils)
+(require 'f)
 
 ;; variables
 (defvar mugu-orgi-last-view nil
@@ -24,8 +25,11 @@
 (defvar mugu-orgi-headline-actions
   `(("a" org-clock-in "set Active" 'persistant "Basic actions")
     ("p" org-priority "set Priority" 'persistant)
-    ("t" org-todo "set Todo" 'persistant)
-    ("ci" org-clock-in "Clock in" 'persistant)
+    ("t" org-todo "set Todo")
+    ("n" (lambda (&optional _) (interactive) (mugu-orgi--action-note-wrapper)) "add note")
+    ("A" org-archive-subtree "archive subtree" 'persistant "Destructive actions")
+    ("D" org-archive-subtree "delete subtree" 'persistant)
+    ("ci" org-clock-in "Clock in" 'persistant "Clocking")
     ("co" org-clock-out "Clock out" 'persistant)
     ("ds" org-schedule "schedule" 'persistant "Scheduling")
     ("dd" org-deadline "deadline" 'persistant)
@@ -37,24 +41,14 @@ Absence of persistance indicates the action interrupts the ivy session upon
 resolution.
 Column indicates where the action should be located on the menu.")
 
-;; hacks
-(defun mugu-orgi-switch-to-buffer-other-window (_orig-fun &rest args)
-  "Ugly but the original implementation popped frame when side window was open.
-This is because of the macro `org-no-popups' which actually did the opposite of
-what it was intended to do.  Since it also unbound `display-buffer-alist' it was
-not possible to fix it otherwise.
-ORIG-FUN and ARGS are not read."
-  (apply #'switch-to-buffer-other-window args))
-
-;; utilitites
-(defun mugu-orgi--prepare-headlines-for-ivy (headlines)
-  "Format HEADLINES to ivy expected format of a list of (candidate . object).
-Also sort the collection by urgency."
-  (let ((total-headlines (length headlines)))
-    (--map-indexed (cons (mugu-orgi--display-headline it it-index total-headlines) it)
-                   (-sort 'mugu-orgw-cmp-headlines headlines))))
-
 ;;; Actions
+(defun mugu-orgi--action-note-wrapper ()
+  "Wrapper for compatibility to take note from anywhere.
+Kinda hackish because add note is implemented with hooks?"
+  (org-add-note)
+  (remove-hook 'post-command-hook 'org-add-log-note)
+  (org-add-log-note))
+
 (defun mugu-orgi--action-focus-headline (headline)
   "Go to HEADLINE and focus on it."
   (interactive)
@@ -96,7 +90,8 @@ Also sort the collection by urgency."
   (cl-letf (((symbol-function 'message) (lambda (&rest _args) nil)))
     (save-excursion
       (org-overview))
-    (org-cycle)))
+    (org-cycle)
+    (org-show-subtree)))
 
 (defun mugu-orgi-counsel-agenda-files (&optional default-action)
   "Select an agenda file and apply it DEFAULT-ACTION.
@@ -109,13 +104,14 @@ action is performed."
 ;; Menus
 (defmenu mugu-orgi-menu-goto-headlines (:color blue :hint nil)
   "Virtual hydra to select and go to an headline"
-  ("gg" (mugu-orgi-select-headlines 'todo_tasks) "all" :column "Goto important tasks")
-  ("gc" org-clock-goto "current")
+  ("gc" org-clock-goto "current" :column "Goto current tasks")
   ("ga" (mugu-orgi-select-headlines 'active_tasks) "active")
-  ("gp" (mugu-orgi-select-headlines 'planned_tasks) "planned")
-  ("gw" (mugu-orgi-select-headlines 'reminder_tasks) "waiting")
+  ("gg" (mugu-orgi-select-headlines 'todo_tasks) "all" )
+  ("gw" (mugu-orgi-select-headlines 'reminder_tasks) "waiting" :column "Goto upcoming tasks")
   ("gi" (mugu-orgi-select-headlines 'inbox_tasks) "inbox")
+  ("gp" (mugu-orgi-select-headlines 'planned_tasks) "planned")
   ("gb" (mugu-orgi-select-headlines 'backlog_tasks) "backlog")
+  ("gr" (mugu-orgi-select-headlines 'upcoming_reminder_tasks) "upcoming")
   ("at" (mugu-orgi-select-headlines 'all_tasks) "task" :column "Goto any")
   ("ah" (mugu-orgi-select-headlines 'all_headlines) "headline"))
 
@@ -218,10 +214,11 @@ action is performed."
   ("d" org-cut-subtree "cut subtree")
   ("p" org-paste-subtree "paste subtree")
   ("t" org-toggle-heading "morph headline/list" :column "Transform")
-  ("s" (progn (mugu-orgu-sort-subtree 'mugu-orgw-cmp-headlines)
-              (mugu-orgi-menu-org-major-mode)) "entry sort" :color blue)
-  ("S" (progn (mugu-orgu-sort-subtree 'mugu-orgw-cmp-headlines 'recursive)
-              (mugu-orgi-menu-org-major-mode)) "recursive subtree sort" :color blue)
+  ("s" mugu-orgw-sort-tasks "sort tasks")
+  ;; ("s" (progn (mugu-orgu-sort-subtree 'mugu-orgw-cmp-headlines)
+  ;;             (mugu-orgi-menu-org-major-mode)) "entry sort" :color blue)
+  ;; ("S" (progn (mugu-orgu-sort-subtree 'mugu-orgw-cmp-headlines 'recursive)
+  ;;             (mugu-orgi-menu-org-major-mode)) "recursive subtree sort" :color blue)
   ("a" org-archive-subtree "archive subtree")
   ("/" org-sparse-tree "search" :color blue :column "Search")
   ("q" mugu-orgi-menu-org-major-mode "Return to org menu" :color blue :column nil))
@@ -263,9 +260,12 @@ action is performed."
 
 (eval
  `(defmenu mugu-orgi-submenu-headline-action
-    (:color blue :hint nil :after-exit (mugu-orgi-menu-org-major-mode))
+    (:color blue :hint nil)
    ,@(--map (list (-first-item it)
-                  (lambda () (interactive) (funcall (-second-item it) (mugu-orgu-element-at-point)))
+                  (lambda () (interactive)
+                    (funcall (-second-item it) (mugu-orgu-element-at-point))
+                    (when (-fourth-item it) (mugu-orgi-menu-org-major-mode))
+                    )
                   (-third-item it)
                   (when (-fifth-item it) :column)
                   (when (-fifth-item it) (-fifth-item it)))
@@ -284,14 +284,6 @@ action is performed."
   (if (eq mugu-orgw-forbidden-headline-p-function #'mugu-orgw-work-headline-p)
       (setq mugu-orgw-forbidden-headline-p-function #'ignore)
     (setq mugu-orgw-forbidden-headline-p-function #'mugu-orgw-work-headline-p)))
-
-(defun mugu-orgi--configure-ivy ()
-  "Customize Ivy experience."
-  (ivy-set-actions 'mugu-orgi
-                   (--map (list (-first-item it)
-                                (mugu-orgi--to-ivy-action (-second-item it) (-fourth-item it))
-                                (-third-item it))
-                          mugu-orgi-headline-actions)))
 
 (defun mugu-orgi-set-configuration ()
   "Set org config value relative to interface."
@@ -314,7 +306,7 @@ action is performed."
   (setq org-log-reschedule nil)
   (setq org-use-fast-todo-selection 'expert)
   (mugu-window-configure-side-window "^CAPTURE*.org" 'bottom 0.2)
-  (advice-add #'org-switch-to-buffer-other-window :around #'mugu-orgi-switch-to-buffer-other-window))
+  (mugu-window-configure-side-window "\\*Org Note\\*" 'bottom 0.2))
 
 (defun mugu-orgi-configure-keys ()
   "Gather keys binding in one place."
@@ -356,13 +348,21 @@ action is performed."
     (mugu-orgi-select-headlines (or view-name 'flat_headlines) action)
     headline))
 
+(defun mugu-orgi--headlines-for-ivy (view-name)
+  "Return a alist of headlines formatted forv ivy corresponding to VIEW-NAME."
+  (message buffer-file-name)
+  (--> (mugu-org-sql-select-from view-name)
+       (if mugu-orgi-is-local
+           (-filter (lambda (p-hl) (f-equal? buffer-file-name (plist-get p-hl :file_path))) it)
+         it)
+       (-map (lambda (p-hl) (cons (mugu-org-sql-headline-repr p-hl) p-hl)) it)))
+
 (defun mugu-orgi-select-headlines (view-name &optional default-action)
   "Interactively select an org headline with ivy corresponding to VIEW-NAME.
 Perform DEFAULT-ACTION on the selected headline."
   (interactive (list 'all_tasks #'mugu-orgi--action-goto))
   (setq mugu-orgi-last-view view-name)
-  (--> (mugu-org-sql-select-from view-name)
-       (-map 'mugu-orgi--prepare-headline-for-ivy it)
+  (--> (mugu-orgi--headlines-for-ivy view-name)
        (ivy-read "Headlines: " it
                  :action (or default-action #'mugu-orgi--action-goto)
                  :caller 'mugu-orgi-headlines)))
@@ -387,8 +387,7 @@ KEEP-SESSION non nil indicates to keep the current ivy open."
   "."
   (remove-hook 'mugu-org-sql-db-updated-hook #'mugu-orgi--refresh-ivy)
   (when (mugu-orgi--ivy-session-active-p)
-    (--> (mugu-org-sql-select-from mugu-orgi-last-view)
-         (-map 'mugu-orgi--prepare-headline-for-ivy it)
+    (--> (mugu-orgi--headlines-for-ivy mugu-orgi-last-view)
          (setf (ivy-state-collection ivy-last) it))
     (ivy-quit-and-run (ivy-resume))))
 
@@ -398,7 +397,7 @@ KEEP-SESSION non nil indicates to keep the current ivy open."
 
 (defun mugu-orgi-define-ivy-actions ()
   "Define all ivy actions."
-   (->> mugu-orgi-headline-actions
+  (->> mugu-orgi-headline-actions
        (-map (-lambda ((key func desc keep _))
                (list key
                      (mugu-orgi--convert-to-ivy-action

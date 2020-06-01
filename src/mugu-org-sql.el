@@ -28,11 +28,13 @@ SELECT h.file_path, h.headline_offset, h.headline_text, h.tree_path, h.keyword, 
        MAX(CASE WHEN c.planning_type = 'closed' THEN COALESCE(c.time_end, c.time) END) AS closed_time,
        MAX(CASE WHEN c.planning_type = 'scheduled' and c.type = 'active' THEN COALESCE(c.time_end, c.time) END) AS scheduled_time,
        MAX(CASE WHEN c.planning_type = 'deadline' and c.type = 'active' THEN COALESCE(c.time_end, c.time) END) AS deadline_time,
-       CASE WHEN h.keyword = 'NEXT' THEN 1
+       CASE WHEN h.keyword = 'ACTIVE' THEN 0
+            WHEN h.keyword = 'NEXT' THEN 1
             WHEN h.keyword = 'TODO' THEN 2
             WHEN h.keyword = 'WAIT' THEN 3
             WHEN h.keyword = 'DONE' THEN 4
-            ELSE 5 END as todo_rank
+            WHEN h.keyword = 'STOP' THEN 5
+            ELSE 6 END as todo_rank
 FROM headlines h
 LEFT OUTER JOIN tags on tags.file_path = h.file_path and tags.headline_offset = h.headline_offset
 LEFT OUTER JOIN timestamp c on c.file_path = h.file_path and c.headline_offset = h.headline_offset
@@ -45,8 +47,11 @@ GROUP BY h.file_path, h.headline_text;")
 SELECT *, COALESCE(scheduled_time, deadline_time) as planned_time
 FROM all_headlines
 WHERE keyword IS NOT NULL
-ORDER BY todo_rank,
-         COALESCE(planned_time, strftime('%s','now', '2 day')),
+ORDER BY CASE WHEN todo_rank = 0 then -1
+              WHEN todo_rank >= 4 THEN 1
+              ELSE 0 END,
+         COALESCE(planned_time, CAST(strftime('%s','now') AS INTEGER)),
+         todo_rank,
          COALESCE(priority, 'Z'),
          headline_offset;")
   "All tasks including done.")
@@ -54,7 +59,7 @@ ORDER BY todo_rank,
 (defconst mugu-org-sql-all-todos-view
   '("todo_tasks" . "CREATE VIEW todo_tasks as
 SELECT * FROM all_tasks
-WHERE keyword != 'DONE' AND keyword != 'WAIT';")
+WHERE todo_rank <= 2;")
   "All tasks not done.  Todos are ordered.")
 
 (defconst mugu-org-sql-planned-view
@@ -68,7 +73,7 @@ WHERE planned_time IS NOT NULL;")
 SELECT * FROM todo_tasks
 WHERE scheduled_time < CAST(strftime('%s', 'now', '1 day') AS INTEGER)
    OR deadline_time < CAST(strftime('%s', 'now', '4 day') AS INTEGER)
-   OR keyword = 'NEXT';")
+   OR todo_rank <= 1;")
   "A query to select all tasks with a planned time in the past or near now or with a next TODO.")
 
 (defconst mugu-org-sql-inbox-view
@@ -92,6 +97,12 @@ FROM all_tasks
 WHERE keyword = 'WAIT' and reminder_time < now_time
 ORDER by reminder_time;"))
 
+(defconst mugu-org-sql-upcoming-reminder-view
+  '("upcoming_reminder_tasks" . "CREATE VIEW upcoming_reminder_tasks as
+SELECT *, COALESCE(deadline_time, scheduled_time, 0) AS reminder_time, CAST(strftime('%s', 'now') AS INTEGER) as now_time
+FROM all_tasks
+WHERE keyword = 'WAIT' and reminder_time > now_time
+ORDER by reminder_time;"))
 
 (defconst mugu-org-sql-base-flat-cols
   '(:file_path :headline_offset :headline_text :tree_path :herited_tags :native_tags :closed_time :scheduled_time :deadline_time :keyword :priority)
@@ -105,7 +116,8 @@ ORDER by reminder_time;"))
         mugu-org-sql-planned-view
         mugu-org-sql-inbox-view
         mugu-org-sql-backlog-view
-        mugu-org-sql-reminder-view)
+        mugu-org-sql-reminder-view
+        mugu-org-sql-upcoming-reminder-view)
   "A list of all of my custom views.")
 
 (defvar mugu-org-sql-db-updated-hook
@@ -146,6 +158,11 @@ ORDER by reminder_time;"))
   "Extract the rfloc of a P-HEADLINE."
   (list nil (plist-get p-headline :file_path) nil (string-to-number (plist-get p-headline :headline_offset))))
 
+(defun mugu-org-sql--save-after-action (&rest _args)
+  "Save buffer after next action.
+ARGS are irrelevant."
+  (run-with-timer 0.2 nil `(lambda () (with-current-buffer ,(current-buffer) (save-buffer)))))
+
 (defun mugu-org-sql-make-action (action-fun)
   "Transform standard ACTION-FUN into an action that can be applied to a P-HEADLINE."
   (lambda (p-headline)
@@ -155,10 +172,13 @@ ORDER by reminder_time;"))
                          (current-buffer)))
            (org-point (string-to-number (plist-get p-headline :headline_offset))))
       (with-current-buffer org-buffer
+        (add-hook 'after-change-functions #'mugu-org-sql--save-after-action nil 'local)
+        (run-with-timer 20 nil (lambda ()
+                                 (with-current-buffer org-buffer
+                                   (remove-hook 'after-change-functions #'mugu-org-sql--save-after-action 'local))))
         (save-excursion
           (goto-char org-point)
-          (call-interactively action-fun)
-          (save-buffer))))))
+          (call-interactively action-fun))))))
 
 (defun mugu-org-sql-select-from (view)
   "Select headlines from VIEW."

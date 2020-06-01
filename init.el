@@ -43,8 +43,10 @@
 (require 'mugu-conf-ruby)
 (require 'mugu-conf-xml)
 (require 'mugu-conf-json)
+(require 'mugu-conf-sql)
 (require 'mugu-ada)
 (require 'mugu-rust)
+
 
 ;;; mugu
 (require 'mugu-keys)

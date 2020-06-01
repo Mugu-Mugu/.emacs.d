@@ -304,7 +304,7 @@ If RECURSIVE is non-nil, the sort is performed for every descendant."
     (save-restriction
       (org-narrow-to-subtree)
       (org-show-subtree)
-      (let* ((ast (org-element-parse-buffer 'object 'visible-only))
+      (let* ((ast (org-element-parse-buffer 'object nil))
              (get-parent-point (lambda (hl)
                                  (or (org-element-property :begin (org-element-property :parent hl))
                                      0)))

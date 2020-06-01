@@ -58,7 +58,12 @@ If there is none, return the one of the  last project visited."
 
 (defun mugu-project-current-root ()
   "Return the current project."
-  (mugu-project-of-buffer (-first #'mugu-project-of-buffer (buffer-list))))
+  (->> (window-list)
+       (--map (->> it
+                   (window-buffer)
+                   (mugu-project-of-buffer)))
+       (-filter 'identity)
+       (-first-item)))
 
 (defun mugu-project-current-name ()
   "Return the current project name."
@@ -106,7 +111,7 @@ If there is none, return the one of the  last project visited."
   ("u" projectile-remove-known-project "unregister project" :color red)
   ("v" mugu-project-vc "version control" :column "Other")
   ("g" (let ((default-directory (mugu-project-current-root))) (counsel-git-grep)) "gitgrep")
-  ("rg" (counsel-rg "" projectile-project-root) "ripgrep")
+  ("rg" (counsel-rg "" (mugu-project-current-root)) "ripgrep")
   ("d" mugu-project-cd "cd" :color blue :column "Find")
   ("b" (mugu-project-switch-buffer-in-project) "buffer" :color blue)
   ("f" mugu-project-find-file "open file alternative")

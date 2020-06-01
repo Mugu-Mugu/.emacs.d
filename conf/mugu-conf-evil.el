@@ -1,13 +1,16 @@
 ;;; Package --- Summary
 ;; tbc
 ;;; Commentary:
-
 ;;; Code:
+
 (require 'use-package)
 
 (use-package evil
   :demand
   :diminish
+  :init
+  (setq evil-want-integration t)
+  (setq evil-want-keybinding nil)
   :custom
   (evil-want-C-i-jump t)
   (evil-jumps-cross-buffers nil)
@@ -16,8 +19,30 @@
   :hook (evil-jumps-post-jump . recenter)
   :config
   (evil-mode 1)
-  (defalias #'forward-evil-word #'forward-evil-symbol)
-  )
+  (defalias #'forward-evil-word #'forward-evil-symbol))
+
+(use-package evil-collection
+  :after evil
+  :config
+  (evil-collection-init))
+
+(use-package general
+  ;; hack to unbind SPC
+  :after evil-collection
+  :init
+  (setq general-override-states '(insert
+                                  emacs
+                                  hybrid
+                                  normal
+                                  visual
+                                  motion
+                                  operator
+                                  replace))
+  :config
+  (general-define-key
+   :states '(normal visual motion)
+   :keymaps 'override
+   "SPC" 'mugu-space-main-menu))
 
 (use-package evil-surround
   :custom
@@ -115,18 +140,20 @@
   (setq evil-goggles-pulse t))
 
 (use-package evil-owl
-  :disabled "because recipe is not found"
   :defer 2
   :config
   (setq evil-owl-display-method 'posframe
-        evil-owl-extra-posframe-args '(:width 50 :height 20)
+        evil-owl-extra-posframe-args '(:width 100 :height 50)
         evil-owl-max-string-length 50)
-  (evil-owl-mode))
+  (evil-owl-mode)
+  :custom
+  (evil-owl-idle-delay 0.0))
 
 (use-package evil-escape
   ;; I may use the super escape provided here but I do not need nor have a binding for it
-  :defer
-  :commands evil-escape)
+  :after evil
+  :config
+  (evil-escape-mode))
 
 (provide 'mugu-conf-evil)
 ;;; mugu-conf-evil ends here
