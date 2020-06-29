@@ -13,7 +13,7 @@
   (setq evil-want-keybinding nil)
   :custom
   (evil-want-C-i-jump t)
-  (evil-jumps-cross-buffers nil)
+  (evil-jumps-cross-buffers t)
   (evil-overriding-maps nil)
   (evil-symbol-word-search t)
   :hook (evil-jumps-post-jump . recenter)

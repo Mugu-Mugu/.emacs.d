@@ -44,8 +44,11 @@
   :config
   (mugu-orgi-set-configuration)
   (mugu-orgi-configure-keys)
-  (mugu-orgi-define-ivy-actions)
-  )
+  (mugu-orgi-define-ivy-actions))
+
+(use-package mugu-org-interface
+  :straight nil
+  :after org)
 
 (use-package mugu-org-workflow
   :after org
@@ -79,11 +82,10 @@
   (push 'company-org-roam company-backends))
 
 (use-package org-sql
-  :defer
+  :after org
   :custom
   (org-sql-use-tag-inheritance t)
-  :config
-  (setq org-sql-files org-agenda-files))
+  (org-sql-files org-agenda-files))
 
 (use-package mugu-org-sql
   :straight nil
@@ -116,6 +118,7 @@
 
 (use-package ox-reveal
   :after org
+  :defer
   :custom
   (org-reveal-root "https://cdn.jsdelivr.net/npm/reveal.js"))
 

@@ -33,7 +33,7 @@
     ("co" org-clock-out "Clock out" 'persistant)
     ("ds" org-schedule "schedule" 'persistant "Scheduling")
     ("dd" org-deadline "deadline" 'persistant)
-    ("rr" mugu-orgi-action-refile-to-headline  "Refile to Headline" nil "Refiling")
+    ("rr" org-refile  "Refile to Headline" nil "Refiling")
     ("rf" mugu-orgi-action-refile-to-file "Refile to File" nil))
   "A list of possible actions for a given headline.
 Each action has the form: hotkey function description persistance column.
@@ -54,16 +54,6 @@ Kinda hackish because add note is implemented with hooks?"
   (interactive)
   (mugu-orgu-action-headline-goto headline)
   (mugu-orgi-focus-headline))
-
-(defun mugu-orgi--action-refile-headline (target-headline-p headline)
-  "Refile HEADLINE to another headline matching predicate TARGET-HEADLINE-P."
-  (mugu-orgu-action-headline-refile headline
-                                    (mugu-orgi-counsel--pick-headlines (mugu-orgw-list-headlines target-headline-p))))
-
-(defun mugu-orgi--action-copy-headline (target-headline-p headline)
-  "Copy HEADLINE to another headline matching predicate TARGET-HEADLINE-P."
-  (mugu-orgu-action-headline-copy headline
-                                    (mugu-orgi-counsel--pick-headlines (mugu-orgw-list-headlines target-headline-p))))
 
 (defsubst mugu-orgi-goto-agenda-file ()
   "."
@@ -241,7 +231,8 @@ action is performed."
   ("ip" org-insert-heading "plain heading")
   ("ic" mugu-orgi-insert-checkbox "checkbox")
   ("iu" mugu-orgi-insert-list-item "item")
-  ("il" mugu-menu-org-insert-link-note "link to note")
+  ("il" mugu-orgi-action-insert-link-to-headline "link to headline")
+  ("in" mugu-menu-org-insert-link-note "link to note")
   ;; ("a" org-attach "attach interface" :column "Insert")
   ;; ("*" org-insert-heading "insert heading")
   ;; ("l" org-insert-link "insert link")
@@ -290,7 +281,7 @@ action is performed."
   (setq org-use-fast-todo-selection t)
   (setq org-refile-use-outline-path t)
   (setq org-refile-use-cache nil)
-  (setq org-refile-targets '((org-agenda-files :maxlevel . 9)))
+  (setq org-refile-targets '((org-agenda-files :maxlevel . 3)))
   (setq org-outline-path-complete-in-steps nil)
   (setq org-startup-indented t)
   ;;Use the current window for indirect buffer display
@@ -312,7 +303,7 @@ action is performed."
   "Gather keys binding in one place."
   ;; (setq org-agenda-ignore-drawer-properties '(effort appt category))
   (mugu-date-utils-configure)
-  (general-def org-mode-map
+  (general-def '(insert normal) org-mode-map
     "M-j" 'org-metadown
     "M-k" 'org-metaup
     "M-h" 'org-metaleft
@@ -326,13 +317,6 @@ action is performed."
   (funcall (mugu-orgi--convert-to-ivy-action #'mugu-org-sql-action-goto) candidate)
   (mugu-orgi-focus-headline))
 
-(defun mugu-orgi-action-refile-to-headline (target-headline)
-  "Refile headline at point to TARGET-HEADLINE."
-  (interactive (list (mugu-orgi-pick-headline)))
-  (->> target-headline
-       (mugu-org-sql-rfloc)
-       (org-refile nil nil)))
-
 (defun mugu-orgi-action-refile-to-file (file)
   "Refile headline at point to FILE."
   (interactive (list (mugu-orgi-counsel-agenda-files)))
@@ -341,16 +325,24 @@ action is performed."
        (org-refile nil nil it))
   (with-current-buffer (find-file-noselect file) (save-buffer)))
 
+(defun mugu-orgi-action-insert-link-to-headline ()
+  "Insert a link to target headline."
+  (interactive)
+  (--> (mugu-orgi-pick-headline)
+       (insert (format "[[file:%s::%s][%s]]"
+                             (plist-get it :file_path)
+                             (plist-get it :headline_text)
+                             (plist-get it :headline_text)))))
+
 (defun mugu-orgi-pick-headline (&optional view-name)
   "Select an headline from VIEW-NAME."
   (let* ((headline nil)
          (action (lambda (candidate) (setq headline (cdr candidate)))))
-    (mugu-orgi-select-headlines (or view-name 'flat_headlines) action)
+    (mugu-orgi-select-headlines (or view-name 'all_headlines) action)
     headline))
 
 (defun mugu-orgi--headlines-for-ivy (view-name)
   "Return a alist of headlines formatted forv ivy corresponding to VIEW-NAME."
-  (message buffer-file-name)
   (--> (mugu-org-sql-select-from view-name)
        (if mugu-orgi-is-local
            (-filter (lambda (p-hl) (f-equal? buffer-file-name (plist-get p-hl :file_path))) it)

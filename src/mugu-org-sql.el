@@ -23,8 +23,8 @@
 (defconst mugu-org-sql-all-headlines-view
   '("all_headlines" . "CREATE VIEW all_headlines AS
 SELECT h.file_path, h.headline_offset, h.headline_text, h.tree_path, h.keyword, h.archived, h.priority,
-       GROUP_CONCAT(CASE WHEN tags.inherited = 0 THEN tags.tag END) as native_tags,
-       GROUP_CONCAT(CASE WHEN tags.inherited = 1 THEN tags.tag END) as herited_tags,
+       GROUP_CONCAT(DISTINCT CASE WHEN tags.inherited = 0 THEN tags.tag END) as native_tags,
+       GROUP_CONCAT(DISTINCT CASE WHEN tags.inherited = 1 THEN tags.tag END) as herited_tags,
        MAX(CASE WHEN c.planning_type = 'closed' THEN COALESCE(c.time_end, c.time) END) AS closed_time,
        MAX(CASE WHEN c.planning_type = 'scheduled' and c.type = 'active' THEN COALESCE(c.time_end, c.time) END) AS scheduled_time,
        MAX(CASE WHEN c.planning_type = 'deadline' and c.type = 'active' THEN COALESCE(c.time_end, c.time) END) AS deadline_time,
@@ -153,10 +153,6 @@ ORDER by reminder_time;"))
   "Go to the location of P-HEADLINE."
   (find-file (plist-get p-headline :file_path))
   (goto-char (string-to-number (plist-get p-headline :headline_offset))))
-
-(defun mugu-org-sql-rfloc (p-headline)
-  "Extract the rfloc of a P-HEADLINE."
-  (list nil (plist-get p-headline :file_path) nil (string-to-number (plist-get p-headline :headline_offset))))
 
 (defun mugu-org-sql--save-after-action (&rest _args)
   "Save buffer after next action.

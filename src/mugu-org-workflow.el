@@ -356,6 +356,7 @@ each project file."
   (setq org-agenda-files `(,(expand-file-name "~/org/") ,(expand-file-name "~/org/roam")))
   (setq calendar-week-start-day 1)
   (add-hook 'org-after-todo-state-change-hook #'mugu-orgw-after-todo-state-change)
+  (add-hook 'org-after-refile-insert-hook #'save-buffer)
   (org-mode-restart))
 
 (provide 'mugu-org-workflow)

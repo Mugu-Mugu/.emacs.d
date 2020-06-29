@@ -55,3 +55,4 @@
 
 (provide 'init)
 ;;; init ends here
+(put 'erase-buffer 'disabled nil)

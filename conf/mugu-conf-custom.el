@@ -83,7 +83,7 @@
  '(evil-ex-search-vim-style-regexp t)
  '(evil-insert-state-modes
    '(comint-mode erc-mode eshell-mode geiser-repl-mode gud-mode inferior-apl-mode inferior-caml-mode inferior-emacs-lisp-mode inferior-j-mode inferior-python-mode inferior-scheme-mode inferior-sml-mode internal-ange-ftp-mode prolog-inferior-mode reb-mode shell-mode slime-repl-mode wdired-mode))
- '(evil-jumps-cross-buffers nil nil nil "Customized with use-package evil")
+ '(evil-jumps-cross-buffers t nil nil "Customized with use-package evil")
  '(evil-motion-state-modes
    '(apropos-mode color-theme-mode command-history-mode dictionary-mode ert-results-mode Man-mode speedbar-mode undo-tree-visualizer-mode woman-mode))
  '(evil-overriding-maps nil nil nil "todo?")
@@ -216,7 +216,7 @@
      (wl . wl-other-frame)))
  '(org-log-buffer-setup-hook '(evil-insert-state))
  '(org-log-done 'time)
- '(org-log-into-drawer t)
+ '(org-log-into-drawer nil)
  '(org-log-note-clock-out t)
  '(org-log-note-headings
    '((done . "CLOSING NOTE %t")
