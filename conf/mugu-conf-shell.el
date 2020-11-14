@@ -34,7 +34,8 @@
   :commands vterm
   :init
   (add-to-list 'load-path "/home/david/.emacs.d/straight/build/vterm")
-  :config
+  :custom
+  (vterm-module-cmake-args "-DUSE_SYSTEM_LIBVTERM=no")
   (require 'mugu-vterm))
 
 (use-package mugu-vterm
