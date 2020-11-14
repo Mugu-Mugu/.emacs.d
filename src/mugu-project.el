@@ -69,6 +69,12 @@ If there is none, return the one of the  last project visited."
   "Return the current project name."
   (projectile-project-name (mugu-project-current-root)))
 
+(defun mugu-project-by-name (name)
+  "Return the project matching exactly NAME."
+  (--first
+   (equal (projectile-project-name it) name)
+   projectile-known-projects))
+
 (defun mugu-project-assign-buffer (buffer project)
   "Assign BUFFER to PROJECT."
   (with-current-buffer buffer (setq projectile-project-root project)))

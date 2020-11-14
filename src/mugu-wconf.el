@@ -41,8 +41,7 @@ applied.")
   "Restore window configuration saved under WCONF-NAME."
   (when wconf-name
     ;(message "before load history %s" mugu-wconf-history)
-    (push wconf-name mugu-wconf-history)
-    (setq mugu-wconf-history (-uniq mugu-wconf-history))
+    (setq mugu-wconf-history (cons wconf-name (-remove-item wconf-name mugu-wconf-history)))
     ;; (message "after load history %s" mugu-wconf-history)
     (if (ht-contains? mugu-wconf-map wconf-name)
         (set-window-configuration (ht-get mugu-wconf-map wconf-name))
@@ -66,9 +65,15 @@ See `mugu-wconf-rules' for details about format of PRIORITY and BUFFER-RULE-FUNC
     (--map (funcall it buffer) (asoc-values (asoc-sort-keys mugu-wconf-rules '>))))))
 
 (defun mugu-wconf-ignored-buffer-p (buffer)
-  "Predicate determing if BUFFER should be ignored by automatic wconf."
-  (or (and (get-buffer-window buffer) (mugu-window-side-managed-p (get-buffer-window buffer)))
-      (equal (buffer-name buffer) " *LV*")))
+  "Predicate determing if BUFFER should be ignored by automatic wconf.
+It is not possible to determine if the new buffer would be displayed in a side
+window.  Since this determines wether or not a wconf switch is needed we need to
+make a fake switch."
+  (let ((display-buffer-overriding-action))
+    (save-window-excursion
+      (display-buffer buffer)
+      (or (mugu-window-side-managed-p (get-buffer-window buffer))
+          (equal (buffer-name buffer) " *LV*")))))
 
 (defun mugu-wconf-update (buffer _alist)
   "Fake `display-buffer' action.
@@ -77,7 +82,8 @@ BUFFER and ALIST are as in `display-buffer'."
   (unless (mugu-wconf-ignored-buffer-p buffer)
     (let ((old-wconf-name (mugu-wconf-current))
           (new-wconf-name (mugu-wconf-of-buffer buffer)))
-      (unless (eq old-wconf-name new-wconf-name)
+      (when (and new-wconf-name
+                 (not (eq old-wconf-name new-wconf-name)))
         (mugu-wconf-switch new-wconf-name))))
   nil)
 

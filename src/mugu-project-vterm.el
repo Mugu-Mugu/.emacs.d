@@ -14,9 +14,22 @@
 
 (defun mugu-pvterm-list-project-vterm (&optional project)
   "List vterm owned by PROJECT or current one if not specified."
+  (if (or project (mugu-project-current-root))
+      (mugu-pvterm--list-project-vterm (or project (mugu-project-current-root)))
+    (mugu-pvterm--list-vterm-without-project)))
+
+(defun mugu-pvterm--list-project-vterm (project)
+  "List vterm owned by PROJECT."
   (--filter (and (mugu-vterm-buffer-vterm-p it)
-                 (equal (mugu-project-name-of-buffer it) (mugu-project-name (or project (mugu-project-current-root)))))
+                 (equal (mugu-project-name-of-buffer it) (mugu-project-name project)))
             (buffer-list)))
+
+(defun mugu-pvterm--list-vterm-without-project ()
+  "Return a list of vterm without project."
+  (--filter (and (mugu-vterm-buffer-vterm-p it)
+                 (not (mugu-project-of-buffer it)))
+            (buffer-list))
+  )
 
 (defun mugu-pvterm-list-all-vterm-project-first ()
   "Return a list of all vterm opened with those from the current project first."
@@ -30,7 +43,7 @@ Rename it to TERM-NAME or PROJECT.
 Then execute COMMANDS if any."
   (let* ((project-name (or (mugu-project-name project) (mugu-project-current-name)))
          (term-name (or term-name project-name)))
-    (mugu-project-assign-buffer (current-buffer) project-name)
+    (mugu-project-assign-buffer (current-buffer) (mugu-project-by-name project-name))
     (mugu-vterm-rename (current-buffer) term-name)
     (when commands
       (vterm-send-string commands t)
