@@ -13,9 +13,12 @@
   (setq evil-want-keybinding nil)
   :custom
   (evil-want-C-i-jump t)
-  (evil-jumps-cross-buffers t)
+  (evil-jumps-cross-buffers nil)
   (evil-overriding-maps nil)
   (evil-symbol-word-search t)
+  :general
+  (:states 'insert
+           "C-d" nil)
   :hook (evil-jumps-post-jump . recenter)
   :config
   (evil-mode 1)
@@ -25,6 +28,10 @@
   :after evil
   :config
   (evil-collection-init))
+
+(use-package undo-tree
+  :config
+  (global-undo-tree-mode))
 
 (use-package general
   ;; hack to unbind SPC
