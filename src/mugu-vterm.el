@@ -73,7 +73,7 @@ synched"
   ;; (general-define-key :keymaps '(vterm-mode-map) :states 'normal
   ;;                     "C-r" #'vterm--self-insert)
   (general-define-key :states '(motion normal)
-                      "²" #'mugu-vterm-toggle))
+                      "&" #'mugu-vterm-toggle))
 
 (defun mugu-vterm-buffer-vterm-p (buffer &rest _args)
   "Predicate indicating if BUFFER is a vterm."

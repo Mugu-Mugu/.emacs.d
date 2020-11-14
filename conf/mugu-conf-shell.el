@@ -39,7 +39,7 @@
 
 (use-package mugu-vterm
   :general
-  (:states 'motion "²" #'mugu-vterm-toggle)
+  (:states 'motion "&" #'mugu-vterm-toggle)
   :straight nil
   :commands mugu-vterm-switch
   :config
