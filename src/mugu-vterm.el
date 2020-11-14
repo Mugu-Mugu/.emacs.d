@@ -42,8 +42,8 @@ synched"
   "Configure all keymaps related to vterm integration."
   (setq vterm-keymap-exceptions nil)
   (general-define-key :keymaps 'vterm-mode-map :states 'insert
+                      "<C-backspace>" (lambda () (interactive) (vterm-send-key (kbd "C-w")))
                       "C-e" #'vterm--self-insert
-                      "C-f" #'vterm--self-insert
                       "C-a" #'vterm--self-insert
                       "C-v" #'vterm--self-insert
                       "C-b" #'vterm--self-insert
