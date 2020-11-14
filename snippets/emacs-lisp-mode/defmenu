@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: defmenu
+# key: defmenu_
+# --
+(defmenu mugu-yasnippet-menu (:color ${1:blue} :hint ${2:nil})
+"${3:undefined} menu"
+$0
+)
