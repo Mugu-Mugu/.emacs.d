@@ -45,7 +45,7 @@
   ("l" windmove-right "→ window")
   ("s" split-window-below "split window" :color blue :column "2-Split Management")
   ("v" split-window-right "split window vertically" :color blue)
-  ("d" delete-window "delete current window")
+  ("d" mugu-window-delete "delete current window")
   ("D" mugu-window-delete-all-windows "delete *all* other windows")
   ("u" winner-undo "undo window conf" :column "3-Undo/Redo")
   ("r" winner-redo "redo window conf")

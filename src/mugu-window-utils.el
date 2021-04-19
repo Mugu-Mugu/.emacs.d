@@ -3,6 +3,7 @@
 
 (require 'mugu-buffer)
 (require 'asoc)
+(require 'lv)
 
 ;;; Code:
 (defvar mugu-window-last-side-buffer-dismissed
@@ -57,22 +58,37 @@ Default to `selected-window'."
   (unless (window-parameter window 'dont-bury) (bury-buffer (window-buffer window)))
   (delete-window window))
 
-(defun mugu-window-delete-next-side ()
-  "Delete the next side window."
+(defun mugu-window-delete-or-toggle-side (&optional with-focus)
+  "Delete or toggle the next side window.
+WITH-FOCUS will also select it."
   (interactive)
-  (let ((next-side-window (get-window-with-predicate 'mugu-window-side-p)))
+  (let ((next-side-window (get-window-with-predicate 'mugu-window-side-managed-p)))
     (if next-side-window
         (mugu-window-bury-buffer-delete-window next-side-window)
       (if mugu-window-last-side-buffer-dismissed
-          (mugu-window-display-in-side
-           mugu-window-last-side-buffer-dismissed
-           mugu-window-last-side-window-dismissed-params)
+          (progn
+            (mugu-window-display-in-side
+             mugu-window-last-side-buffer-dismissed
+             mugu-window-last-side-window-dismissed-params)
+            (when with-focus (switch-to-buffer mugu-window-last-side-buffer-dismissed)))
+
         (message "There is no side window open.")))))
+
+(defun mugu-window-last-p ()
+  "Predicate determining if current window is the last one."
+  (= 1 (length (--reject (eq it lv-wnd) (window-list)))))
+
+(defun mugu-window-delete ()
+  "Delete current window unless its the last one."
+  (interactive)
+  (if (mugu-window-last-p)
+      (message "can not delete last live window")
+    (delete-window)))
 
 (defun mugu-window-display-in-side (buffer alist)
   "Behave as `display-buffer-in-side-window' but hook some parameters.
 BUFFER and ALIST parameters have the same semantics as in other `display-buffer' methods."
-  (let* ((additional-window-parameters (asoc-merge '((mugu-window . t)) alist))
+  (let* ((additional-window-parameters (asoc-merge '((mugu-window . t)) (asoc-get alist 'window-parameters) alist))
          (modified-alist (asoc-merge alist `((window-parameters . ,additional-window-parameters)))))
     (display-buffer-in-side-window buffer modified-alist)))
 
