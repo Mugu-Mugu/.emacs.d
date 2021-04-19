@@ -10,37 +10,26 @@
 
 (use-package projectile
   :diminish projectile-mode
-  :after mugu-project
   :defer
-  :commands projectile-mode
   :config
   (setq projectile-completion-system 'ivy)
   (add-hook 'kill-emacs-hook 'projectile-save-known-projects)
   (add-to-list 'projectile-globally-ignored-directories "elpa")
   (add-to-list 'projectile-globally-ignored-directories ".cache")
   (add-to-list 'projectile-globally-ignored-directories "node_modules")
-  (when (file-directory-p "~/work") (setq projectile-project-search-path '("~/work/")))
-  (projectile-mode 1))
+  (when (file-directory-p "~/work") (setq projectile-project-search-path '("~/work/"))))
 
 (use-package mugu-project
   :straight nil
-  :defer
-  :commands (mugu-project-menu)
+  :commands mugu-project-menu
   :config
-  (mugu-project-activate))
+  (mugu-project-mode))
 
 (use-package mugu-project-vterm
   :straight nil
   :after mugu-project
   :config
   (mugu-pvterm-activate))
-
-(use-package mugu-wconf
-  :straight nil
-  :after mugu-project
-  :config
-  (mugu-wconf-add-rule 0 #'mugu-project-name-of-buffer))
-
 
 (provide 'mugu-conf-project)
 ;;; mugu-conf-project ends here

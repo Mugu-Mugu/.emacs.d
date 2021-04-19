@@ -16,8 +16,8 @@
   (mugu-window-configure-side-window "\\*Messages\\*" 'top 0.3)
 
   (setq display-buffer-base-action
-        '((display-buffer-reuse-window display-buffer-same-window)
-          (inhibit-switch-frame . t))))
+        (cons '(display-buffer-reuse-window display-buffer-same-window)
+              '((inhibit-switch-frame . t)))))
 
 (provide 'mugu-window-defaults)
 ;;; mugu-window-defaults ends here
