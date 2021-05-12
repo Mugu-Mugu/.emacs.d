@@ -14,7 +14,16 @@
   "A simple wrapper to go to daily note file without capture org shenanigans.
 A bit hacky but the roam interface is kinda bad."
   (interactive)
-  (f-join org-roam-directory (format "%s.org" (format-time-string "%Y-%m-%d"))))
+  (f-join org-roam-dailies-directory (format "%s.org" (format-time-string "%Y-%m-%d"))))
+
+(defun mugu-roam-capture-chore ()
+  "."
+  (interactive)
+  (noflet ((delete-other-windows (&optional _window) (set-window-configuration (org-capture-get :return-to-wconf))))
+    (let ((org-capture-templates `(("x" "capture a task todo"
+                                    checkitem (file+headline ,(mugu-roam-daily-filename) "Chores") nil))))
+      (org-capture nil "x")
+      (evil-insert-state))))
 
 ;;;###autoload
 (defun mugu-roam-capture-daily-todo ()
@@ -22,7 +31,7 @@ A bit hacky but the roam interface is kinda bad."
   (interactive)
   (noflet ((delete-other-windows (&optional _window) (set-window-configuration (org-capture-get :return-to-wconf))))
     (let ((org-capture-templates `(("x" "capture a task todo"
-                                    entry (file ,(mugu-roam-daily-filename)) "* TODO %?\n%i"
+                                    entry (file ,(mugu-roam-daily-filename)) (org-roam-capture--fill-template "* TODO %?\n %i")
                                     :unnarrowed t))))
       (org-capture nil "x")
       (evil-insert-state))))
@@ -47,13 +56,6 @@ The hack with noflet is to prevent fucking orgmode to sabotage the windows confi
                                     entry (file ,(mugu-roam-daily-filename)) "* TODO %?\n%l\n%i"
                                     :unnarrowed t))))
       (org-capture nil "x"))))
-
-(setq org-roam-dailies-capture-templates
-      '(("d" "daily" plain (function org-roam-capture--get-point)
-         ""
-         :immediate-finish t
-         :file-name "%<%Y-%m-%d>"
-         :head "#+TITLE: %<%Y-%m-%d>\n#+FILETAGS: fast")))
 
 ;;; Code:
 

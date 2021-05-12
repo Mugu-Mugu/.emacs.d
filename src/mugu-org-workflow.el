@@ -43,8 +43,6 @@
 (require 'org-habit)
 
 ;; variable
-(defvar mugu-orgw-forbidden-headline-p-function #'mugu-orgw-private-headline-p)
-
 ;; * Headlines predicate
 (defun mugu-orgw-private-headline-p (headline)
   "Reject HEADLINE with private tag."
@@ -127,70 +125,11 @@ A HEADLINE is schedulable if at all conditions are met:
        (and (mugu-orgw-action-p headline) (mugu-orgw-scheduled-p headline)))
    (not (mugu-orgu-has-child-p headline #'mugu-orgw-scheduled-p))))
 
-(defun mugu-orgw-for-transport-box-p (headline)
-  "Predicate detemining if HEADLINE is a box for transport."
-  (and (mugu-orgw-icebox-p headline)
-       (mugu-orgw-with-tag-p "@transport" headline)))
-
-(defun mugu-orgw-fast-task-p (headline)
-  "Predicates determining if HEADLINE is a fast task."
-  (and (mugu-orgu-has-tag? headline "fast" 'inherit) (mugu-orgw-task-p headline)))
-
 (defun mugu-orgw-done-yesterday-p (headline)
   "Predicate indicating if HEADLINE was done yesterday."
   (let ((yesterday (round (- (float-time) (mod (float-time) (* 24 3600)) (* 24 3600))))
         (done-date (mugu-orgw-done-date headline)))
     (and done-date (> done-date yesterday))))
-
-(defmacro mugu-orgw--make-box-predicate (box-name-predicate box-name)
-    "Small macro to build predicate for BOX-NAME.
-Predicate will be called BOX-NAME-PREDICATE."
-    `(defun ,box-name-predicate (headline)
-     ,(format "Predicated determing if HEADLINE is a %s." box-name)
-     (mugu-orgw-with-tag-p ,box-name headline)))
-
-(defmacro mugu-orgw--make-inbox-predicate (box-name-predicate box-name)
-  "Small macro to build predicate for in BOX-NAME.
-Predicate will be called BOX-NAME-PREDICATE."
-  `(defun ,box-name-predicate (headline)
-     ,(format "Predicated determing if HEADLINE is a %s." box-name)
-     (mugu-orgu-has-tag? headline ',box-name 'inherit)))
-
-(mugu-orgw--make-box-predicate mugu-orgw-inbox-p "inbox")
-(mugu-orgw--make-box-predicate mugu-orgw-icebox-p "icebox")
-(mugu-orgw--make-box-predicate mugu-orgw-backlog-p "backlog")
-(mugu-orgw--make-box-predicate mugu-orgw-archive-p "archive")
-(mugu-orgw--make-inbox-predicate mugu-orgw-in-inbox-p "inbox")
-(mugu-orgw--make-inbox-predicate mugu-orgw-in-icebox-p "icebox")
-(mugu-orgw--make-inbox-predicate mugu-orgw-in-backlog-p "backlog")
-(mugu-orgw--make-inbox-predicate mugu-orgw-in-archive-p "archive")
-
-(defun mugu-orgw-get-box (box-p headline)
-  "Get the box corresponding to BOX-P applicable for HEADLINE."
-  (-first-item
-   (mugu-orgu-list-headlines-in-same-file box-p headline)))
-
-(defun mugu-orgw-move-to-box (box-p headline)
-  "Move HEADLINE to a headline satisfying BOX-P."
-  (mugu-orgu-action-headline-refile headline (mugu-orgw-get-box box-p headline)))
-
-(defun mugu-orgw-select-for-transport (headline)
-  "Select HEADLINE for transport scheduling.
-It will be copied to a special inbox which is not scheduled but readily accessible from mobile."
-  (mugu-orgu-action-headline-copy headline (-first-item (mugu-orgu-list-headlines #'mugu-orgw-for-transport-box-p))))
-
-(defun mugu-orgw-list-headlines (headline-p &optional local)
-  "List headlines satisfying HEADLINE-P and not FORBIDDEN-HEADLINE-P.
-If LOCAL is non-nil, the search is restricted to local file."
-  (let* ((full-headline-p (lambda (h) (and (funcall headline-p h)
-                                           (not (funcall mugu-orgw-forbidden-headline-p-function h))))))
-    (if local
-        (mugu-orgu-list-headlines-in-file (buffer-file-name (current-buffer)) full-headline-p)
-      (mugu-orgu-list-headlines full-headline-p))))
-
-(defun mugu-orgw-global-tags-list (predicate)
-  "Return all tags respecting PREDICATE."
-  (-select predicate (-flatten (org-global-tags-completion-table (org-agenda-files)))))
 
 ;; * Headlines sort
 (defun mugu-orgw--cmp-score-scheduled (headline time)
@@ -332,10 +271,6 @@ On WAIT ask for a new scheduled time."
     (call-interactively #'org-add-note)))
 
 ;; * Misc
-(defun mugu-orgw-current-task ()
-  "Retrieve the current active task."
-  (-first-item (-sort #'mugu-orgw-cmp-headlines (mugu-orgw-list-headlines 'mugu-orgw-schedulable-p))))
-
 (defun mugu-orgw-sort-tasks ()
   "Sort the arborescence by todo then priorities."
   (interactive)

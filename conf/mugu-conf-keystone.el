@@ -13,10 +13,20 @@
 
 (use-package hydra
   :demand
+  :custom
+  (hydra-look-for-remap t)
   :config
   ;; hack needed to solve flickering issue https://github.com/abo-abo/hydra/issues/349
-  (setq hydra--work-around-dedicated nil)
-  )
+  (setq hydra--work-around-dedicated nil))
+
+;; consider removal
+(use-package major-mode-hydra
+  :custom
+  (major-mode-hydra-invisible-quit-key "q")
+  (major-mode-hydra-separator "─"))
+
+(use-package use-package-hydra
+  :ensure t)
 
 (use-package undo-tree
   :custom (undo-tree-mode-lighter "")

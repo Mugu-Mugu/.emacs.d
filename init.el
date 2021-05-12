@@ -15,6 +15,7 @@
 (require 'mugu-conf-lib)
 (require 'mugu-conf-vanilla)
 (require 'mugu-conf-evil)
+(require 'mugu-conf-help)
 (require 'mugu-conf-session)
 (require 'mugu-conf-window)
 (require 'mugu-conf-modeline)
@@ -34,7 +35,8 @@
 (require 'mugu-conf-temp)
 (require 'mugu-conf-site-lisp)
 (require 'mugu-conf-fold)
-(require 'mugu-conf-text)
+(require 'mugu-conf-writing)
+(require 'mugu-conf-misc)
 
 ;;; languages features
 (require 'mugu-conf-lisp)
@@ -55,4 +57,6 @@
 
 (provide 'init)
 ;;; init ends here
+;; (put 'list-timers 'disabled nil)
 (put 'erase-buffer 'disabled nil)
+(put 'narrow-to-region 'disabled nil)

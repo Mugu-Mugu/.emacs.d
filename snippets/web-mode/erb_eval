@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: erb_eval
+# expand-env: ((yas-wrap-around-region nil))
+# key: erb_eval
+# --
+<%= ${1:`(or yas-selected-text "value")`} %>$0

@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: describe (rspec)
+# key: describe
+# --
+describe '${1:description}' do
+  $0
+end

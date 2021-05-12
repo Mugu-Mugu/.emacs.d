@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: roam key
+# key: #+roam_key
+# --
+
+#+roam_key: ${1:link}
+$0

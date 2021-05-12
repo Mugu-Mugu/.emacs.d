@@ -18,8 +18,9 @@
   (evil-symbol-word-search t)
   :general
   (:states 'insert
-           "C-d" nil)
-  :hook (evil-jumps-post-jump . recenter)
+           "C-a" nil
+           "C-d" nil
+           "C-e" nil)
   :config
   (evil-mode 1)
   (defalias #'forward-evil-word #'forward-evil-symbol))
@@ -36,6 +37,8 @@
 (use-package general
   ;; hack to unbind SPC
   :after evil-collection
+  :custom
+  (evil-move-cursor-back nil)
   :init
   (setq general-override-states '(insert
                                   emacs
@@ -159,6 +162,7 @@
 (use-package evil-escape
   ;; I may use the super escape provided here but I do not need nor have a binding for it
   :after evil
+  :disabled
   :config
   (evil-escape-mode))
 

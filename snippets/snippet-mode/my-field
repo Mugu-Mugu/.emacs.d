@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: my field
+# expand-env: ((yas-wrap-around-region nil))
+# key: my field
+# --
+
+\${${1:${2:n}:`yas-selected-text`}\}$0

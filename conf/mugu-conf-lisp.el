@@ -42,7 +42,15 @@
      c-w
      (escape insert)
      pretiffy
-     (additional-movement normal visual motion))))
+     (normal visual motion))))
+
+(use-package lispyville
+  :after (lispy evil-lispy)
+  :general
+  (:keymaps '(evil-lispy-mode-map lispyville-mode-map lispy-mode-map) :states 'insert
+            "M-k" nil
+            "[" nil
+            "]" nil))
 
 (use-package mugu-lisp
   :defer
@@ -55,6 +63,8 @@
 
 (use-package eldoc
   :defer
+  :custom
+  (eldoc-idle-delay 0.1)
   :diminish eldoc-mode)
 
 (use-package elisp-slime-nav

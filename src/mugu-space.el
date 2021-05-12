@@ -4,8 +4,9 @@
 
 ;;; Code:
 (require 'mugu-menu)
-(require 'mugu-buffer)
+(require 'helpful)
 (require 'general)
+(require 'mugu-feature)
 
 (defun mugu-space-activate-helm-menu ()
   "."
@@ -35,11 +36,12 @@
     ("ss" counsel-grep-or-swiper "swiper" :column "earch")
     ("sr" (counsel-rg "" mugu-directory) "rgrep")
     ("sx" sx-search "stack exchange")
-    ("sgg" counsel-search "seach w/ google")
+    ("sgg" mugu-feature-search-google "seach w/ google")
+    ("sgt" mugu-feature-search-google-at-point "seach w/ google at point")
     ("y" counsel-yank-pop "yank ring" :column "Misc")
     ("u" counsel-unicode-char "insert unicode")
-    ("j" scroll-up "scroll down" :color red)
-    ("k" scroll-down "scroll up" :color red)
+    ("j" (scroll-up 3) "scroll up" :color red)
+    ("k" (scroll-down 3) "scroll down" :color red)
     ("l" ace-link "link" :color blue)
     ("x" counsel-M-x "execute" :column "Execute")
     ("r" ivy-resume "ivy resume")
@@ -50,9 +52,11 @@
     ("C-SPC" mugu-menu-call-mode-menu nil)
     ("p" mugu-project-menu "project")
     ("h" mugu-space-help-menu "help")
+    (";" mugu-flyspell-menu/body "spelling")
     ("!" mugu-flycheck-menu "linting")
     ("o" mugu-orgi-menu-global "orgmode")
-    ("z" mugu-window-menu "window")
+    ("z" mugu-window-menu/body "window")
+    ("w" mugu-tab-menu/body "workspace")
     ("vh" mugu-git-tm-menu-or-activate "vc file history")
     ("vv" mugu-git-gutter-menu "vc gutter")
     ("vm" git-messenger:popup-message "vc describe thing")
@@ -64,14 +68,17 @@
                                 -- HELP MENU --
 
 "
-    ("h" help "general help" :column "1-Describe")
+    ("h" helpful-at-point "thing at point" :column "1-Describe")
     ("s" counsel-info-lookup-symbol "symbol" :column "1-Describe")
     ("f" counsel-describe-function "function")
     ("v" counsel-describe-variable "variable")
     ("b" counsel-descbinds "binding")
     ("d" counsel-describe-face "face")
     ("c" mugu-counsel-describe-custom "custom")
-    ("aa" apropos "symbols" :column "2-Apropos")
+    ("ii" Info-goto-emacs-command-node "look for some node" :column "2-Info")
+    ("is" counsel-info-lookup-symbol "look for some symbol")
+    ("ia" Info-apropos "text based search" )
+    ("aa" apropos "symbols" :column "3-Apropos")
     ("ac" apropos-command "commands")
     ("av" apropos-variable "variables")
     ("ar" apropos-value "value")
@@ -81,7 +88,7 @@
 
  (general-def '(motion emacs) "SPC" #'mugu-space-main-menu)
  (general-def '(insert visual) "M-SPC" #'mugu-space-main-menu)
-  (general-def '(motion emacs) "M-SPC" (lambda () (interactive)
+ (general-def '(motion emacs) "M-SPC" (lambda () (interactive)
                                         (forward-char)
                                         (insert " ")
                                         (backward-char))))

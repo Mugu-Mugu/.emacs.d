@@ -46,5 +46,27 @@
   :config
   (mugu-vterm-activate))
 
+(use-package vterm
+  :after yasnippet
+  :mode-hydra
+  (vterm-mode
+   (:title (with-faicon "terminal" "Vterm Mode") :color blue :hint nil)
+   ("Vterm commands"
+    (("C" vterm-clear)))))
+
+(use-package mugu-yasnippet
+  :after vterm
+  :straight nil
+  :general
+  (:keymaps 'vterm-mode-map :states '(insert normal)
+             "²" #'mugu-yasnippet-insert
+             (general-chord "²²") #'mugu-yasnippet-menu))
+
+(use-package mugu-vterm-snippet
+  :straight nil
+  :after yasnippet
+  :config
+  (mugu-vterm-snippet-mode))
+
 (provide 'mugu-conf-shell)
 ;;; mugu-conf-shell ends here

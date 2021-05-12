@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: use-package-pretty-hydra
+# key: :pretty-hydra
+
+# --
+:pretty-hydra
+ (${2:title} (:color ${3:blue} :hint nil))
+ ("${4:column name}"
+  (${5:(heads)}$0))

@@ -1,0 +1,10 @@
+# -*- mode: snippet -*-
+# name: yard_method_description
+# key: /yard_method
+# --
+##
+# ${1:description}
+#
+# ${2:@param ${3:arg_name} [${4:arg_type}] ${5: arg description}}
+# ${6:@return [${7:return_type}] ${8:return description}}
+$0

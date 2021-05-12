@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: raw_sql_insert_statement (from select)
+# key: ActiveRecord::Base.connection.execute
+# --
+ActiveRecord::Base.connection.execute(
+"
+INSERT INTO ${1:table} ${2:(columns)}
+VALUES (${3:values separted by comma for each columns}), (${4:one additional line per row})
+")

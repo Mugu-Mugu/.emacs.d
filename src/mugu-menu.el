@@ -11,6 +11,7 @@
 (require 'mugu-hydra)
 (require 's)
 (require 'dash)
+(require 'major-mode-hydra)
 
 (defmacro defmenu (name body &optional docstring &rest heads)
   "Same as `defhydra' but naming is different and args are recorded for replay.
@@ -43,11 +44,6 @@ HEADS is a list of head expected to be understood by `defhydra'."
 (defvar mugu-menu-mode-menus (list)
   "Association list between a major mode and a menu.")
 
-(defun mugu-menu-stub-mode-menu ()
-  "Placeholder menu that does nothing but display a message."
-  (interactive)
-  (message "No menu registered for this mode [%s]" major-mode))
-
 (defmacro define-mugu-menu-command (name)
   "Define a mugu-menu stub command named mugu-menu- NAME."
   `(defun ,(intern (format "mugu-menu-%s" name)) ()
@@ -59,7 +55,7 @@ HEADS is a list of head expected to be understood by `defhydra'."
   "This function will display the menu applicable for the current mode.
 If no menu has been registered for the registered for this mode"
   (interactive)
-  (call-interactively (alist-get major-mode mugu-menu-mode-menus #'mugu-menu-stub-mode-menu)))
+  (call-interactively (alist-get major-mode mugu-menu-mode-menus #'major-mode-hydra)))
 
 (defun mugu-menu-register-mode-menu (mode-symbol menu-function)
   "Bind a menu MENU-FUNCTION to the mode MODE-SYMBOL.

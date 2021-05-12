@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: eval <%= >
+# key: <%
+# --
+<%= ${1:expression} %>

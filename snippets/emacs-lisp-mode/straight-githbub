@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: straight github
+# key: :straight_github
+# --
+:straight (:host github :repo "${1:user}/${2:repo}")

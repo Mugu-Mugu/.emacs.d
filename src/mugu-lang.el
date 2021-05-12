@@ -25,6 +25,8 @@
 (define-mugu-lang-command test-method)
 (define-mugu-lang-command test-single-at-point)
 (define-mugu-lang-command test-all-in-project)
+(define-mugu-lang-command test-directory)
+(define-mugu-lang-command test-debugger)
 (define-mugu-lang-command additional-menu)
 
 (defmenu mugu-lang-menu (:color blue :hint nil)
@@ -40,12 +42,14 @@
 
 (defmenu mugu-lang-test-menu (:color blue :hint nil)
   "-- Language menu test --"
-  ("t" mugu-lang-test-file "verify test" :column "rspec")
+  ("t" mugu-lang-test-file "verify test" :column "launch tests")
   ("r" mugu-lang-test-rerun-last "rerun test")
   ("g" mugu-lang-test-toggle-goto "switch spec/file")
   ("m" mugu-lang-test-method "verify method")
   ("s" mugu-lang-test-single-at-point "verify example")
-  ("a" mugu-lang-test-all-in-project "verify project"))
+  ("a" mugu-lang-test-all-in-project "verify project")
+  ("d" mugu-lang-test-directory "test directory" :column "Submenu")
+  ("D" mugu-test-debugger "start debugger" :column "debugger"))
 
 (defun mugu-lang-activate-for-mode (mode)
   "Activate the mugu lang mode for MODE."

@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: internal_link
+# key: /internal_link
+# expand-env: ((mugu (when org-link-descriptive (org-toggle-link-display))) (yas-after-exit-snippet-hook (lambda () (unless org-link-descriptive (org-toggle-link-display)))))
+# --
+[[roam:*${1:headline}][${2:description}]]

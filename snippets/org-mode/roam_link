@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: roam link
+# key: [[r]]
+# expand-env: ((yas-wrap-around-region nil)(mugu (when org-link-descriptive (org-toggle-link-display))) (yas-after-exit-snippet-hook (lambda () (unless org-link-descriptive (org-toggle-link-display)))))
+# --
+[[roam:${1:`(or yas-selected-text "node")`}]]$0

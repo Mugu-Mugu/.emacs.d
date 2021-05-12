@@ -1,6 +1,5 @@
-;;; mugu-org-utils --- Summary
-;; -*- lexical-binding: t -*-
-;; tbc
+;; mugu-org-utils --- Summary
+;;; -*- lexical-binding: t -*-
 ;;; Commentary:
 
 ;;; Code:
@@ -22,111 +21,79 @@
 (require 'org-agenda)
 (require 'dash)
 (require 'ht)
+(require 'mugu-org-sql)
 (eval-when-compile (require 'cl))
 
+;; Actions
+(defun mugu-orgu-refresh-headline (headline)
+  "Return a up to date HEADLINE."
+  (mugu-orgu-find-headline-in (mugu-headline-filepath headline) (mugu-headline-title headline)))
+
+(defun mugu-orgu-priority (priority headline)
+  "Wrapper around org-priority that enable replay.
+HEADLINE PRIORITY."
+  (save-excursion
+    (when headline (mugu-orgu-goto-headline headline))
+    (org-priority priority)
+    (save-buffer)))
+
+ (defun mugu-orgu-refile (target-headline headline)
+  "Wrapper around org-refile that enable replay.
+Will refile HEADLINE to TARGET-HEADLINE."
+  (save-excursion
+    (when headline (mugu-orgu-goto-headline (mugu-orgu-refresh-headline headline)))
+    (org-refile nil nil (mugu-orgu-get-rfloc (mugu-orgu-refresh-headline target-headline)))
+    (save-buffer)
+    (mugu-orgu-goto-headline target-headline)
+    (save-buffer)))
+
+(defun mugu-orgu-refile-to-file (file headline)
+  "Wrapper around org-refile that enables replay.
+Will refile HEADLINE to FILE."
+  (save-excursion
+    (when headline (mugu-orgu-goto-headline (mugu-orgu-refresh-headline-offset headline)))
+    (--> file
+         (list (file-name-nondirectory it) it nil nil)
+         (org-refile nil nil it))
+    (with-current-buffer (find-file-noselect file) (save-buffer)))
+  )
+
+(defun mugu-orgu-goto-headline (headline)
+  "Goto HEADLINE."
+  (let* ((headline-point (mugu-headline-offset headline))
+         (headline-filename (mugu-headline-filepath headline)))
+    (find-file headline-filename)
+    (unless (mugu-orgu--position-visible-p headline-point)
+      (widen))
+    (goto-char headline-point)))
+
+;; Common selecters
+(defun mugu-orgu-find-headline-in (filepath title)
+  "Try to find headline in FILEPATH with TITLE."
+  (-first-item (mugu-org-sql-cmd-select
+                (sql-matcher-in-files filepath)
+                (sql-matcher-match-title title))))
+
+(defun mugu-orgu-headline-at-point ()
+  "Return the headline at point."
+  (mugu-orgu-find-headline-in buffer-file-name
+                              (org-element-property :raw-value (org-element-at-point))))
+
 ;; Getter on headlines
-(defun mugu-orgu-get-file (headline)
-  "Get file where HEADLINE is located."
-  (org-element-property :file headline))
+(defun mugu-orgu-get-rfloc (&optional headline)
+  "Return the rfloc of the HEADLINE or the one at point."
+  (let ((headline (or headline (mugu-orgu-headline-at-point))))
+    (list (mugu-headline-title headline)
+          buffer-file-name
+          nil
+          (mugu-headline-offset headline))))
 
-(defun mugu-orgu-get-filetags (headline)
-  "Retrieve tags defined at file level of HEADLINE."
-  (-map 'substring-no-properties (buffer-local-value 'org-file-tags (get-file-buffer (mugu-orgu-get-file headline)))))
+(defun mugu-orgu-get-tags (headline)
+  "Return tags of HEADLINE."
+  (or (org-element-property :tags headline)
+      (-uniq (s-split "," (plist-get headline :native_tags)))))
 
-(defun mugu-orgu-get-tags (headline &optional inherit inherit-only)
-  "Retrieve local tags of HEADLINE.
-When INHERIT is non-nil also fetch tags from its parents (recursively).
-When INHERIT and INHERIT-ONLY are both non-nil retrieve only tags from parents."
-  (when headline
-    (let* ((include-self (not (and inherit inherit-only)))
-           (headlines (if inherit
-                          (org-element-lineage headline nil include-self)
-                        (list headline))))
-      (-uniq
-       (-flatten
-        (-concat
-         (mugu-orgu-get-filetags headline)
-         (--map (or (org-element-property :tags it)
-                    (list))
-                headlines)))))))
-
-(defun mugu-orgu-get-priority (headline)
-  "Retrieve the priority of the HEADLINE or the inherited one of its parents."
-  (cond ((not headline) org-default-priority)
-        ((and headline
-              (org-element-property :priority headline)))
-        ((mugu-orgu-get-priority (org-element-property :parent headline)))))
-
-;; Actions on headlines
-(defun mugu-orgu--simulate-universal-arg-for-date (time)
-  "Simulate universal argument called for `org-deadline' bzsed on TIME value."
-  (if time nil '(4)))
-
-(defun mugu-orgu-put-property (headline property value)
-  "Change in HEADLINE the choosen PROPERTY to a new VALUE.
-Property refers to the native `org' one (not `org-element')."
-  (mugu-orgu-do-action #'org-put-property headline property (format "%s" value)))
-
-(defun mugu-orgu-delete-property (headline property)
-  "Delete in HEADLINE the choosen PROPERTY.
-Property refers to the native `org' one (not `org-element')."
-  (mugu-orgu-do-action #'org-delete-property headline property))
-
-(defun mugu-orgu-change-todo-state (headline &optional todo-state)
-  "Change the HEADLINE TODO-STATE."
-  (mugu-orgu-do-action #'org-todo headline todo-state))
-
-(defun mugu-orgu-set-priority (headline)
-  "Change the HEADLINE prirority."
-  (mugu-orgu-do-action #'org-priority headline))
-
-(defun mugu-orgu-do-action (action-function headline &rest args)
-  "Apply ACTION-FUNCTION to HEADLINE or headline at point if it's nil.
-ARGS are applied as is to ACTION-FUNCTION."
-  (let* ((org-file (mugu-orgu-get-file headline))
-         (org-buffer (if org-file
-                         (or (find-buffer-visiting org-file) (find-file-noselect org-file))
-                       (current-buffer)))
-         (org-point (or (org-element-property :begin headline) (point))))
-    (with-current-buffer org-buffer
-      (save-excursion
-        (goto-char org-point)
-        (apply action-function args)))))
-
-(defun mugu-orgu-schedule (headline time)
-  "Change the schedule time of HEADLINE to TIME."
-  (mugu-orgu-do-action #'org-schedule headline
-                       (mugu-orgu--simulate-universal-arg-for-date time)
-                       (mugu-orgu-time-to-timestamp time)))
-
-(defun mugu-orgu-set-deadline (headline time)
-  "Change the deadline time of HEADLINE to TIME."
-  (mugu-orgu-do-action #'org-deadline headline
-                       (mugu-orgu--simulate-universal-arg-for-date time)
-                       (mugu-orgu-time-to-timestamp time)))
-
-(defun mugu-orgu--refile-to (target-headline)
-  "Refile headline at point to TARGET-HEADLINE."
-  (save-restriction
-    (org-narrow-to-element)
-    (let ((rfloc (list (org-element-property :raw-value target-headline)
-                       (mugu-orgu-get-file target-headline)
-                       nil
-                       (org-element-property :begin target-headline))))
-      (org-refile nil nil rfloc))))
-
-(defun mugu-orgu-action-headline-refile (headline target-headline)
-  "Refile HEADLINE to TARGET-HEADLINE.
-HEADLINE is a an org-element object generated from any mugu-orgu function."
-  (mugu-orgu-do-action #'mugu-orgu--refile-to headline target-headline))
-
-(defun mugu-orgu-action-headline-copy (headline target-headline)
-  "Copy HEADLINE to TARGET-HEADLINE.
-HEADLINE is a an org-element object generated from any mugu-orgu function."
-  (let ((org-refile-keep t))
-    (mugu-orgu-do-action #'mugu-orgu--refile-to headline target-headline)))
-
-;; Time utilities
+;;; Time utilities
 (defun mugu-orgu-timestamp-to-float (org-timestamp)
   "Convert a ORG-TIMESTAMP to a number of seconds since epoch."
   (and org-timestamp (float-time (org-timestamp-to-time org-timestamp))))
@@ -137,23 +104,14 @@ TIME must be homogenous to `float-time'."
   (org-timestamp-format (org-timestamp-from-time time 'with-time)
                         (org-time-stamp-format 'long)))
 
-;; General headlines predicates
-(defun mugu-orgu-all-p (&rest predicates-and-headline)
-  "Predicate determining if headline match all given predicates.
-PREDICATES-AND-HEADLINE should be a list of predicates following by an headline."
-  (let ((predicates (-butlast predicates-and-headline))
-        (headline (-last-item predicates-and-headline)))
-    (--all? (funcall it headline) predicates)))
+;;; Headline predicate factory
+(defun mugu-orgu-make-tag-predicate (tag)
+  "Return an headline predicate where it contain TAG."
+  `(lambda (headline)
+     (-contains? (mugu-orgu-get-tags headline) ,tag)))
 
-(defun mugu-orgu-todo-headline-p (headline)
-  "Predicicate for HEADLINE indicating if it's a TODO."
-  (and (org-element-property :todo-type headline)
-       headline))
 
-(defun mugu-orgu-has-parent-p (parent-predicate headline)
-  "Predicate indicating if HEADLINE has any parent meeting PARENT-PREDICATE."
-  (-first-item (-filter parent-predicate (org-element-lineage headline))))
-
+;;; General headlines predicates
 (defun mugu-orgu-has-child-p (headline child-predicate)
   "Predicate indicating if HEADLINE has any child meeting CHILD-PREDICATE."
   (let ((child-predicate-ignore-self (lambda (hl)
@@ -165,17 +123,6 @@ PREDICATES-AND-HEADLINE should be a list of predicates following by an headline.
   "Predicate indicting if POSITION is visible or not in current buffer."
   (and (<= position (point-max))
        (<= (point-min) position)))
-
-(defun mugu-orgu-action-headline-goto (headline)
-  "Goto HEADLINE.
-HEADLINE is a an org-element object generated from any mugu-orgu function."
-  (let* ((headline-point (org-element-property :begin headline))
-         (headline-filename (mugu-orgu-get-file headline)))
-    (find-file-noselect headline-filename)
-    (switch-to-buffer (get-file-buffer headline-filename))
-    (unless (mugu-orgu--position-visible-p headline-point)
-      (widen))
-    (goto-char headline-point)))
 
 (defun mugu-orgu-has-tag? (headline tag &optional inherit inherit-only)
   "Predicate indicating if HEADLINE contain TAG.
@@ -290,10 +237,11 @@ If no org buffer was visited return scratch"
 
 (defun mugu-orgu-element-at-point ()
   "Return element at point with full content and lineage."
-  (with-cached-org-element
-   (save-excursion
-     (beginning-of-line)
-     (org-element-at-point))))
+  (let ((org-agenda-files (list (buffer-file-name))))
+    (with-cached-org-element
+     (save-excursion
+       (beginning-of-line)
+       (org-element-at-point)))))
 
 (defun mugu-orgu-sort-subtree (cmp-fun &optional recursive)
   "Sort the childs of headline at point according to order defined in CMP-FUN.

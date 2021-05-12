@@ -1,0 +1,12 @@
+# -*- mode: snippet -*-
+# name: pytest parametrize
+# key: pytest.mark.pa
+# --
+@pytest.mark.parametrize(
+"${1:arg1}${2:, arg2...}",
+[
+(${3:arg1_value}${4:, arg2_value...}),
+(${5: other_example})
+]
+)
+$0

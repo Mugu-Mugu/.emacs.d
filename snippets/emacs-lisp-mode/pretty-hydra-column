@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: pretty hydra column
+# key: /pretty_hydra_column
+# --
+
+"${1:column name}"
+ ($0)

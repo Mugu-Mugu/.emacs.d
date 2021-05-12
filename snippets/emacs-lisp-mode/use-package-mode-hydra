@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: use-package-mode-hydra
+# key: :mode-hydra
+# --
+:mode-hydra
+(${1:mode}
+ (${2:title} (:color ${3:blue} :hint nil))
+ ("${4:column name}"
+  (${5:(heads)}$0)))

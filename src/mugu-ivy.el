@@ -5,7 +5,7 @@
 ;;; Code:
 (require 'ivy)
 (require 'mugu-menu)
-(require 'mugu-window-utils)
+(require 'mugu-window)
 
 (defun mugu-ivy-yank-action (x)
   "Yank the candidate X."

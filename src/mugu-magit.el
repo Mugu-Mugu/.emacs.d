@@ -108,7 +108,7 @@ That is: bind SPC SPC for the mode and autoload the menu on first buffer enterin
 (defun mugu-magit-configure ()
   "Set various magit settings."
   (setq magit-display-buffer-function #'magit-display-buffer-fullframe-status-topleft-v1)
-  (magit-define-popup-switch 'magit-log-popup ?b "First parent" "--first-parent"))
+  (transient-insert-suffix 'magit-commit "-s" '("-L" "Reset date to" "--date=now")))
 
 (provide 'mugu-magit)
 ;;; mugu-magit ends here

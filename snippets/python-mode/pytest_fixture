@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: pytest_fixture
+# key: pytest_fixture
+# --
+@pytest.fixture
+def ${1: fixture_name}(self):
+return ${0}

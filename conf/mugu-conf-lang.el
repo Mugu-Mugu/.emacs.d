@@ -12,17 +12,12 @@
   :custom
   (lsp-prefer-flymake nil)
   (lsp-auto-guess-root t)
-  (lsp-enable-snippet nil))
+  (lsp-enable-snippet t))
 
 (use-package lsp-ui
   :defer
   :commands lsp-ui-mode
   :hook (lsp-mode . lsp-ui-mode))
-
-(use-package company-lsp
-  :after (company lsp-mode)
-  :commands company-lsp
-  :custom (company-lsp-cache-candidates 'auto))
 
 (use-package mugu-lsp
   :straight nil
@@ -30,6 +25,18 @@
   :commands mugu-lsp-menu
   :config
   (mugu-lsp-activate-ui-keymap))
+
+(use-package tree-sitter
+  :defer
+  :hook
+  (python-mode . tree-sitter-hl-mode)
+  (prog-mode . global-tree-sitter-mode))
+
+(use-package tree-sitter-langs
+  :after tree-sitter)
+
+(use-package lsp-treemacs
+  :after lsp-mode)
 
 (use-package dumb-jump
   :defer

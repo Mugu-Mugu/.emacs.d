@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: use package general
+# key: :general
+# --
+
+ :general
+ (:keymaps '(${1:mode-map} ${2:another-mode-map}) ${3::states '(${4:states})}
+           [remap mugu-menu-call-mode-menu] ${5:command})

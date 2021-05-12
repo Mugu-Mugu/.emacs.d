@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: yard attr_accessor
+# key: /yard_attr_accessor
+# --
+
+# ${1: description}
+# @return [${2:type}] ${3:return value decription}
+$0

@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: raw_sql_insert_statement (from select)
+# key: ActiveRecord::Base.connection.execute
+# --
+ActiveRecord::Base.connection.execute(
+"
+INSERT INTO ${1:table} ${2:(columns)}
+SELECT ${3: select statement (order of columns matter)}
+")

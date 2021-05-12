@@ -1,4 +1,4 @@
-;;; mugu-conf-org --- Summary
+;; mugu-conf-org --- Summary
 ;; tbc
 ;;; Commentary:
 
@@ -26,8 +26,16 @@
   (mugu-org-hack-mode))
 
 (use-package org
+  :straight org-plus-contrib
   :defer
-  :interpreter "org")
+  :hook
+  (org-mode . (lambda ()  (auto-fill-mode) (set-fill-column 110)))
+  (org-capture-mode . (lambda () (evil-insert-state)))
+  :custom
+  (org-src-preserve-indentation t))
+
+(use-package org-plus-contrib
+  :defer)
 
 (use-package org-indent
   :after org
@@ -46,9 +54,21 @@
   (mugu-orgi-configure-keys)
   (mugu-orgi-define-ivy-actions))
 
+(use-package mugu-org-wconf
+  :straight nil
+  :after org
+  :config
+  (mugu-org-wconf-mode +1))
+
+(use-package mugu-org-wconf-tab
+  :straight nil
+  :after (org mugu-tab)
+  :config
+  (mugu-org-wconf-tab-mode +1))
+
 (use-package mugu-org-interface
   :straight nil
-  :after org)
+  :after org-roam)
 
 (use-package mugu-org-workflow
   :after org
@@ -62,20 +82,26 @@
 (use-package org-roam
   :straight (:host github :repo "jethrokuan/org-roam")
   :after org
+  :demand
   :config
   (org-roam-mode)
   (require 'org-roam-protocol)
-  :custom (org-roam-directory "~/org/roam")
+  :custom
+  (org-roam-directory (file-truename "~/org/roam"))
+  (org-roam-dailies-directory "daily/")
+  (org-roam-db-update-method 'immediate)
   :general (:keymaps 'global
-                     [remap mugu-menu-org-note] #'org-roam-find-file))
+                     [remap mugu-feature-org-note] #'org-roam-find-file))
 
 (use-package mugu-roam
+  :after org-roam
   :straight nil
   :commands mugu-roam-capture-daily-note mugu-roam-capture-daily-todo-with-link mugu-roam-capture-daily-todo mugu-roam-daily-filename
   :general (:keymaps 'global
-                     [remap mugu-menu-org-insert-link-note] #'mugu-roam-insert))
+                     [remap mugu-feature-org-insert-link-note] #'mugu-roam-insert))
 
 (use-package company-org-roam
+  :disabled "it has been obsoleted and archived and now rely on company-cpaf"
   :straight (:host github :repo "jethrokuan/company-org-roam")
   :after org-roam
   :config
@@ -85,7 +111,7 @@
   :after org
   :custom
   (org-sql-use-tag-inheritance t)
-  (org-sql-files org-agenda-files))
+  (org-sql-files (-map #'file-truename org-agenda-files)))
 
 (use-package mugu-org-sql
   :straight nil
@@ -93,34 +119,39 @@
   :config
   (mugu-org-sql-mode))
 
-(use-package mugu-wconf
-  :straight nil
-  :after mugu-org-utils
-  :config
-  (add-to-list 'display-buffer-alist '(".*org" (display-buffer-same-window
-                                                display-buffer-reuse-window
-                                                display-buffer-reuse-mode-window
-                                                display-buffer-use-some-window)))
-  (mugu-wconf-add-rule 100 (lambda (buffer)
-                             (when buffer
-                               (with-current-buffer buffer
-                                 (when (eq major-mode 'org-mode) "org"))))))
-
-(use-package org-journal
-  :after org
-  :custom
-  (org-journal-dir "~/org/journal/")
-  (org-journal-date-format "%A, %d %B %Y")
-  :config
-  (mugu-window-configure-side-window (lambda (buffer _action)
-                                       (eq (buffer-local-value 'major-mode (get-buffer buffer)) 'org-journal-mode))
-                                     'bottom 0.3))
+(use-package org-protocol
+  :defer
+  :straight nil)
 
 (use-package ox-reveal
   :after org
   :defer
   :custom
   (org-reveal-root "https://cdn.jsdelivr.net/npm/reveal.js"))
+
+(use-package org-protocol-capture-html
+  :straight (:host github :repo "alphapapa/org-protocol-capture-html")
+  :after org)
+
+(use-package org-protocol-capture-html
+  :straight (:host github :repo "alphapapa/org-protocol-capture-html")
+  :defer)
+
+(use-package org-protocol-capture-html
+  :straight (:host github :repo "alphapapa/org-protocol-capture-html")
+  :config
+  (require 'mugu-org-protocol)
+  (push `("w" "Web site"
+          entry (file+headline ,mugu-orgp-capture-file-path ,mugu-orgp-capture-default-inbox)
+          "* %a :website:\n\n%U %?\n\n%:initial"
+          :immediate-finish t)
+        org-capture-templates)
+  (push '("capture-html"
+          :protocol "capture-html"
+          :function org-protocol-capture-html--with-pandoc)
+        org-protocol-protocol-alist))
+
+;(require 'org-protocol-capture-html)
 
 (provide 'mugu-conf-org)
 ;;; mugu-conf-org ends here

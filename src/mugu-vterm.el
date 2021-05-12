@@ -8,41 +8,19 @@
 (require 'vterm)
 (require 'ivy)
 (require 'general)
-(require 'mugu-buffer)
 
-(defvar-local mugu-vterm--cursor-pos 0
-  "Pos of vterm cursor.")
 (defvar mugu-vterm-list-buffer-function #'mugu-vterm-list-buffer-by-mru
   "The function to use whenever a list of vterm buffer needs to be made.")
 (defvar mugu-vterm-after-vterm-creation-hook nil
   "Hook run just after a vterm is created.")
-
-(defun mugu-vterm--record-cursor-pos (&optional offset)
-  "Record the current position of the vterm cursor.
-If OFFSET is non nil, add it to the current `point'.
-It's up to the caller to ensure current `point' and the real vterm cursor are
-synched"
-  (setq mugu-vterm--cursor-pos (+ (point) (or offset 0))))
-
-(defun mugu-vterm--move-real-cursor ()
-  "Send command to vterm to synch its cursor to the current one."
-  (let* ((cursor-difference (min 100 (max -100 (- (point) mugu-vterm--cursor-pos))))
-         (movement-function (if (> cursor-difference 0) #'vterm-send-right #'vterm-send-left)))
-    (dotimes (_ (abs cursor-difference))
-      (funcall movement-function))
-    (mugu-vterm--record-cursor-pos)))
-
-(defun mugu-vterm--install-hook ()
-  "Install all hook required for vterm."
-  (interactive)
-  (add-hook 'evil-insert-state-exit-hook #'mugu-vterm--record-cursor-pos nil 'local)
-  (add-hook 'evil-insert-state-entry-hook #'mugu-vterm--move-real-cursor nil 'local))
 
 (defun mugu-vterm--install-keymaps ()
   "Configure all keymaps related to vterm integration."
   (setq vterm-keymap-exceptions nil)
   (general-define-key :keymaps 'vterm-mode-map :states 'insert
                       "<C-backspace>" (lambda () (interactive) (vterm-send-key (kbd "C-w")))
+                      "<C-left>" (lambda () (interactive) (vterm-send-key "b" nil 'meta))
+                      "<C-right>" (lambda () (interactive) (vterm-send-key "f" nil 'meta))
                       "C-e" #'vterm--self-insert
                       "C-a" #'vterm--self-insert
                       "C-v" #'vterm--self-insert
@@ -63,7 +41,7 @@ synched"
                       "C-SPC" #'vterm--self-insert
                       "ESC" #'vterm--self-insert)
   (general-define-key :keymaps '(vterm-mode-map) :states 'motion
-                      [remap evil-paste-after] #'mugu-vterm-paste
+                      [remap evil-paste-before] #'vterm-yank
                       [remap undo] #'vterm-undo
                       [remap redo] #'ignore
                       "C-c" #'vterm--self-insert
@@ -87,13 +65,6 @@ synched"
   "Return a list of opened vterm."
   (funcall mugu-vterm-list-buffer-function))
 
-(defun mugu-vterm-paste ()
-  "Paste current kill content at current cursor position."
-  (interactive)
-  (mugu-vterm--move-real-cursor)
-  (vterm-yank)
-  (mugu-vterm--record-cursor-pos (length (substring-no-properties (current-kill 0)))))
-
 (defun mugu-vterm-rename (vterm-buffer new-name)
   "Rename VTERM-BUFFER to NEW-NAME."
   (interactive (list (mugu-vterm--select-terminal) (read-string "New vterm name: ")))
@@ -105,27 +76,31 @@ synched"
 When SELECT-OTHER is non-nil, the preselected terminal is the next one."
   (ivy-read (format "Select a terminal: ")
             (-map #'buffer-name (mugu-vterm-list-buffer))
-            :preselect (if select-other 1 0)))
+            :preselect (if select-other 1 0)
+            :caller 'vterm))
 
 (defun mugu-vterm-kill (term-name)
   "Kill vterm TERM-NAME or select one to kill."
   (interactive (list (mugu-vterm--select-terminal)))
   (let ((kill-buffer-query-functions nil))
-    (kill-buffer term-name)))
+    (save-current-buffer (kill-buffer term-name))))
 
-(defun mugu-vterm-switch (&optional select-first)
+(defun mugu-vterm-switch (&optional select-first select-other)
   "Switch to a vterm buffer interactively if there is several open.
 If none exists, one will be created.
-If SELECT-FIRST is non-nil, select the first buffer in the list `mugu-vterm-list-buffer'."
+If SELECT-FIRST is non-nil, select the first buffer in the list
+`mugu-vterm-list-buffer'.  If SELECT-OTHER is non-nil and SELECT-FIRST is nil,
+select the second buffer in the list instead."
   (interactive)
-  (let* ((vterm-list (if select-first
-                         (-take 1 (mugu-vterm-list-buffer))
-                       (mugu-vterm-list-buffer))))
+  (let* ((base-vterm-list (mugu-vterm-list-buffer))
+         (vterm-list (if select-first
+                         (-take 1 base-vterm-list)
+                       base-vterm-list)))
     (pcase (length vterm-list)
       (0 (mugu-vterm-create))
       (1 (switch-to-buffer (-first-item vterm-list)))
       (_ (switch-to-buffer (get-buffer
-                            (mugu-vterm--select-terminal 'select-other)))))))
+                            (mugu-vterm--select-terminal select-other)))))))
 
 (defun mugu-vterm-toggle ()
   "Switch to a vterm buffer or hide one if already displayed."
@@ -133,7 +108,7 @@ If SELECT-FIRST is non-nil, select the first buffer in the list `mugu-vterm-list
   (let ((window-displaying-vterm (get-window-with-predicate
                                   (lambda (window) (mugu-vterm-buffer-vterm-p (window-buffer window))))))
     (if window-displaying-vterm
-        (mugu-vterm-switch)
+        (mugu-vterm-switch nil 'select-other)
       (mugu-vterm-switch 'select-first))))
 
 (defun mugu-vterm-create (&optional name)
@@ -147,11 +122,45 @@ If SELECT-FIRST is non-nil, select the first buffer in the list `mugu-vterm-list
      (run-hooks 'mugu-vterm-after-vterm-creation-hook)
      (current-buffer))))
 
+(defun vterm-evil-insert ()
+  (interactive)
+  (vterm-goto-char (point))
+  (call-interactively #'evil-insert))
+
+(defun vterm-evil-append ()
+  (interactive)
+  (vterm-goto-char (1+ (point)))
+  (call-interactively #'evil-append))
+
+(defun vterm-evil-delete ()
+  "Provide similar behavior as `evil-delete'."
+  (interactive)
+  (let ((inhibit-read-only t))
+    (cl-letf (((symbol-function #'delete-region) #'vterm-delete-region))
+      (call-interactively 'evil-delete))))
+
+(defun vterm-evil-change ()
+  "Provide similar behavior as `evil-change'."
+  (interactive)
+  (let ((inhibit-read-only t))
+    (cl-letf (((symbol-function #'delete-region) #'vterm-delete-region))
+      (call-interactively 'evil-change))))
+
+;; (defun my-vterm-hook()
+;;   (evil-local-mode 1)
+;;   (evil-define-key 'normal 'local "a" 'vterm-evil-append)
+;;   (evil-define-key 'normal 'local "d" 'vterm-evil-delete)
+;;   (evil-define-key 'normal 'local "i" 'vterm-evil-insert)
+;;   (evil-define-key 'normal 'local "c" 'vterm-evil-change))
+
 (defun mugu-vterm-activate ()
   "Configure vterm integration."
   (mugu-vterm--install-keymaps)
-  (add-hook 'vterm-mode-hook #'mugu-vterm--install-hook)
-  (mugu-window-configure-side-window 'mugu-vterm-buffer-vterm-p 'top 0.7 t))
+  ;; (add-hook 'vterm-mode-hook 'my-vterm-hook)
+   (ivy-add-actions 'vterm
+                   '(("r" mugu-vterm-rename "rename")
+                     ("k" mugu-vterm-kill "kill")))
+   (mugu-window-configure-side-window 'mugu-vterm-buffer-vterm-p 'top 0.7 t))
 
 (provide 'mugu-vterm)
 ;;; mugu-vterm ends here

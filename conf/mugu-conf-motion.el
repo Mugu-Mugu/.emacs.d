@@ -26,7 +26,7 @@
 
 (use-package ace-window
   :defer
-  :config (setq aw-keys '(?a ?z ?e ?r ?t)))
+  :config (setq aw-keys '(?a ?e ?r ?t)))
 
 (use-package ace-link :defer)
 

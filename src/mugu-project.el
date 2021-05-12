@@ -8,84 +8,111 @@
 (require 'mugu-counsel)
 (require 'mugu-directory)
 (require 'mugu-menu)
-(require 'mugu-buffer)
 (require 'mugu-window)
 (require 'mugu-space)
 (require 'projectile)
 (require 'dash)
 (require 'ht)
+(require 'f)
 
-;; * Code
-(defun mugu-project-buffer-in-project-p (buffer project)
-  "Predicate indicating if BUFFER is in PROJECT."
-  (projectile-project-buffer-p buffer project))
 
-(defun mugu-project-buffer-selector (project)
-  "Return a predicate to identify buffer in project with PROJECT."
-  (let ((default-directory project))
-    (lambda (buffer)
-      (projectile-project-buffer-p buffer project))))
+;; * Variable
+(defvar-local mugu-project-pinned-root
+  nil
+  "Pinned project root of a buffer.  Will bypass all other rules.")
+(defvar mugu-project-root-fallback-functions
+  (list #'mugu-project-root-visible
+        #'mugu-project-root-last-visited)
+  "A list of functions to determine project root of current buffer.
+Each function will be called until one return a non-nil result.
+No argument is passed on call invocation.")
 
-(defun mugu-project-buffers (project)
-  "Return a list of buffer in PROJECT."
-  (-filter (mugu-project-buffer-selector (file-truename project)) (buffer-list)))
-
-(defun mugu-project-switch-buffer-in-project ()
-  "Interactively switch to a buffer in current project."
-  (ivy-read (format "Select a buffer in project %s" (mugu-project-current-name))
-            (-map 'buffer-name
-                  (-remove-first 'identity
-                                 (mugu-project-buffers (mugu-project-current-root))))
-            :action 'switch-to-buffer))
-
-(defun mugu-project-name (project)
-  "Return the name of the PROJECT."
-  (projectile-project-name project))
-
-(defun mugu-project-name-of-buffer (buffer)
-  "Return the project name of BUFFER.
-If there is none, return the one of the  last project visited."
-  (let ((buffer-project (mugu-project-of-buffer buffer)))
-    (when buffer-project (projectile-project-name buffer-project))))
-
-(defun mugu-project-of-buffer (buffer)
-  "Return the project of BUFFER or nil if it does not exists."
-  (when  buffer
+;; Pin method
+(defun mugu-project-pin-buffer (&optional buffer project-root)
+  "Pin BUFFER to the project defined by PROJECT-ROOT."
+  (interactive)
+  (let ((buffer (or buffer (current-buffer)))
+        (project-root (or project-root (mugu-projet-current-root))))
     (with-current-buffer buffer
-      (or
-       projectile-project-root
-       (and buffer-file-truename (projectile-project-root))))))
+      (setq mugu-project-pinned-root project-root))))
 
-(defun mugu-project-current-root ()
-  "Return the current project."
+(defun mugu-project-unpin-buffer (&optional buffer)
+  "Unpin BUFFER from any project."
+  (interactive)
+  (let ((buffer (or buffer (current-buffer))))
+    (with-current-buffer buffer
+      (setq mugu-project-pinned-root nil))))
+
+;; Root determination methods
+(defalias 'mugu-project-current-project-name #'projectile-project-name)
+
+(defun mugu-project--projectile-root (original-root-function &optional directory)
+  "Replacement for `projectile-project-root'.
+It will return the project root applicable for current buffer and will backup on
+fallback methods defined in `mugu-project-root-fallback-functions' which may use
+more information such as current window configuration/history/etc...
+ORIGINAL-ROOT-FUNCTION should be `projectile-project-root'.
+DIRECTORY is not supported and will raise an error if defined."
+  (if (and directory (not (f-same? directory default-directory)))
+      (funcall original-root-function directory)
+    (or mugu-project-pinned-root
+        (and buffer-file-truename (funcall original-root-function))
+        (-first-item (-map 'funcall mugu-project-root-fallback-functions)))))
+
+(defun mugu-project-root-visible ()
+  "Return the project of visible roots."
   (->> (window-list)
        (--map (->> it
                    (window-buffer)
-                   (mugu-project-of-buffer)))
-       (-filter 'identity)
+                   (mugu-project-root-of-buffer)))
+       (-non-nil)
        (-first-item)))
 
-(defun mugu-project-current-name ()
-  "Return the current project name."
-  (projectile-project-name (mugu-project-current-root)))
+(defun mugu-project-root-last-visited ()
+  "Return the project of visible roots."
+  (mugu-project-root-of-buffer (-first #'mugu-project-root-of-buffer (buffer-list))))
+
+(defalias 'mugu-project-root #'projectile-project-root)
+(defalias 'mugu-project-current-root #'projectile-project-root)
+
+;; Project buffers methods
+(defun mugu-project-root-of-buffer (buffer)
+  "Return the project root of BUFFER."
+  (let ((mugu-project-root-fallback-functions))
+    (and buffer
+         (with-current-buffer buffer (mugu-project-root)))))
+
+(defun mugu-project-buffer-in-project-p (buffer project-root)
+  "Predicate indicating if BUFFER is included in project with PROJECT-ROOT."
+  (f-same? (or (mugu-project-root-of-buffer buffer) "/")
+           project-root))
+
+(defun mugu-project-buffers (project-root)
+  "Return a list of buffer in project with PROJECT-ROOT."
+  (-filter
+   (lambda (buffer) (mugu-project-buffer-in-project-p buffer project-root))
+   (buffer-list)))
+
+(defun mugu-project-switch-buffer-in-project ()
+  "Interactively switch to a buffer in current project."
+  (ivy-read (format "Select a buffer in project %s" (mugu-project-name (mugu-project-root)))
+            (-map 'buffer-name
+                  (-remove-first 'identity
+                                 (mugu-project-buffers (mugu-project-root))))
+            :action 'switch-to-buffer))
+
+;; accessor
+(defun mugu-project-name (project)
+  "Return the name of the PROJECT."
+  (let ((projectile-project-name))
+    (projectile-project-name project)))
 
 (defun mugu-project-by-name (name)
   "Return the project matching exactly NAME."
-  (--first
-   (equal (projectile-project-name it) name)
-   projectile-known-projects))
-
-(defun mugu-project-assign-buffer (buffer project)
-  "Assign BUFFER to PROJECT."
-  (with-current-buffer buffer (setq projectile-project-root project)))
-
-(defun mugu-project-generate-scratch-buffer (project)
-  "Create a scratch buffer for the PROJECT and return it."
-  (let* ((project-name (projectile-project-name project))
-         (scratch-buffer (get-buffer-create (format "scratch (%s)" project-name))))
-    (with-current-buffer scratch-buffer
-      (mugu-project-assign-buffer scratch-buffer project))
-    scratch-buffer))
+  (let ((projectile-project-name))
+    (--first
+     (equal (projectile-project-name it) name)
+     projectile-known-projects)))
 
 (defun mugu-project-cd ()
   "Change directory to a child dir of the project."
@@ -123,22 +150,31 @@ If there is none, return the one of the  last project visited."
   ("f" mugu-project-find-file "open file alternative")
   ("q" nil "quit menu" :color blue :column nil))
 
-(defun mugu-project-load-buffer-after-switch ()
-  "Switch to NEW-PROJECT changing wconf and projectile internal."
-  ;; (message "project buffers: %s" (mugu-project-buffers (projectile-project-name default-directory)))
-  (switch-to-buffer (or (-second-item (mugu-project-buffers default-directory))
-                        (mugu-project-generate-scratch-buffer default-directory))))
-
-
-(defun mugu-project-activate ()
-  "Configure perspective and projectile in a coherent feature."
-  (setq projectile-switch-project-action #'mugu-project-load-buffer-after-switch))
-
 (defun mugu-project-hyper-star ()
   "Search thing at point in project."
   (interactive)
   (let ((ivy-hooks-alist '((t . mugu-ivy-active-menu))))
     (counsel-rg (thing-at-point 'symbol t) (mugu-project-current-root))))
+
+;; * Mode related functions
+(defun mugu-project--activate ()
+  "."
+  (advice-add #'projectile-project-root :around #'mugu-project--projectile-root)
+  (projectile-mode 1))
+
+(defun mugu-project--deactivate ()
+  "."
+  (advice-remove #'projectile-project-root #'mugu-project--projectile-root)
+  (projectile-mode -1))
+
+(define-minor-mode mugu-project-mode
+  "A minor mode to activate automatic tab management based on buffer project."
+  nil
+  :global t
+  :group 'mugu
+  (if mugu-project-mode
+      (mugu-project--activate)
+    (mugu-project--deactivate)))
 
 (provide 'mugu-project)
 ;;; mugu-project ends here

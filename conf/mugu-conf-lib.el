@@ -10,6 +10,7 @@
 (use-package dash :defer)
 (use-package s :defer)
 (use-package ht :defer)
+(use-package f :defer)
 (use-package noflet :defer)
 (use-package async :defer)
 (use-package transient :config (transient-bind-q-to-quit))

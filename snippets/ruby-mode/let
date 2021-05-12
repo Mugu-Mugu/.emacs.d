@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: let block
+# key: let
+# --
+let(:${1:var_name}) { $0 }

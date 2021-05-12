@@ -1,0 +1,16 @@
+# -*- mode: snippet -*-
+# name: complex-cl-defstruct example
+# key: cl-defstruct full
+# --
+
+(cl-defstruct (sql-cond-in (:include sql-cond)
+                           (:constructor sql-cond-in-files
+                                         (&rest files &aux
+                                                (criteria-name "file_path")
+                                                (criterias files)))
+                           (:constructor sql-cond-with-tags
+                                         (&rest tags &aux
+                                                (criteria-name "all_tags")
+                                                (criterias tags))))
+  (criterias :type list :documentation "The list of the criteria values")
+  (criteria-name :type string :documentation "The name of the criteria"))

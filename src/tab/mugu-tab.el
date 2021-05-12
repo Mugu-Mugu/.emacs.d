@@ -17,12 +17,49 @@
 ;;; Code:
 ;;; Variables
 (defvar-local mugu-tab-pinned-tab-name nil "Tab name of tab owning the buffer.")
+(defvar mugu-tab-local-variables-list (list)
+  "A list of variables symbols that are local to a tab.")
 (defvar mugu-tab-attribution-functions (list #'mugu-tab-attribution-rule-pinned)
   "A list of functions to determine the tab of a buffer.
 Functions in the list will be evaluated until one returns a non-nil result.
 Each function should take a BUFFER-OR-NAME as argument and returns a string if a
 tab should own the buffer or nil if the rule doesn't cover it.")
 (defvar mugu-tab-mode nil "To silence warnings.")
+(defvar mugu-tab-after-switch-hook (list)
+  "Hook run just after a tab switch has occurred.")
+(defvar mugu-tab-before-switch-hook (list)
+  "Hook run just before a tab switch will occur.")
+
+;;; Variables management
+(defun mugu-tab-make-variable-local (var-symbol)
+  "Make VAR-SYMBOL tab local."
+  (when (symbolp var-symbol)
+    (push var-symbol mugu-tab-local-variables-list)))
+
+(defun mugu-tab--var-property-name (var-name)
+  "Return a symbol for a local property for VAR-NAME."
+  (intern (format "mugu-tab-local-var-%s-%s" (mugu-tab-current-tab-name) var-name)))
+
+(defun mugu-tab--store-local-variables (&rest _)
+  "."
+  (-each mugu-tab-local-variables-list
+    (lambda (var-symbol)
+      (put var-symbol (mugu-tab--var-property-name var-symbol) (symbol-value var-symbol)))))
+
+(defun mugu-tab--restore-local-variables (&rest _)
+  "."
+  (-each mugu-tab-local-variables-list
+    (lambda (var-symbol)
+      (set var-symbol
+           (get var-symbol (mugu-tab--var-property-name var-symbol))))))
+
+;;; Macros
+(defmacro save-current-tab (&rest body)
+  "Evaluate BODY and then restore current tab and return BODY value."
+  `(let ((current-tab-name (mugu-tab-current-tab-name)))
+     (prog1
+         (progn ,@body)
+       (mugu-tab-switch current-tab-name))))
 
 ;;; Accessors
 (defun mugu-tab-current-tab ()
@@ -50,6 +87,11 @@ tab should own the buffer or nil if the rule doesn't cover it.")
   (let ((tab-name (or tab-name (mugu-tab-current-tab-name))))
     (tab-bar-close-tab-by-name tab-name)))
 
+(defun mugu-tab-try-delete (tab-name)
+  "Delete tab with TAB-NAME if it exists."
+  (when (mugu-tab-get-tab-with-name tab-name)
+    (mugu-tab-delete tab-name)))
+
 (defun mugu-tab-clone ()
   "Duplicate current window configuration in a new tab."
   (interactive)
@@ -71,9 +113,24 @@ tab should own the buffer or nil if the rule doesn't cover it.")
   (with-current-buffer (or buffer (current-buffer))
     (setq mugu-tab-pinned-tab-name nil)))
 
+ (defun mugu-tab-clean ()
+  "Clean the window configuration of current tab."
+  (interactive)
+  (delete-other-windows)
+  (display-buffer-use-some-window (get-buffer-create "*Messages*") (list)))
+
 (defalias 'mugu-tab-rename 'tab-bar-rename-tab)
 
 ;;; Selection
+(defun mugu-tab-switch-or-create (tab-name)
+  "Switch to tab with TAB-NAME creating it if needed."
+  (mugu-tab--store-local-variables)
+  (if (mugu-tab-get-tab-with-name tab-name)
+      (tab-bar-switch-to-tab tab-name)
+    (tab-new)
+    (mugu-tab-clean)
+    (tab-rename tab-name))
+  (mugu-tab--restore-local-variables))
 (defalias 'mugu-tab-switch #'tab-bar-switch-to-tab)
 (defalias 'mugu-tab-switch-to-next #'tab-bar-switch-to-next-tab)
 (defalias 'mugu-tab-switch-to-previous #'tab-bar-switch-to-prev-tab)
@@ -103,10 +160,12 @@ ALIST is not used but will be forwarded to `display-buffer' functions."
   (when mugu-tab-mode
     (let* ((tab-name (mugu-tab-attribution-evaluate buffer))
            (alist (asoc-merge alist `((tab-name . ,tab-name)))))
-      (message "buffer current %s new %s" (current-buffer) buffer)
-      (message "tab current %s new %s" (mugu-tab-current-tab-name) tab-name)
-      (and tab-name (not (equal tab-name (mugu-tab-current-tab-name)))
-           (display-buffer-in-tab buffer alist)))))
+      (when (and tab-name (not (equal tab-name (mugu-tab-current-tab-name))))
+        (run-hooks 'mugu-tab-before-switch-hook)
+        (mugu-tab--store-local-variables)
+        (display-buffer-in-tab buffer alist)
+        (mugu-tab--restore-local-variables)
+        (run-hooks 'mugu-tab-after-switch-hook)))))
 
 ;;; Mode functions
 (defun mugu-tab--add-to-display-buffer-action (display-buffer-action)
@@ -139,37 +198,43 @@ ALIST is not used but will be forwarded to `display-buffer' functions."
                   (cons pattern (mugu-tab--remove-from-display-buffer-action action))))
               display-buffer-alist)))
 
+(defun mugu-tab-ensure-tab-rule-prioritary ()
+  "Ensure the tab `display-buffer' rule has most priority."
+  (mugu-tab--activate-display-buffer-action))
+
 (defun mugu-tab--activate ()
   "Initialize the mode."
   (general-def
     mugu-tab-mode-map
     [remap winner-undo] #'tab-bar-history-back
     [remap winner-redo] #'tab-bar-history-forward)
-  (add-to-list 'display-buffer-alist `(".*" ,@display-buffer-base-action) 'append)
-  (mugu-tab--activate-display-buffer-action)
-  (customize-set-variable 'display-buffer-base-action (mugu-tab--add-to-display-buffer-action display-buffer-base-action))
+  (add-to-list 'display-buffer-alist
+               `(".*" ,(cons #'mugu-tab-display-buffer
+                             (list)))
+               'append)
+  (mugu-tab-ensure-tab-rule-prioritary)
+  (add-hook 'mugu-window-display-rules-added-hook #'mugu-tab-ensure-tab-rule-prioritary)
+  (advice-add 'tab-bar-select-tab :before #'mugu-tab--store-local-variables)
+  (advice-add 'tab-bar-select-tab :after #'mugu-tab--restore-local-variables)
   (tab-bar-mode 1)
   (tab-bar-history-mode 1)
   (when (eq 1 (length (tab-bar-tabs)))
-    (mugu-tab-rename "default"))
-  )
+    (mugu-tab-rename "default")))
 
 (defun mugu-tab--deactivate ()
   "Initialize the mode."
   (mugu-tab--deactivate-display-buffer-action)
   (customize-set-variable 'display-buffer-base-action (mugu-tab--remove-from-display-buffer-action display-buffer-base-action))
+  (advice-remove 'tab-bar-select-tab #'mugu-tab--store-local-variables)
+  (advice-remove 'tab-bar-select-tab #'mugu-tab--restore-local-variables)
   (tab-bar-mode -1)
   (tab-bar-history-mode -1))
 
-(defun mugu-tab-ensure-tab-rule-prioritary ()
-  "Ensure the tab `display-buffer' rule has most priority."
-  (mugu-tab--activate-display-buffer-action))
-
 (define-minor-mode mugu-tab-mode
-  "A minor mode to provide window configuration management in tabs along with
-simple rules to automate the process."
-  nil
+  "A minor mode to provide window configuration management in tabs.
+Extends mode tab-bar' with a few automation rules."
   :global t
+  :keymap (make-sparse-keymap)
   :group 'mugu
   (if mugu-tab-mode
       (mugu-tab--activate)

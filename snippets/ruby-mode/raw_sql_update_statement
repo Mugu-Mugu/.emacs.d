@@ -1,0 +1,11 @@
+# -*- mode: snippet -*-
+# name: raw_sql_update_statement
+# key: ActiveRecord::Base.connection.execute
+# --
+ActiveRecord::Base.connection.execute(
+"
+UPDATE ${1:table}
+SET ${2:field = source}
+${3:FROM ${4: additional table}}
+${5: WHERE ${6:conditions}}
+")

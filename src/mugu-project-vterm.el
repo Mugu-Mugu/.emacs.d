@@ -7,7 +7,6 @@
 (require 'vterm)
 (require 'ivy)
 (require 'general)
-(require 'mugu-buffer)
 (require 'mugu-vterm)
 (require 'mugu-project)
 (require 'mugu-misc)
@@ -21,13 +20,13 @@
 (defun mugu-pvterm--list-project-vterm (project)
   "List vterm owned by PROJECT."
   (--filter (and (mugu-vterm-buffer-vterm-p it)
-                 (equal (mugu-project-name-of-buffer it) (mugu-project-name project)))
+                 (mugu-project-buffer-in-project-p it project))
             (buffer-list)))
 
 (defun mugu-pvterm--list-vterm-without-project ()
   "Return a list of vterm without project."
   (--filter (and (mugu-vterm-buffer-vterm-p it)
-                 (not (mugu-project-of-buffer it)))
+                 (not (mugu-project-root-of-buffer it)))
             (buffer-list))
   )
 
@@ -41,9 +40,10 @@
 Set its project to PROJECT or current project.
 Rename it to TERM-NAME or PROJECT.
 Then execute COMMANDS if any."
-  (let* ((project-name (or (mugu-project-name project) (mugu-project-current-name)))
+  (let* ((project (or project (mugu-project-current-root)))
+         (project-name (mugu-project-name project))
          (term-name (or term-name project-name)))
-    (mugu-project-assign-buffer (current-buffer) (mugu-project-by-name project-name))
+    (mugu-project-pin-buffer (current-buffer) project)
     (mugu-vterm-rename (current-buffer) term-name)
     (when commands
       (vterm-send-string commands t)
@@ -61,6 +61,7 @@ If PROJECT is not defined, `mugu-project-current-root' is used instead."
 If PROJECT is not defined, current-project is used instead.
 Run COMMANDS upon creation if defined."
   (interactive)
+  (message "%s %s %s" project term-name commands)
   (with-temp-hook
     mugu-vterm-after-vterm-creation-hook
     (apply-partially #'mugu-pvterm-after-creation project term-name commands)

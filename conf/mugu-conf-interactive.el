@@ -87,7 +87,9 @@
           counsel-yank-pop
           mugu-orgi-headlines)))
 
-(use-package company-prescient)
+(use-package company-prescient
+  :after company
+  )
 
 (use-package ivy-avy
   :defer

@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: use package hydra
+# key: :hydra
+# --
+
+:hydra
+(${1:name}-menu (:color ${2:blue} :hint nil)
+                ("${3:key}" ${4:command} "${5:description}"))

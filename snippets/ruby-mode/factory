@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: factory
+# key: factory
+# --
+factory :${1:factory_name}, ${2:parent: :${3:parent_symbol_name}}, ${4:class: ${5:associated_class}}

@@ -18,10 +18,11 @@
 
 (defun mugu-ruby-prettify (file)
   "Prettify FILE."
-  (interactive (list buffer-file-truename))
+  (interactive (list buffer-file-name))
   (if (eq major-mode 'ruby-mode)
       (progn
-        (shell-command (format "%s %s" mugu-ruby-prettify-cmd file))
+        (shell-command (format "%s %s" mugu-ruby-prettify-cmd
+                               (rspec--shell-quote-local file)))
         (revert-buffer 'ignore-auto 'no-confirm))
     (message "Can only prettify ruby file")))
 
@@ -33,6 +34,12 @@
                                      (rspec-verify-method)
                                      (rspec-toggle-spec-and-target-find-example)))
     (rspec-verify-method)))
+
+(defun mugu-ruby-rspec-verify-directory ()
+  "Verify current directory.  Not recursive."
+  (interactive)
+  (rspec-compile (-filter #'rspec-spec-file-p (f-files default-directory))
+                 (rspec-core-options)))
 
 (mugu-define-lang-mode "ruby" "")
 

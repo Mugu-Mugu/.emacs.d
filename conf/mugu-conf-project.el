@@ -27,7 +27,7 @@
 
 (use-package mugu-project-vterm
   :straight nil
-  :after mugu-project
+  :after (mugu-project mugu-vterm)
   :config
   (mugu-pvterm-activate))
 

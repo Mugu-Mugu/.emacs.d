@@ -23,6 +23,7 @@ Scratch is in Emacs Lisp mode and trigger a lot of package configuration at
 startup which is not needed nor required.  To prevent this, we kill it before it
 had chance to be loaded."
   (setq initial-frame-alist (mugu-cosmetics-frame-params))
+  (push '(fullscreen . maximized) initial-frame-alist)
   (setq initial-scratch-message nil)
   (setq initial-major-mode 'fundamental-mode)
   (setq inhibit-splash-screen nil
@@ -77,6 +78,7 @@ had chance to be loaded."
   (setq require-final-newline t)
   (setq scroll-conservatively 9999
         scroll-preserve-screen-position t)
+  (setq enable-local-variables 'safe)
   (setq system-time-locale "C")
   (which-function-mode 0)
   (fset 'yes-or-no-p 'y-or-n-p)

@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: ivy-add-actions
+# key: (ivy-add-actions
+# --
+
+(ivy-add-actions ${1:ivy-command}
+                 '(${2:(${3:"r"} ${4:command} ${5:"command description"})}))

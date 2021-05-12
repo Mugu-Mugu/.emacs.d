@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: aggregate_failures
+# key: aggregate_failures
+# --
+
+aggregate_failures '${1:message}' do
+  $0
+end

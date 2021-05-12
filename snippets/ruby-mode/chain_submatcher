@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: chain_submatcher
+# key: chain_submatcher
+# --
+chain(:${1:sub_matcher}) { chain_matcher(${2:condition}) }

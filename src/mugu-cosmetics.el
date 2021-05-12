@@ -7,13 +7,12 @@
 ;; * begin:
 (defun mugu-cosmetics-frame-params ()
   "Return the frame params I like."
-  `((fullscreen . maximized)
-    (horizontal-scroll-bars . nil)
+  `((horizontal-scroll-bars . nil)
     (vertical-scroll-bars . nil)
     (tool-bar-lines . nil)
     (menu-bar-lines . nil)
-    (font . "DejaVu Sans Mono-9:bold")
-    (alpha . (95 . 95))
+    (font . "Fira Code-9")
+    ;; (alpha . (98 . 98))
     ,(when (mugu-compat-wsl-p) '(inhibit-double-buffering . t))))
 
 (defun mugu-cosmetics-activate ()

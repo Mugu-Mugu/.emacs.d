@@ -19,8 +19,9 @@
   :config
   (load-theme 'doom-city-lights t))
   ;; very nice theme
-  ;; (load-theme 'doom-vibrant t)
   ;; (load-theme 'doom-tomorrow-night t)
+  ;; (load-theme 'doom-city-lights t)
+  ;; (load-theme 'doom-vibrant t)
   ;; nice themes
   ;; (load-theme 'doom-palenight t)
   ;; (load-theme 'doom-moonlight t)

@@ -1,6 +1,12 @@
 # straight file
 straight/*
 
+# transient files
+transient/
+
+# other useless file
+.docker-robe-project
+
 # Windows image file caches
 Thumbs.db
 ehthumbs.db
@@ -34,6 +40,10 @@ $RECYCLE.BIN/
 # Thumbnails
 ._*
 
+# object file
+*.eln
+eln-cache/
+
 # Files that might appear in the root of a volume
 .DocumentRevisions-V100
 .fseventsd
@@ -64,3 +74,6 @@ site/*
 !**/.keep
 *.org_archive
 mugu-packages/mugu-custom.el
+
+# db
+org-roam.db
