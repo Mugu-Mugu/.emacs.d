@@ -15,10 +15,19 @@
 
 (use-package mugu-magit
   :straight nil
+  :demand
   :after magit
+  :general
+  (:keymaps 'evil-collection-magit-toggle-text-minor-mode-map
+            [remap mugu-menu-call-mode-menu] #'mugu-magit-leave-text-mode)
   :config
   (mugu-magit-enable-menus)
   (mugu-magit-configure))
+
+(use-package evil-collection
+  :after magit
+  :custom
+  (evil-collection-magit-use-y-for-yank t))
 
 (use-package git-timemachine
   :defer

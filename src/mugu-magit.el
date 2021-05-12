@@ -5,6 +5,7 @@
 (require 'hydra)
 (require 'magit)
 (require 'mugu-menu)
+(require 'evil-collection)
 
 (defun mugu-magit-yank-branch ()
   "Self explanotary."
@@ -36,8 +37,8 @@
   ("k" magit-section-backward "↑ section")
   ("J" avy-goto-line-below "↓ jump")
   ("K" avy-goto-line-above "↑ jump")
-  ("v" evil-visual-char "visual" :color blue)
-  ("m" evil-motion-state "free motion" :color blue))
+  ("v" nil "visual" :color pink)
+  ("m" evil-collection-magit-toggle-text-mode "free motion" :color blue))
 
 (defhydra mugu-magit-status-actions-hydra
   (:color red :hint nil)
@@ -67,11 +68,16 @@
 
 (defhydra mugu-magit-status-menu
   (:color amaranth :inherit (mugu-magit-default-menu/heads
-                             mugu-magit-status-actions-hydra/heads
-                             ))
+                             mugu-magit-status-actions-hydra/heads))
   "
                                -- MAGIT STATUS --
 ")
+
+(defun mugu-magit-leave-text-mode ()
+  (interactive)
+  "."
+  (evil-collection-magit-toggle-text-mode)
+  (mugu-magit-default-menu/body))
 
 (defun mugu-magit-ediff-stage ()
   "Show ediff for staged in a tweaked ediff view.
