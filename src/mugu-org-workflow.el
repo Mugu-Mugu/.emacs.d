@@ -213,6 +213,17 @@ The hack with noflet is to prevent fucking orgmode to sabotage the windows confi
   "Capture a link in the form of a todo at location selected by FIND-LOC-FIND."
   (mugu-orgw-capture-todo find-loc-find "* TODO %i %? \n %l"))
 
+(defun mugu-orgw-checkout-headline-to-dailies (daily-capture-function)
+  "Command to capture the headline at point as link to a daily.
+The daily file is the one referenced by DAILY-CAPTURE-FUNCTION."
+  (interactive)
+  (call-interactively #'org-store-link)
+  (let ((org-roam-dailies-capture-templates '(("d" "default" entry #'org-roam-capture--get-point "* TODO %a" :file-name "daily/%<%Y-%m-%d>" :head "#+title: %<%Y-%m-%d>\n" :olp
+                                               ("Inbox")
+                                               :unnarrowed t
+                                               :immediate-finish t))))
+    (call-interactively daily-capture-function)))
+
 ;; * Agenda
 (defun mugu-orgw-agenda-future-overview ()
   "Display a global org agenda view about upcoming events.."
