@@ -224,6 +224,16 @@ The daily file is the one referenced by DAILY-CAPTURE-FUNCTION."
                                                :immediate-finish t))))
     (call-interactively daily-capture-function)))
 
+(defun mugu-orgw-move-headline-to-dailies (daily-goto-function)
+  "Command to move the headline at point to target dailies file.
+The daily file is the one referenced by DAILY-GOTO-FUNCTION."
+  (interactive)
+  (let ((daily-rfloc (save-window-excursion
+                       (funcall daily-goto-function)
+                       (mugu-orgu-rfloc-at-point))))
+    (org-refile nil nil daily-rfloc)
+    (save-buffer)))
+
 ;; * Agenda
 (defun mugu-orgw-agenda-future-overview ()
   "Display a global org agenda view about upcoming events.."

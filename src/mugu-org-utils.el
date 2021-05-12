@@ -93,6 +93,10 @@ Will refile HEADLINE to FILE."
   (or (org-element-property :tags headline)
       (-uniq (s-split "," (plist-get headline :native_tags)))))
 
+(defun mugu-orgu-rfloc-at-point ()
+  "Get the RFLOC of headline at point a s in `org-refile'."
+  (list "" buffer-file-name nil (point)))
+
 ;;; Time utilities
 (defun mugu-orgu-timestamp-to-float (org-timestamp)
   "Convert a ORG-TIMESTAMP to a number of seconds since epoch."
