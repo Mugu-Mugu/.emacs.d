@@ -21,6 +21,9 @@
   :straight nil
   :hook
   (python-mode . mugu-python-configure-file)
+   :general
+   (:keymaps '(python-mode-map)
+             [remap mugu-menu-call-mode-menu] #'mugu-lang-menu-menu)
   :config
   (mugu-python-configure-package))
 

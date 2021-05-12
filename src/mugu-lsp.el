@@ -13,30 +13,52 @@
 (require 'dumb-jump)
 (require 'mugu-dumbjump)
 
-(defmenu mugu-lsp-menu (:color blue :hint nil :inherit (mugu-lang-menu-hydra/heads))
-  "-- Language menu -- "
-  ("dd" lsp-ui-doc-mode "display doc" :column "Display" :color red)
-  ("ds" lsp-ui-sideline-toggle-symbols-info "display symbol" :color red)
-  ("md" lsp-describe-session "describe lsp session" :column "Management")
-  ("mr" lsp-workspace-restart "Restart project")
-  ("ma" lsp-workspace-folders-add "Add workspace folder")
-  ("mD" lsp-workspace-folders-remove "Remove workspace folder")
-  ("ms" lsp-workspace-folders-open "Switch workspace folder"))
 
-(defun mugu-lsp-goto-def ()
-  "Goto definition at point with LSP or another tool."
-  (interactive)
-  (with-dump-jump-fallback (lsp-find-definition)))
+
+(defmenu mugu-lsp-menu (:color red :hint nil)
+  "-- Language menu -- "
+
+  ("sD" lsp-disconnect "disconnect" :column "Session")
+  ("sd" lsp-describe-session "describe session")
+  ("sq" lsp-workspace-shutdown "shutdown server")
+  ("sr" lsp-workspace-restart "restart server")
+  ("ss" lsp "start server")
+
+  ("fa" lsp-workspace-folders-add "add folder" :column "Folder")
+  ("fb" lsp-workspace-blacklist-remove "un-blacklist folder")
+  ("fr" lsp-workspace-folders-remove "remove folder")
+
+  ("Td" lsp-modeline-diagnostics-mode "toggle modeline diagnostics" :column "Misc Toggles")
+  ("Tl" lsp-toggle-trace-io "toggle log io")
+  ("Tt" lsp-treemacs-sync-mode "toggle treemacs integration")
+
+  ("ts" lsp-ui-sideline-mode "toggle sideline" :column "UI toggles")
+  ("ta" lsp-modeline-code-actions-mode "toggle modeline code actions")
+  ("tb" lsp-headerline-breadcrumb-mode "toggle breadcrumb")
+  ("td" lsp-ui-doc-mode "toggle documentation popup")
+  ("tf" lsp-toggle-on-type-formatting "toggle on type formatting")
+  ("th" lsp-toggle-symbol-highlight "toggle highlighting")
+  ("tl" lsp-lens-mode "toggle lenses")
+  ("ts" lsp-toggle-signature-auto-activate "toggle signature")
+  ("q" nil "quit" :color blue :column nil))
 
 (defun mugu-lsp-activate-for-keymap (keymap-sym)
   "Configure lsp binding for the given KEYMAP-SYM symbol."
   (general-define-key :keymaps keymap-sym
-                      [remap mugu-lang-goto-def] #'mugu-lsp-goto-def
-                      [remap mugu-lang-find-ref] #'lsp-ui-peek-find-references
-                      [remap mugu-lang-execute-code-action] #'lsp-execute-code-action
-                      [remap mugu-lang-format-buffer] #'lsp-format-buffer
+                      [remap mugu-lang-lsp-menu] #'mugu-lsp-menu
+                      [remap mugu-lang-find-declaration] #'lsp-find-declaration
+                      [remap mugu-lang-find-definition] #'lsp-find-definition
+                      [remap mugu-lang-find-implementation] #'lsp-find-implementation
+                      [remap mugu-lang-find-reference] #'lsp-find-references
+                      [remap mugu-lang-find-symbol] #'xref-find-apropos
+                      [remap mugu-lang-find-type-definition] #'lsp-find-type-definition
                       [remap mugu-lang-rename-thing] #'lsp-rename
-                      [remap mugu-menu-call-mode-menu] #'mugu-lsp-menu))
+                      [remap mugu-lang-execute-code-action] #'lsp-execute-code-action
+                      [remap mugu-lang-peek-find-definitions] #'lsp-ui-peek-find-definitions
+                      [remap mugu-lang-peek-find-implementation] #'lsp-ui-peek-find-implementation
+                      [remap mugu-lang-peek-find-references] #'lsp-ui-peek-find-references
+                      [remap mugu-lang-organize-imports] #'lsp-organize-imports
+                      [remap mugu-lang-peek-find-workspace-symbol] #'lsp-ui-peek-find-workspace-symbol))
 
 (defun mugu-lsp-activate-ui-keymap ()
   "."

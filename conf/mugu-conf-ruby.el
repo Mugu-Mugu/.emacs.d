@@ -47,7 +47,7 @@
   :straight nil
   :general
   (:keymaps 'mugu-ruby-minor-mode-map
-            [remap mugu-lang-goto-def] (lambda () (interactive) (with-dump-jump-fallback (robe-jump)))
+            [remap mugu-lang-find-definition] (lambda () (interactive) (with-dump-jump-fallback (robe-jump)))
             [remap mugu-lang-format-buffer] #'mugu-ruby-prettify
             [remap mugu-lang-test-file] #'rspec-verify
             [remap mugu-lang-test-rerun-last] #'rspec-rerun

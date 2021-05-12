@@ -12,7 +12,12 @@
   :custom
   (lsp-prefer-flymake nil)
   (lsp-auto-guess-root t)
-  (lsp-enable-snippet t))
+  (lsp-enable-snippet t)
+  (lsp-ui-doc-delay 0.3)
+  (lsp-ui-doc-include-signature t)
+  (lsp-ui-doc-position 'at-point)
+  (lsp-ui-sideline-delay 0.5)
+  (lsp-ui-sideline-enable t))
 
 (use-package lsp-ui
   :defer

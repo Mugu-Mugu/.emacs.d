@@ -62,7 +62,7 @@
   "Activate lang bindings for Emacs Lisp."
   (general-define-key :keymaps 'emacs-lisp-mode-map
                       [remap mugu-lang-additional-menu] #'mugu-lisp-additional-menu
-                      [remap mugu-lang-goto-def] #'mugu-lisp-goto-def
+                      [remap mugu-lang-find-definition] #'mugu-lisp-goto-def
                       [remap mugu-lang-format-buffer] #'mugu-lisp-prettify))
 
 (provide 'mugu-lisp)

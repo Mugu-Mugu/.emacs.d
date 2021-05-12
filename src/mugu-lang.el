@@ -14,11 +14,7 @@
      "A stub command that should be remapped."
      (message "feature %s not available in %s" ,(symbol-name name) major-mode)))
 
-(define-mugu-lang-command goto-def)
-(define-mugu-lang-command find-ref)
-(define-mugu-lang-command execute-code-action)
-(define-mugu-lang-command format-buffer)
-(define-mugu-lang-command rename-thing)
+;; tests
 (define-mugu-lang-command test-file)
 (define-mugu-lang-command test-rerun-last)
 (define-mugu-lang-command test-toggle-goto)
@@ -27,17 +23,55 @@
 (define-mugu-lang-command test-all-in-project)
 (define-mugu-lang-command test-directory)
 (define-mugu-lang-command test-debugger)
+
+;; menus stubs
 (define-mugu-lang-command additional-menu)
+(define-mugu-lang-command lsp-menu)
+
+;; lsp/general lang features
+(define-mugu-lang-command find-symbol)
+(define-mugu-lang-command find-declaration)
+(define-mugu-lang-command find-definition)
+(define-mugu-lang-command find-implementation)
+(define-mugu-lang-command find-reference)
+(define-mugu-lang-command find-type-definition)
+(define-mugu-lang-command organize-imports)
+(define-mugu-lang-command peek-find-implementation)
+(define-mugu-lang-command peek-find-references)
+(define-mugu-lang-command peek-find-definitions)
+(define-mugu-lang-command peek-find-workspace-symbol)
+(define-mugu-lang-command execute-code-action)
+(define-mugu-lang-command format-buffer)
+(define-mugu-lang-command format-region)
+(define-mugu-lang-command rename-thing)
+
+;; non lsp lang features
+(define-mugu-lang-command compile)
 
 (defmenu mugu-lang-menu (:color blue :hint nil)
   "-- Language menu -- "
-  ("g" mugu-lang-goto-def "goto def" :column "Navigation")
-  ("x" mugu-lang-find-ref "xref lookup")
-  ("s" imenu "structure menu")
-  ("f" mugu-lang-execute-code-action "fix code" :column "Actions")
-  ("F" mugu-lang-format-buffer "fix file")
-  ("r" mugu-lang-rename-thing "rename thing")
-  ("t" mugu-lang-test-menu "test menu" :column "Submenu")
+  ("ga" mugu-lang-find-symbol "find symbol in workspace" :column "Find")
+  ("gd" mugu-lang-find-declaration "find declarations")
+  ("gg" mugu-lang-find-definition "find definitions")
+  ("gi" mugu-lang-find-implementation "find implementations")
+  ("gr" mugu-lang-find-reference "find references")
+  ("gt" mugu-lang-find-type-definition "find type definition")
+  ("s" imenu "structure menu" :column "Misc")
+
+  ("ro" mugu-lang-organize-imports "organize imports" :column "Actions")
+  ("rr" mugu-lang-rename-thing "rename")
+  ("aa" mugu-lang-execute-code-action "code actions")
+  ("==" mugu-lang-format-buffer "format buffer")
+  ("=r" mugu-lang-format-region "format region")
+  ("c" mugu-lang-compile "compile project")
+
+  ("pg" mugu-lang-peek-find-definitions  "peek definitions" :column "Peek")
+  ("pi" mugu-lang-peek-find-implementation  "peek implementations")
+  ("pr" mugu-lang-peek-find-references  "peek references")
+  ("ps" mugu-lang-peek-find-workspace-symbol  "peek workspace symbol")
+
+  ("l" mugu-lang-lsp-menu "lsp menu" :column "Submenus")
+  ("t" mugu-lang-test-menu "test menu")
   ("a" mugu-lang-additional-menu "additional menu"))
 
 (defmenu mugu-lang-test-menu (:color blue :hint nil)
