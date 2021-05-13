@@ -69,6 +69,8 @@
   :config
   (mugu-tab-mode +1)
   (setq tab-bar-history-limit 200)
+  :custom
+  (tab-bar-show 1)
   :pretty-hydra
   (mugu-tab-menu
    (:color red :hint nil)
