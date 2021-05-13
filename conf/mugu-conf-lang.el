@@ -10,24 +10,43 @@
 (use-package lsp-mode
   :commands lsp
   :custom
+  (lsp-eldoc-render-all nil)
+  (lsp-eldoc-enable-hover nil)
   (lsp-prefer-flymake nil)
   (lsp-auto-guess-root t)
-  (lsp-enable-snippet t)
-  (lsp-ui-doc-delay 0.3)
-  (lsp-ui-doc-include-signature t)
-  (lsp-ui-doc-position 'at-point)
-  (lsp-ui-sideline-delay 0.5)
-  (lsp-ui-sideline-enable t))
+  (lsp-enable-snippet t))
 
 (use-package lsp-ui
   :defer
   :commands lsp-ui-mode
-  :hook (lsp-mode . lsp-ui-mode))
+  :custom
+  (lsp-ui-sideline-delay 0.1)
+  (lsp-ui-sideline-enable t)
+  :hook
+  (lsp-mode . lsp-ui-mode))
+
+(use-package lsp-ui
+  :defer
+  :general
+  (:keymaps
+   '(lsp-ui-doc-frame-mode-map lsp-ui-doc-mode-map)
+   :states '(normal motion)
+   "<space>" #'mugu-lsp-doc-hide
+   "q" #'mugu-lsp-doc-hide)
+  :custom
+  (lsp-ui-doc-enable nil)
+  (lsp-ui-doc-delay 5.0)
+  (lsp-ui-doc-position 'at-point)
+  (lsp-ui-doc-include-signature t)
+  (lsp-ui-doc-max-width 400)
+  (lsp-ui-doc-max-height 40))
 
 (use-package mugu-lsp
   :straight nil
   :after lsp-mode
-  :commands mugu-lsp-menu
+  :commands
+  mugu-lsp-menu
+  mugu-lsp-activate-for-keymap
   :config
   (mugu-lsp-activate-ui-keymap))
 

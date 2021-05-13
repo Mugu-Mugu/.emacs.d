@@ -44,6 +44,9 @@
 (define-mugu-lang-command format-buffer)
 (define-mugu-lang-command format-region)
 (define-mugu-lang-command rename-thing)
+(define-mugu-lang-command doc-show-at-point)
+(define-mugu-lang-command doc-search)
+(define-mugu-lang-command doc-toc)
 
 ;; non lsp lang features
 (define-mugu-lang-command compile)
@@ -60,7 +63,7 @@
 
   ("ro" mugu-lang-organize-imports "organize imports" :column "Actions")
   ("rr" mugu-lang-rename-thing "rename")
-  ("aa" mugu-lang-execute-code-action "code actions")
+  ("ra" mugu-lang-execute-code-action "code actions")
   ("==" mugu-lang-format-buffer "format buffer")
   ("=r" mugu-lang-format-region "format region")
   ("c" mugu-lang-compile "compile project")
@@ -69,6 +72,10 @@
   ("pi" mugu-lang-peek-find-implementation  "peek implementations")
   ("pr" mugu-lang-peek-find-references  "peek references")
   ("ps" mugu-lang-peek-find-workspace-symbol  "peek workspace symbol")
+
+  ("dd" mugu-lang-doc-show-at-point "show doc at point" :column "doc")
+  ("ds" mugu-lang-doc-search "search in docs")
+  ("df" mugu-lang-doc-toc "search a doc")
 
   ("l" mugu-lang-lsp-menu "lsp menu" :column "Submenus")
   ("t" mugu-lang-test-menu "test menu")

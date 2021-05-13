@@ -46,8 +46,8 @@
 (require 'mugu-conf-xml)
 (require 'mugu-conf-json)
 (require 'mugu-conf-sql)
+(require 'mugu-conf-rust)
 (require 'mugu-ada)
-(require 'mugu-rust)
 
 
 ;;; mugu

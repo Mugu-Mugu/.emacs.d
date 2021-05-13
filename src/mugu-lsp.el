@@ -42,10 +42,14 @@
   ("ts" lsp-toggle-signature-auto-activate "toggle signature")
   ("q" nil "quit" :color blue :column nil))
 
+;;;###autoload
 (defun mugu-lsp-activate-for-keymap (keymap-sym)
   "Configure lsp binding for the given KEYMAP-SYM symbol."
   (general-define-key :keymaps keymap-sym
+                      [remap mugu-lang-format-buffer] #'lsp-format-buffer
+                      [remap mugu-lang-format-region] #'lsp-format-region
                       [remap mugu-lang-lsp-menu] #'mugu-lsp-menu
+                      [remap mugu-lang-doc-show-at-point] #'mugu-lsp-doc-show-and-focus
                       [remap mugu-lang-find-declaration] #'lsp-find-declaration
                       [remap mugu-lang-find-definition] #'lsp-find-definition
                       [remap mugu-lang-find-implementation] #'lsp-find-implementation
@@ -59,6 +63,18 @@
                       [remap mugu-lang-peek-find-references] #'lsp-ui-peek-find-references
                       [remap mugu-lang-organize-imports] #'lsp-organize-imports
                       [remap mugu-lang-peek-find-workspace-symbol] #'lsp-ui-peek-find-workspace-symbol))
+
+(defun mugu-lsp-doc-show-and-focus ()
+  "."
+  (interactive)
+  (lsp-ui-doc-show)
+  (lsp-ui-doc-focus-frame))
+
+(defun mugu-lsp-doc-hide ()
+  "."
+  (interactive)
+  (lsp-ui-doc-unfocus-frame)
+  (lsp-ui-doc-hide))
 
 (defun mugu-lsp-activate-ui-keymap ()
   "."
