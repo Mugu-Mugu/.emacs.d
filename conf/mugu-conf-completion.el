@@ -29,6 +29,7 @@
    [tab] #'company-complete-common-or-cycle)
    :general
    (:states '(insert)
+            [remap indent-for-tab-command] #'company-indent-or-complete-common
             [remap completion-at-point] #'company-complete))
 
 (use-package company
