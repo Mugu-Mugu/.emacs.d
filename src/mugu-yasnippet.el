@@ -21,8 +21,9 @@
 (defun mugu-yasnippet-insert ()
   "Insert a snippet but go in insert state if needed."
   (interactive)
-  (when (evil-normal-state-p) (evil-insert-state))
-  (yas-insert-snippet))
+  (let ((ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-point))))
+    (when (evil-normal-state-p) (evil-insert-state))
+    (yas-insert-snippet)))
 
 (provide 'mugu-yasnippet)
 ;;; mugu-yasnippet ends here
