@@ -5,6 +5,7 @@
 (require 'general)
 (require 'f)
 
+;;; Core
 (use-package company
   :diminish company-mode
   :hook (prog-mode . company-mode)
@@ -12,11 +13,6 @@
   (company-idle-delay 0.1)
   (company-minimum-prefix-length 1)
   (company-require-match nil)
-  (company-backends '((company-capf :with company-yasnippet)
-                      company-files
-                      (company-dabbrev-code :with company-yasnippet)
-                      (company-dabbrev company-ispell :with company-yasnippet)))
-
   (setq company-frontends nil)
   :config
   (global-company-mode 1)
@@ -38,14 +34,37 @@
   (:keymaps '(lispyville-mode-map lispy-mode-map evil-lispy-mode-map) :states 'insert
             "M-k" nil))
 
-(use-package company-flx
-  :diminish
-  :after company
+;;; Completion sources
+(use-package company
+  :defer
   :custom
-  (company-flx-limit 250)
-  :config
-  (company-flx-mode 1))
+  (company-backends '(;; this should be the main backend
+                      (company-capf :with company-yasnippet)
+                      ;; not in the same backend as capf because if the backend offer semantic completion
+                      ;; then the dumb one from dabbrev is not welcome
+                      (company-dabbrev-code company-keywords :with company-yasnippet)
+                      ;; it makes senses to have it alone and after other to prevent a file in current
+                      ;; directory to shadow legitimate results. Besides most of the time, a completion on
+                      ;; file should start by ../ or ~/ or ./ which should be exclusive to this backend
+                      (company-files)
+                      ;; dabbrev is after becasue it could match all sort of junk
+                      (company-dabbrev :with company-yasnippet)
+                      ;; last but not least snippet alone as they were previously included as an optional
+                      ;; result
+                      (company-yasnippet))))
 
+(use-package company-restclient
+  :after restclient
+  :config
+  (push '(company-restclient :with company-yasnippet) company-backends))
+
+(use-package robe
+  :after company
+  :defer
+  :config
+  (push '(company-robe company-keywords :with company-yasnippet) company-backends))
+
+;;; Front end
 (use-package company-quickhelp
   :diminish
   :disabled
@@ -61,9 +80,10 @@
   :hook (company-mode . company-box-mode)
   :custom (company-box-doc-delay 0.1))
 
+;;; Snippets
 (use-package yasnippet
-  :defer
   :after company
+  :demand
   :delight yas-minor-mode
   :general
   (:keymaps '(prog-mode-map org-mode-map)
@@ -74,6 +94,7 @@
   (yas-wrap-around-region t)
   :config
   (yas-global-mode))
+
 (use-package yasnippet-snippets
   :after yasnippet)
 
@@ -85,12 +106,49 @@
             "²" #'mugu-yasnippet-insert
             (general-chord "²²") #'mugu-yasnippet-menu))
 
-(use-package yasnippet
-  :defer
-  :after 'ivy
-  :config
 
-  )
+;;; History
+(use-package company-prescient
+  :after company
+  :config
+  (company-prescient-mode)
+  :custom
+  (company-prescient-sort-length-enable nil))
+
+;;; Completion styles and filtering
+(use-package orderless
+  :defer
+  :custom
+  (completion-styles '(orderless))
+  (orderless-matching-styles '(orderless-literal orderless-regexp orderless-prefixes)))
+
+(use-package mugu-orderless
+  :straight nil
+  :after orderless
+  :custom
+  (orderless-style-dispatchers '(mugu-orderless-flex-if-twiddle
+                                 mugu-orderless-first-with-initialism
+                                 mugu-orderless-without-if-bang)))
+
+(use-package orderless
+  :after (company mugu-orderless)
+  :demand
+  :config
+  (advice-add 'company-capf--candidates :around #'mugu-orderless-company-face-advice)
+  :custom
+  (orderless-component-separator "[ &]"))
+
+(use-package orderless
+  :after ivy
+  :demand
+  :config
+  (push '(t . orderless-ivy-re-builder) ivy-re-builders-alist)
+  (push '(counsel-rg . ivy--regex-ignore-order) ivy-re-builders-alist))
+
+(use-package lsp-mode
+  :after company yasnippet
+  :custom
+  (lsp-enable-snippet t))
 
 (provide 'mugu-conf-completion)
 ;;; mugu-conf-completion ends here

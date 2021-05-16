@@ -18,6 +18,8 @@
 (use-package ivy
   :defer
   :delight ivy-mode
+  :custom
+  (ivy-re-builders-alist '((t . ivy--regex-ignore-order)))
   :config
   (ivy-mode 1))
 
@@ -72,12 +74,16 @@
 
 (use-package prescient
   :custom
-  (prescient-persist-mode t))
+  (prescient-history-length 200)
+  (prescient-persist-mode t)
+
+  (prescient-sort-full-matches-first t))
 
 (use-package ivy-prescient
   :config
   (ivy-prescient-mode)
   :custom
+  (ivy-prescient-enable-filtering nil)
   (ivy-prescient-sort-commands
    '(:not swiper
           ivy-switch-buffer
@@ -86,10 +92,6 @@
           counsel-fzf
           counsel-yank-pop
           mugu-orgi-headlines)))
-
-(use-package company-prescient
-  :after company
-  )
 
 (use-package ivy-avy
   :defer

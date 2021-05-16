@@ -33,7 +33,6 @@
         ivy-count-format "(%d/%d) "
         ivy-height 20
         ivy-wrap t
-        ivy-re-builders-alist '((t . ivy--regex-ignore-order))
         ivy-preferred-re-builders '((ivy--regex-ignore-order . "order")
                                     (ivy--regex-plus . "ivy")
                                     (ivy--regex-fuzzy . "fuzzy"))
