@@ -92,5 +92,12 @@ HOOK-FUNCTION will be temporarily added to VAR-HOOK."
     (error (message "Invalid expression")
            (insert (current-kill 0)))))
 
+(defun mugu-silence-function (function)
+  "Prevent FUNCTION from displaying message."
+  (advice-add function :around
+              (lambda (orig &rest args)
+                (let ((inhibit-message t))
+                  (apply orig args)))))
+
 (provide 'mugu-misc)
 ;;; mugu-misc ends here

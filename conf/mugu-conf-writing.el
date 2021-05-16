@@ -11,6 +11,10 @@
   :custom
   (ispell-quietly t)
   (flyspell-issue-message-flag nil)
+  (flyspell-issue-welcome-flag nil)
+  :config
+  (mugu-silence-function #'ispell-lookup-words)
+
   :pretty-hydra
   (mugu-flyspell-menu (:color red :hint nil)
                       ("Search error"
@@ -33,18 +37,27 @@
 (use-package flyspell-correct-ivy
   :after flyspell-correct)
 
+(use-package flyspell-lazy
+  :disabled "triggers some error and also kill buffers randomly."
+  :after flyspell
+  :config
+  (flyspell-lazy-mode))
+
 (use-package guess-language
   :hook
   (text-mode . guess-language-mode)
   :custom
   (guess-language-min-paragraph-length 45)
   :config
+  (mugu-silence-function #'guess-language)
   (setq guess-language-languages '(en fr))
   :diminish guess-language-mode)
 
 (use-package company
+  :disabled "In practice, orthographic completion checking is not effective. Stopping to read a word and the possible candidates is still slower than typing fast and wrong and correcting later."
   :after guess-language
   :config
+  (add-to-list 'company-backends '(company-dabbrev company-ispell company-yasnippet) 'append)
   (add-to-list #'guess-language-after-detection-functions
                (lambda (&rest _args) (setq-local company-ispell-dictionary (f-join (expand-file-name user-emacs-directory) "etc/spelling" (concat (or ispell-current-dictionary "default") ".txt"))))
                'append))
