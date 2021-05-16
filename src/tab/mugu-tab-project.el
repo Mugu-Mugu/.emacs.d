@@ -25,10 +25,14 @@
 
 (defun mugu-tab-project-after-switch ()
   "."
-  (unless (f-same? (mugu-project-root-of-buffer (current-buffer))
-                   mugu-tab-project-root)
-    (with-temp-buffer
-      (projectile-find-file))))
+  (unless
+      (let ((buffer-root (mugu-project-root-of-buffer (current-buffer))))
+        (or (not mugu-tab-project-root)
+            (not buffer-root)
+            (f-same? (mugu-project-root-of-buffer (current-buffer))
+                     mugu-tab-project-root))
+        (with-temp-buffer
+          (projectile-find-file)))))
 
 (defun mugu-tab-project--save-project ()
   "Record current root."
