@@ -1,12 +1,23 @@
 # -*- mode: snippet -*-
 # name: my minor mode
-# key: (define-minor-mode
+# key: dfm
 # --
 
-(define-minor-mode ${1:mugu-${2:package}-mode}
-  "${3:Minor mode description.}"
+(defun mugu-$1--activate ()
+  "Setup for mugu-$1-mode."
+
+  )
+
+(defun mugu-$1--deactivate ()
+  "Tear down for mugu-$1-mode."
+
+  )
+
+(define-minor-mode mugu-${1:package}-mode
+  "Define mugu-$1-mode${2:.}"
   :global t
   :group 'mugu
-  (if $1
-      (${4:mugu-$2--activate})
-    (${5:mugu-$2--deactivate})))
+  :keymap (make-sparse-keymap)
+  (if mugu-$1-mode
+      (mugu-$1--activate)
+    (mugu-$1--deactivate)))

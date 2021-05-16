@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: caption
+# key: caption
+# --
+#+CAPTION: ${1:Exemple de définition de backends}

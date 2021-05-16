@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: src rust
+# expand-env: ((yas-wrap-around-region nil))
+# key: rust
+# --
+#+begin_src rust
+`yas-selected-text`$1
+#+end_src
+$0
