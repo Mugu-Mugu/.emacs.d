@@ -23,7 +23,7 @@
   :disabled
   :defer t
   :delight outshine-mode
-  :hook  ((emacs-lisp-mode) . outshine-mode))
+  :hook  (emacs-lisp-mode . outshine-mode))
 
 (use-package origami
   :commands origami-mode origami-recursively-toggle-node

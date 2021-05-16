@@ -38,7 +38,7 @@
 (defun mugu-lisp--insert-package-prefix ()
   "Insert package prefix at point."
   (interactive)
-  (insert (format " %s/" (file-name-base buffer-file-name)))
+  (insert (format " %s-" (file-name-base buffer-file-name)))
   (when (fboundp 'evil-insert) (evil-insert 1)))
 
 (defmenu mugu-lisp-additional-menu
