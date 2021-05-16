@@ -38,7 +38,7 @@ can't search without inserting whatever shit is at point."
   ([remap mugu-feature-search-google] #'counsel-web-suggest
    [remap mugu-feature-search-google-at-point] #'counsel-web-thing-at-point)
   :custom
-  (counsel-web-search-action #'browse-url-default-browser)
+  (counsel-web-search-action #'counsel-web-search-open-externally)
   (counsel-web-engine 'duckduckgo))
 
 (use-package mugu-org-link
@@ -47,7 +47,9 @@ can't search without inserting whatever shit is at point."
   :config
   (mugu-org-link-activate-ivy-actions)
   (org-link-set-parameters "http" :complete #'mugu-org-link-http-complete)
-  (org-link-set-parameters "https" :complete #'mugu-org-link-http-complete))
+  (org-link-set-parameters "https" :complete #'mugu-org-link-http-complete)
+  (org-link-set-parameters "roam" :complete #'org-roam-insert)
+  )
 
 
 (provide 'mugu-conf-search)

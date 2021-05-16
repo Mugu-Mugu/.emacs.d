@@ -20,7 +20,6 @@ Return (link description)"
 
 (defun mugu-org-link--action-insert (candidate)
   "Insert the CANDIDATE link as a org format link."
-  (message "%s" (mugu-org-link--decompose-candidate candidate))
   (apply #'org-insert-link nil (mugu-org-link--decompose-candidate candidate)))
 
 (defun mugu-org-link-http-complete ()
