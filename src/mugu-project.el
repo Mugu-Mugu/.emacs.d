@@ -32,7 +32,7 @@ No argument is passed on call invocation.")
   "Pin BUFFER to the project defined by PROJECT-ROOT."
   (interactive)
   (let ((buffer (or buffer (current-buffer)))
-        (project-root (or project-root (mugu-projet-current-root))))
+        (project-root (or project-root (mugu-project-current-root))))
     (with-current-buffer buffer
       (setq mugu-project-pinned-root project-root))))
 
