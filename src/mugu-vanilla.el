@@ -6,11 +6,17 @@
 (require 'mugu-cosmetics)
 (require 'mugu-misc)
 (require 'evil)
+(require 'dash)
 
 ;; * begin:
-(defun mugu-vanilla--gc ()
+(defun mugu-vanilla--gc (&rest _args)
   "."
-  (garbage-collect))
+  (run-at-time 0.1 nil (lambda ()
+                         (when (-none? 'identity (-map #'frame-focus-state (frame-list)))
+                           (message "garbage collect on focus out at %s with state %s"
+                                    (format-time-string "%M:%S" (current-time))
+                                    (-map #'frame-focus-state (frame-list)))
+                           (garbage-collect)))))
 
 (defun mugu-vanilla--kill-scratch ()
   "Scratch buffer is hard coded to Emacs Lisp mode.
