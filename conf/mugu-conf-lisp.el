@@ -53,13 +53,14 @@
             "]" nil))
 
 (use-package mugu-lisp
-  :defer
   :straight nil
+  :hook (emacs-lisp-mode . mugu-elisp-minor-mode)
   :general
-  (:keymaps 'emacs-lisp-mode-map
-            [remap mugu-menu-call-mode-menu] #'mugu-lisp-lang-menu)
-  :config
-  (mugu-lisp-set-bindings))
+  (:keymaps 'mugu-elisp-minor-mode-map
+            [remap mugu-lang-additional-menu] #'mugu-lisp-additional-menu
+            [remap mugu-lang-format-buffer] #'mugu-lisp-prettify
+            [remap mugu-lang-find-definition] #'elisp-slime-nav-find-elisp-thing-at-point
+            [remap mugu-menu-call-mode-menu] #'mugu-lisp-lang-menu))
 
 (use-package eldoc
   :defer

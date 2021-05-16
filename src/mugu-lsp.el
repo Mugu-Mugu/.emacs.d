@@ -11,7 +11,6 @@
 (require 'lsp-ui)
 (require 'mugu-lang)
 (require 'dumb-jump)
-(require 'mugu-dumbjump)
 
 
 

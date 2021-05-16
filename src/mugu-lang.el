@@ -104,6 +104,28 @@
     (define-key map [remap mugu-menu-call-mode-menu] #'mugu-lang-menu)
     map))
 
+
+(defun mugu-lang--activate ()
+  "Setup for mugu-lang-mode."
+  ;; I don't think this is ever the trouble with lsp or rg as fallback
+  (add-hook 'xref-backend-functions #'dumb-jump-xref-activate 99 'local)
+  (remove-hook 'xref-backend-functions #'etags--xref-backend 'local)
+  ;; yeah i dunno why it gets added but it does
+  (remove-hook 'xref-backend-functions t 'local))
+
+(defun mugu-lang--deactivate ()
+  "Tear down for mugu-lang-mode."
+
+  )
+
+(define-minor-mode mugu-lang-mode
+  "Define mugu-lang-mode."
+  :group 'mugu
+  :keymap (make-sparse-keymap)
+  (if mugu-lang-mode
+      (mugu-lang--activate)
+    (mugu-lang--deactivate)))
+
 (defmacro mugu-define-lang-mode (lang doc)
   "Define a minor mode to provide bindings to interract with a language.
 LANG is exepect to be the name of a major mode for a language.

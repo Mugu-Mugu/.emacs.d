@@ -7,6 +7,17 @@
 ;; * begin:
 (require 'use-package)
 
+(use-package mugu-lang
+  :straight nil
+  :hook
+  (prog-mode . mugu-lang-mode)
+  :custom
+  (xref-show-definitions-function #'xref-show-definitions-completing-read)
+  :general
+  (:keymaps 'mugu-lang-mode-map
+            [remap mugu-lang-find-definition] #'dumb-jump-go
+            [remap mugu-lang-find-reference] #'xref-find-definitions))
+
 (use-package lsp-mode
   :commands lsp
   :custom
@@ -14,7 +25,8 @@
   (lsp-eldoc-enable-hover nil)
   (lsp-prefer-flymake nil)
   (lsp-auto-guess-root t)
-  (lsp-enable-snippet t))
+  (lsp-enable-snippet t)
+  (lsp-completion-provider :none))
 
 (use-package lsp-ui
   :defer
@@ -22,6 +34,7 @@
   :custom
   (lsp-ui-sideline-delay 0.1)
   (lsp-ui-sideline-enable t)
+  (lsp-signature-function #'lsp-signature-posframe)
   :hook
   (lsp-mode . lsp-ui-mode))
 
@@ -64,6 +77,7 @@
 
 (use-package dumb-jump
   :defer
+  :commands dumb-jump-xref-activate
   :custom
   (dumb-jump-selector 'ivy)
   (dumb-jump-confirm-jump-to-modified-file nil)

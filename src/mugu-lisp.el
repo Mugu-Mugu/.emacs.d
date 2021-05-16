@@ -3,7 +3,6 @@
 ;;; Commentary:
 (require 'mugu-menu)
 (require 'elisp-slime-nav)
-(require 'mugu-dumbjump)
 (require 'lispyville)
 (require 'mugu-lang)
 
@@ -29,11 +28,6 @@
           ((boundp sym) (find-variable sym))
           (t (message "%s not defined either as a var or a function" sym)))))
 
-(defun mugu-lisp-goto-def ()
-  "Jump to definition of thing at point."
-  (interactive)
-  (with-dump-jump-fallback (call-interactively #'elisp-slime-nav-find-elisp-thing-at-point)))
-
 (defun mugu-lisp-prettify ()
   "Jump to definition of thing at point."
   (interactive)
@@ -58,12 +52,7 @@
 
 (defalias 'mugu-lisp-lang-menu #'mugu-lang-menu)
 
-(defun mugu-lisp-set-bindings ()
-  "Activate lang bindings for Emacs Lisp."
-  (general-define-key :keymaps 'emacs-lisp-mode-map
-                      [remap mugu-lang-additional-menu] #'mugu-lisp-additional-menu
-                      [remap mugu-lang-find-definition] #'mugu-lisp-goto-def
-                      [remap mugu-lang-format-buffer] #'mugu-lisp-prettify))
+(mugu-define-lang-mode elisp "elisp mode")
 
 (provide 'mugu-lisp)
 ;;; mugu-lisp ends here
