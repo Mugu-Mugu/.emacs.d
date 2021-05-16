@@ -47,7 +47,7 @@ Side window not declared by this mean won't be managed."
     `(,buffer-name-or-predicate
       (mugu-window-display-in-side display-buffer-in-side-window display-buffer-same-window display-buffer-use-some-window)
       (side . ,direction)
-      (slot . 1)
+      (slot . -1)
       (,height-or-width . ,size)
       (inhibit-switch-frame . t)
       (window-parameters (dont-bury ,dont-bury)
@@ -87,9 +87,8 @@ Default to `selected-window'."
   (unless (window-parameter window 'dont-bury) (bury-buffer (window-buffer window)))
   (delete-window window))
 
-(defun mugu-window-delete-or-toggle-side (&optional with-focus)
-  "Delete or toggle the next side window.
-WITH-FOCUS will also select it."
+(defun mugu-window-delete-or-toggle-side ()
+  "Delete or toggle the next side window."
   (interactive)
   (let ((next-side-window (get-window-with-predicate 'mugu-window-side-managed-p)))
     (if next-side-window
@@ -99,7 +98,7 @@ WITH-FOCUS will also select it."
             (mugu-window-display-in-side
              mugu-window-last-side-buffer-dismissed
              mugu-window-last-side-window-dismissed-params)
-            (when with-focus (switch-to-buffer mugu-window-last-side-buffer-dismissed)))
+            (switch-to-buffer mugu-window-last-side-buffer-dismissed))
 
         (message "There is no side window open.")))))
 
@@ -142,6 +141,7 @@ ARGS are forwarded as is to ORIGINAL-DELETE-OTHER-WINDOWS."
   (mugu-window-configure-side-window "\\*Apropos\\*" 'right 80)
   (mugu-window-configure-side-window "\\*Backtrace\\*" 'bottom 0.2)
   (mugu-window-configure-side-window "\\*Shell Command Output\\*" 'bottom 0.5)
+  (mugu-window-configure-side-window "\\*grep\\*" 'top 0.3)
   (mugu-window-configure-side-window "\\*Messages\\*" 'top 0.3)
   (setq display-buffer-base-action
         (cons mugu-window-base-display-action
