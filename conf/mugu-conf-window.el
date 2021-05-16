@@ -92,6 +92,12 @@
   :after mugu-project
   :config (mugu-tab-project-mode))
 
+(use-package mugu-window
+  :straight nil
+  :after robe
+  :config
+  (mugu-window-configure-side-window "\\*robe-doc\\*" 'top 0.2))
+
 ;;; Code:
 ;; -*- lexical-binding: t -*-
 (provide 'mugu-conf-window)

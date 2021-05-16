@@ -5,8 +5,10 @@
 ;;; Code:
 (require 'mugu-lang)
 (require 'rspec-mode)
+(require 'f)
 
 (defvar-local mugu-ruby-prettify-cmd "rubocop -x" "Base command to prettify a file.")
+(defvar mugu-ruby-use-robe nil "Indicate if robe should be used for ruby mode.")
 
 (defun mugu-ruby-toggle-spec-and-target ()
   "Try to toggle method spec and implem."
@@ -40,6 +42,13 @@
   (interactive)
   (rspec-compile (-filter #'rspec-spec-file-p (f-files default-directory))
                  (rspec-core-options)))
+
+(defun mugu-ruby-robe-mode-maybe ()
+  "Start robe if activated."
+  (when mugu-ruby-use-robe
+    (eval-when-compile
+      (require 'robe)
+      (robe-mode))))
 
 (mugu-define-lang-mode "ruby" "")
 

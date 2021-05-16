@@ -6,7 +6,6 @@
 (require 'use-package)
 (require 'mugu-hydra)
 (require 'mugu-menu)
-(require 'mugu-dumbjump)
 
 (use-package rvm
   :after ruby-mode)
@@ -29,6 +28,7 @@
   :after ruby-mode
   :custom
   (inf-ruby-console-environment "development")
+  :commands inf-ruby-switch-setup
   :config
   (inf-ruby-switch-setup)
   :pretty-hydra
@@ -47,7 +47,6 @@
   :straight nil
   :general
   (:keymaps 'mugu-ruby-minor-mode-map
-            [remap mugu-lang-find-definition] (lambda () (interactive) (with-dump-jump-fallback (robe-jump)))
             [remap mugu-lang-format-buffer] #'mugu-ruby-prettify
             [remap mugu-lang-test-file] #'rspec-verify
             [remap mugu-lang-test-rerun-last] #'rspec-rerun
@@ -64,11 +63,24 @@
   (mugu-window-configure-side-window "\\*rspec-compilation\\*" 'top 0.7)
   (mugu-window-configure-side-window "*rails*" 'top 0.5))
 
-(use-package robe
+(use-package mugu-ruby
+  :disabled "solargraph is still too slow for rails"
+  :straight nil
   :hook
-  (ruby-mode . robe-mode)
+  (ruby-mode . lsp-mode)
   :config
-  (push '(company-robe :with company-yasnippet) company-backends))
+  (mugu-lsp-activate-for-keymap 'mugu-ruby-minor-mode-map))
+
+(use-package robe
+  :after mugu-ruby
+  :general
+  (:keymaps 'robe-mode-map
+            [remap mugu-lang-find-definition] #'robe-jump
+            [remap mugu-lang-doc-show-at-point] #'robe-doc
+            [remap mugu-lang-doc-toc] #'robe-jump-to-module
+            [remap mugu-lang-doc-search] #'robe-ask)
+  :hook
+  (ruby-mode . mugu-ruby-robe-mode-maybe))
 
 (use-package docker-robe
   :disabled
