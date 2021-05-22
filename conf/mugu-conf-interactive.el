@@ -74,7 +74,7 @@
 
 (use-package prescient
   :custom
-  (prescient-history-length 200)
+  (prescient-history-length 400)
   (prescient-persist-mode t)
 
   (prescient-sort-full-matches-first t))

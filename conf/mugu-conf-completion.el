@@ -10,7 +10,7 @@
   :diminish company-mode
   :hook (prog-mode . company-mode)
   :custom
-  (company-idle-delay 0.1)
+  (company-idle-delay 0.3)
   (company-minimum-prefix-length 1)
   (company-require-match nil)
   (setq company-frontends nil)
@@ -42,7 +42,7 @@
                       (company-capf :with company-yasnippet)
                       ;; not in the same backend as capf because if the backend offer semantic completion
                       ;; then the dumb one from dabbrev is not welcome
-                      (company-dabbrev-code company-keywords :with company-yasnippet)
+                      (company-dabbrev-code :with company-keywords company-yasnippet)
                       ;; it makes senses to have it alone and after other to prevent a file in current
                       ;; directory to shadow legitimate results. Besides most of the time, a completion on
                       ;; file should start by ../ or ~/ or ./ which should be exclusive to this backend
@@ -62,7 +62,7 @@
   :after company
   :defer
   :config
-  (push '(company-robe company-keywords :with company-yasnippet) company-backends))
+  (push '(company-robe :with company-keywords company-dabbrev-code company-yasnippet) company-backends))
 
 ;;; Front end
 (use-package company-quickhelp
@@ -78,7 +78,7 @@
 (use-package company-box
   :after company
   :hook (company-mode . company-box-mode)
-  :custom (company-box-doc-delay 0.1))
+  :custom (company-box-doc-delay 0.3))
 
 ;;; Snippets
 (use-package yasnippet
@@ -86,7 +86,7 @@
   :demand
   :delight yas-minor-mode
   :general
-  (:keymaps '(prog-mode-map org-mode-map)
+  (:keymaps '(prog-mode-map org-mode-map yaml-mode-map)
             "²" #'yas-insert-snippet)
   :custom
   (yas-snippet-dirs (list (f-join (expand-file-name user-emacs-directory) "snippets")))
@@ -102,7 +102,7 @@
   :straight nil
   :after yasnippet
   :general
-  (:keymaps '(prog-mode-map org-mode-map)
+  (:keymaps '(prog-mode-map org-mode-map yaml-mode-map)
             "²" #'mugu-yasnippet-insert
             (general-chord "²²") #'mugu-yasnippet-menu))
 
