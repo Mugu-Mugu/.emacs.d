@@ -12,8 +12,13 @@
   (ispell-quietly t)
   (flyspell-issue-message-flag nil)
   (flyspell-issue-welcome-flag nil)
+  (ispell-extra-args ("--sug-mode=ultra") )
   :config
   (mugu-silence-function #'ispell-lookup-words)
+  ;; fuck this horrible flyspell hack
+  (advice-add 'flyspell-after-change-function :around
+              (lambda (&rest args)
+                (remove-hook 'after-change-functions #'flyspell-after-change-function t)))
 
   :pretty-hydra
   (mugu-flyspell-menu (:color red :hint nil)
