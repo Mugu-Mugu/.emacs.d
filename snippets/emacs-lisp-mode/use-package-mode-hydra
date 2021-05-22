@@ -3,7 +3,12 @@
 # key: :mode-hydra
 # --
 :mode-hydra
-(${1:mode}
- (${2:title} (:color ${3:blue} :hint nil))
- ("${4:column name}"
-  (${5:(heads)}$0)))
+ (${1:xxx}-mode
+  (:title "$2:{title}" :color ${3:blue} :hint nil)
+  ("${4:column name}"
+   ((${5:"binding" command "description"})
+    (${6:"binding" command "description"}))
+   ${7:"column name"
+   (("binding" command "description")
+    ("binding" command "description"))}))
+$0

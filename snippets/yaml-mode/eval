@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: eval
+# key: eval
+# expand-env: ((yas-wrap-around-region nil))
+# --
+<%= ${1:expression:`yas-selected-text`} %>$0

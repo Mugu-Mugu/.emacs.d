@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name ENV var
+# expand-env: ((yas-wrap-around-region nil))
+# key: env
+# --
+<%= ENV["${1:`yas-selected-text`}"] %> $0
