@@ -105,10 +105,16 @@
   (ivy-posframe-mode)
   :custom
   (posframe-inhibit-double-buffering nil)
-  (ivy-posframe-display-functions-alist '((swiper . ivy-posframe-display-at-frame-bottom-window-center)
+  (ivy-posframe-display-functions-alist '((swiper . ivy-display-function-fallback)
                                           (t . ivy-posframe-display-at-frame-center)))
   (ivy-posframe-height-alist '((swiper . 20)
                                (t . 20))))
+
+(use-package mugu-ivy-posframe
+  :disabled "Todo this does not work because ivy is a mess"
+  :after ivy-posframe
+  :config
+  (mugu-ivy-posframe-mode))
 
 (provide 'mugu-conf-interactive)
 ;;; mugu-conf-interactive ends here

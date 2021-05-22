@@ -94,20 +94,16 @@
   :hook (prog-mode . rainbow-delimiters-mode)
   :config)
 
-(use-package hydra-posframe
-  :straight (:host github :repo "Ladicle/hydra-posframe")
-  :after hydra
-  :demand
-  :config (hydra-posframe-mode)
-  :custom
-  (hydra-posframe-poshandler #'posframe-poshandler-frame-bottom-center)
-  (hydra-posframe-border-width 1)
-  (hydra-posframe-parameters '((left-fringe . 10)
-                               (right-fringe . 10))))
-
 (use-package fira-code-mode
   :custom (fira-code-mode-disabled-ligatures '("[]" "#{" "#(" "#_" "#_(" "x")) ;; List of ligatures to turn off
   :hook prog-mode) ;; Enables fira-code-mode automatically for programming major modes
+
+(use-package mugu-hydra-posframe
+  :straight nil
+  :after (hydra posframe)
+  :demand
+  :config
+  (mugu-hydra-posframe-mode))
 
 (use-package visual-fill-column
   ;; Allow for saner non disruptive long line display by virtual wrapping
