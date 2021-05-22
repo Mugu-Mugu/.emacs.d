@@ -30,5 +30,9 @@
 
 (use-package ace-link :defer)
 
+(use-package link-hint
+  :general
+  ([remap ace-link] 'link-hint-open-link))
+
 (provide 'mugu-conf-motion)
 ;;; mugu-conf-motion ends here
