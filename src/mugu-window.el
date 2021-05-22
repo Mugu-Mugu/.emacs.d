@@ -87,20 +87,34 @@ Default to `selected-window'."
   (unless (window-parameter window 'dont-bury) (bury-buffer (window-buffer window)))
   (delete-window window))
 
-(defun mugu-window-delete-or-toggle-side ()
-  "Delete or toggle the next side window."
-  (interactive)
-  (let ((next-side-window (get-window-with-predicate 'mugu-window-side-managed-p)))
-    (if next-side-window
-        (mugu-window-bury-buffer-delete-window next-side-window)
-      (if mugu-window-last-side-buffer-dismissed
-          (progn
-            (mugu-window-display-in-side
-             mugu-window-last-side-buffer-dismissed
-             mugu-window-last-side-window-dismissed-params)
-            (switch-to-buffer mugu-window-last-side-buffer-dismissed))
 
-        (message "There is no side window open.")))))
+(defun mugu-side-window-list ()
+  "Return a list of side window (first lru, last mru)."
+  (let ((window-rank-lru-first (lambda (w1 w2) (< (window-use-time w1) (window-use-time w2)))))
+    (-sort window-rank-lru-first
+           (-select #'mugu-window-side-managed-p (window-list-1 nil 'nomini (selected-frame))))))
+
+(defun mugu-window-delete-or-toggle-side (side-window)
+  "Delete SIDE-WINDOW or redisplay the last one that was deleted."
+  (if side-window
+      (mugu-window-bury-buffer-delete-window side-window)
+    (if mugu-window-last-side-buffer-dismissed
+        (progn
+          (mugu-window-display-in-side
+           mugu-window-last-side-buffer-dismissed
+           mugu-window-last-side-window-dismissed-params)
+          (switch-to-buffer mugu-window-last-side-buffer-dismissed))
+      (message "There is no side window open."))))
+
+(defun mugu-window-delete-or-toogle-lru-side ()
+  "Delete the LRU side window or toggle the last one deleted."
+  (interactive)
+  (mugu-window-delete-or-toggle-side (-first-item (mugu-side-window-list))))
+
+(defun mugu-window-delete-or-toogle-mru-side ()
+  "Delete the MRU side window or toggle the last one deleted."
+  (interactive)
+  (mugu-window-delete-or-toggle-side (-last-item (mugu-side-window-list))))
 
 (defun mugu-window-last-p ()
   "Predicate determining if current window is the last one."

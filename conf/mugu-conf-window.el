@@ -9,7 +9,8 @@
   (mugu-window-mode)
   :general
   (:states 'motion
-           "<backspace>" #'mugu-window-delete-or-toggle-side)
+           "s-<backspace>" #'mugu-window-delete-or-toogle-lru-side
+           "<backspace>" #'mugu-window-delete-or-toogle-mru-side)
   :hydra
   (mugu-window-resize-menu
    (:color red :hint nil)
