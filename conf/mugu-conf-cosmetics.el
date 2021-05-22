@@ -36,6 +36,7 @@
 (use-package beacon
   ;; :defer 3
   :delight
+  :disabled "lagging"
   :custom
   (beacon-color "darkorange")
   :config

@@ -35,13 +35,13 @@
   :init
   (add-to-list 'load-path "/home/david/.emacs.d/straight/build/vterm")
   :custom
-  (vterm-module-cmake-args "-DUSE_SYSTEM_LIBVTERM=no")
-  (require 'mugu-vterm))
+  (vterm-module-cmake-args "-DUSE_SYSTEM_LIBVTERM=no"))
 
 (use-package mugu-vterm
+  :straight nil
+  :demand
   :general
   (:states 'motion "&" #'mugu-vterm-toggle)
-  :straight nil
   :commands mugu-vterm-switch
   :config
   (mugu-vterm-activate))

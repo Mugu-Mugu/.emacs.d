@@ -121,7 +121,7 @@
  '(flycheck-haskell-hlint-executable "/usr/bin/cabal exec hlint")
  '(flycheck-python-flake8-executable "python3")
  '(gdb-many-windows t)
- '(git-messenger:use-magit-popup t t nil "Customized with use-package git-messenger")
+ '(git-messenger:use-magit-popup t nil nil "Customized with use-package git-messenger")
  '(global-company-mode t)
  '(global-flycheck-mode t)
  '(global-hl-line-mode t)

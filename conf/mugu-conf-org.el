@@ -58,7 +58,13 @@
   :straight nil
   :after org
   :config
-  (mugu-org-wconf-mode +1))
+  (mugu-org-wconf-mode +1)
+  :custom
+  ;; org-roam-buffer-window-parameters
+  (org-roam-buffer-window-parameters '((mugu-window t)))
+  (org-roam-buffer-position 'bottom)
+  (org-roam-buffer-height 0.5)
+  (org-roam-buffer-width 0.2))
 
 (use-package mugu-org-wconf-tab
   :straight nil
@@ -117,7 +123,7 @@
   :straight nil
   :defer
   :config
-  (mugu-org-sql-mode))
+  (mugu-org-sql-mode -1))
 
 (use-package org-protocol
   :defer
