@@ -50,6 +50,7 @@
     ("SPC" mugu-menu-call-mode-menu "major mode" :column "Submenu")
     ("M-SPC" mugu-menu-call-mode-menu nil)
     ("C-SPC" mugu-menu-call-mode-menu nil)
+    ("ù" mugu-feature-slack "slack")
     ("p" mugu-project-menu "project")
     ("h" mugu-space-help-menu "help")
     (";" mugu-flyspell-menu/body "spelling")

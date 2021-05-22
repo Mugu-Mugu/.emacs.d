@@ -58,6 +58,12 @@
   :config
   (push '(company-restclient :with company-yasnippet) company-backends))
 
+(use-package slack
+  :defer
+  :config
+  (push '(company-slack-backend :with company-yasnippet company-files company-dabbrev)
+        company-backends))
+
 (use-package robe
   :after company
   :defer

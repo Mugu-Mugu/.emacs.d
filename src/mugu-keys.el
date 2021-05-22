@@ -7,6 +7,8 @@
 
 (require 'evil)
 (require 'mugu-menu)
+(require 'mugu-feature)
+(require 'general)
 
 (key-chord-define evil-insert-state-map "jk" 'evil-normal-state)
 (key-chord-define evil-normal-state-map "jk" 'keyboard-quit)
@@ -26,6 +28,10 @@
 ;; super star remap
 (define-key evil-motion-state-map (kbd "*") 'mugu-counsel-super-star)
 (define-key evil-motion-state-map (kbd "µ") 'mugu-counsel-hyper-star)
+
+;;
+(general-def 'normal "ù" #'mugu-feature-slack)
+
 
 (provide 'mugu-keys)
 ;;; mugu-keys ends here

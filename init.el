@@ -36,6 +36,7 @@
 (require 'mugu-conf-site-lisp)
 (require 'mugu-conf-fold)
 (require 'mugu-conf-writing)
+(require 'mugu-conf-slack)
 (require 'mugu-conf-misc)
 
 ;;; languages features

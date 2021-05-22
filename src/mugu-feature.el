@@ -14,6 +14,7 @@
 
 (define-mugu-feature search-google)
 (define-mugu-feature search-google-at-point)
+(define-mugu-feature slack)
 
 (provide 'mugu-feature)
 ;;; mugu-feature ends here
