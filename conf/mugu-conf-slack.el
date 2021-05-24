@@ -116,7 +116,8 @@
 
 (use-package mugu-slack-ext
   :straight nil
-  :after (slack)
+  :after slack
+  :demand
   :general
   (:keymaps '(mugu-slack-ext-mode-map)
             [remap tracking-next-buffer] #'mugu-slack-ext-next-unread
@@ -127,8 +128,9 @@
 (use-package mugu-slack-link
   :straight nil
   :after (slack link-hint)
-  :config
-  (mugu-slack-link-mode))
+  :hook
+  (slack-message-buffer-mode . mugu-slack-link-mode)
+  (slack-file-info-buffer-mode . mugu-slack-link-mode))
 
 (provide 'mugu-conf-slack)
 ;;; mugu-conf-slack ends here
