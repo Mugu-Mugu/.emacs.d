@@ -20,6 +20,7 @@
 (def-slack-buffer-mode-p message-edit-buffer 'slack-message-edit-buffer-mode)
 (def-slack-buffer-mode-p message-thread-buffer 'slack-thread-message-buffer-mode)
 (def-slack-buffer-mode-p file-buffer 'slack-file-info-buffer-mode)
+(def-slack-buffer-mode-p file-buffer 'slack-file-info-buffer-mode)
 
 (defun mugu-slack-wconf-buffer-mode-p (mode)
   "Return a closure predicate determining if an input buffer has MODE."
