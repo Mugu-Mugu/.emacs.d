@@ -19,6 +19,7 @@ Line larger than this will be visually wrapped."
   "Setup for mugu-slack-fill-mode."
   (visual-line-mode +1)
   (visual-fill-column-mode +1)
+  (setq-local lui-time-stamp-position 'right-margin)
   (setq-local visual-fill-column-width mugu-slack-fill-column)
   (setq-local lui-fill-column mugu-slack-fill-column)
   (setq-local lui-fill-type nil))
@@ -27,6 +28,7 @@ Line larger than this will be visually wrapped."
   "Tear down for mugu-slack-fill-mode."
   (visual-line-mode -1)
   (visual-fill-column-mode -1)
+  (kill-local-variable 'lui-time-stamp-position)
   (kill-local-variable 'visual-fill-column-width)
   (kill-local-variable 'lui-fill-colum)
   (kill-local-variable 'lui-fill-type))
