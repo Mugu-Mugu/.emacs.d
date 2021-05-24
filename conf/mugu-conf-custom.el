@@ -250,7 +250,8 @@
  '(recentf-max-saved-items 1000 nil nil "Customized with use-package recentf")
  '(ruby-insert-encoding-magic-comment nil)
  '(safe-local-variable-values
-   '((help-window-select . t)
+   '((rspec-use-docker-when-possible)
+     (help-window-select . t)
      (help-window-select . always)
      (mugu-ruby-use-robe . t)
      (mangle-whitespace . t)

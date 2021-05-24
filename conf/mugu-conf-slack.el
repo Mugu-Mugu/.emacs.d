@@ -15,6 +15,7 @@
   (slack-enable-wysiwyg t)
   (slack-render-image-p t)
   (slack-typing-visibility 'buffer)
+  (slack-file-dir "~/Downloads/")
   (slack-enable-global-mode-string t))
 
 (use-package slack
