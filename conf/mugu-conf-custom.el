@@ -223,6 +223,7 @@
  '(org-lowest-priority 70)
  '(org-odd-levels-only nil)
  '(org-outline-path-complete-in-steps nil)
+ '(org-pandoc-options-for-markdown_mmd '((wrap . "none")))
  '(org-pretty-entities t)
  '(org-refile-use-outline-path 'file)
  '(org-roam-dailies-capture-templates

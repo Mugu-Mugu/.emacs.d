@@ -17,5 +17,8 @@
 
 (use-package emacs-everywhere :defer)
 
+(use-package ox-pandoc
+  :defer)
+
 (provide 'mugu-conf-temp)
 ;;; mugu-conf-temp ends here
