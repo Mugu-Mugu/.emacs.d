@@ -318,6 +318,7 @@
  '(verilog-indent-level-module 4)
  '(visual-order-cursor-movement nil)
  '(vterm-max-scrollback 10000)
+ '(which-key-popup-type 'side-window)
  '(which-key-side-window-max-width 0.25)
  '(whitespace-line-column 0)
  '(whitespace-style '(trailing) t nil "Customized with use-package whitespace"))
