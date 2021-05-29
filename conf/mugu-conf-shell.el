@@ -68,5 +68,11 @@
   :config
   (mugu-vterm-snippet-mode))
 
+(use-package evil-collection
+  :after vterm
+  :config
+  (evil-collection-vterm-setup))
+
+
 (provide 'mugu-conf-shell)
 ;;; mugu-conf-shell ends here
