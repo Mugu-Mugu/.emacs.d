@@ -270,6 +270,7 @@
  '(semantic-mode nil)
  '(show-paren-mode t)
  '(show-paren-style 'mixed nil nil "Customized with use-package paren")
+ '(slack-thread-also-send-to-room nil)
  '(sqlformat-args nil)
  '(straight-check-for-modifications '(find-when-checking))
  '(straight-package-neutering-mode t)
