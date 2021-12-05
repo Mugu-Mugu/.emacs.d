@@ -26,7 +26,7 @@
   (mugu-org-hack-mode))
 
 (use-package org
-  :straight org-plus-contrib
+  :straight nil
   :defer
   :hook
   (org-mode . (lambda ()  (auto-fill-mode) (set-fill-column 110)))
@@ -35,6 +35,7 @@
   (org-src-preserve-indentation t))
 
 (use-package org-plus-contrib
+  :straight nil
   :defer)
 
 (use-package org-indent
