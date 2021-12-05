@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: sidekiq_select_retry_by_class
+# key: sidekiq_select_retry_by_class
+# --
+rs = Sidekiq::RetrySet.new.select { |j| j.klass == ${1:class_to_filter} }

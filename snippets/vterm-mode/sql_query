@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: sql_query
+# key: sql_query
+# condition: (mugu-vterm-snippet-condition-project-p "wakeo_platform")
+# --
+ActiveRecord::Base.connection.execute("${1:SELECT"})

@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: find_by
+# key: find_by
+# --
+${1:model}.find_by(${2:token}: ${3:"token"})

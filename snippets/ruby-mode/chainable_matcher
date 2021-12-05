@@ -5,7 +5,9 @@
 matcher :${1:matcher_name} do
   include ChainableMatcherDecorator
 
-  match(notify_expectation_failures: true) do |${2:tested_item}|
-    expect($2).to match_all_chained_matchers(with_base: ${3:anything})
+  standard_compatibility_match
+
+  def base_matcher
+    be_a(Hash)
   end
 end

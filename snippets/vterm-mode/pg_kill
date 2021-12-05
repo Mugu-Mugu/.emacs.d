@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: pg_kill
+# key: pg_kill
+# --
+select pg_terminate_backend(${1:pid});

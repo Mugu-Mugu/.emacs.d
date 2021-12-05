@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: disable_rubocop
+# key: #rubocop:
+# --
+#rubocop:disable ${1:Rails/xxx}
+$0
+#rubocop:enable $1

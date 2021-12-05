@@ -20,5 +20,15 @@
 (use-package ox-pandoc
   :defer)
 
+(use-package forge
+  :defer)
+
+(use-package github-review
+  :defer)
+
+(use-package nix-mode
+  :mode "\\.nix\\'")
+
+
 (provide 'mugu-conf-temp)
 ;;; mugu-conf-temp ends here

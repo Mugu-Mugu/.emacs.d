@@ -27,7 +27,9 @@
   (js-mode . mugu-js-configure-file)
   :config
   (mugu-js-configure-package)
-  )
+  :general
+  (:keymaps '(js-mode-map)
+            [remap mugu-menu-call-mode-menu] #'mugu-lang-menu-menu))
 
 (use-package js2-mode
   :disabled "Because js-mode is better on 27 and is officialy recommanded by js2 team"

@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: rake_task_definition
+# key: rake_task_definition
+# --
+
+  desc '${1:Task description}'
+  task ${2:task_name}: :environment do
+    $0
+  end

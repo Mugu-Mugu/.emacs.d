@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: Faker_Time_between
+# key: Faker::Time.between
+# --
+Faker::Time.between(from: ${1:1.day.ago}, to: ${2:1.hour.ago})
+$0

@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: condition_back
+# key:
+# --
+# condition: (mugu-vterm-snippet-condition-project-p "wakeo_platform")

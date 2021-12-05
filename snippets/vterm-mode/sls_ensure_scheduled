@@ -1,0 +1,5 @@
+# key: sls_ensure_scheduled
+# name: sls_ensure_scheduled
+# condition: (mugu-vterm-snippet-condition-project-p "shipping_lines_scraper")
+# --
+Subscription.active.each { |s| ScrapWorker.ensure_subscription_scheduled(s.id) }

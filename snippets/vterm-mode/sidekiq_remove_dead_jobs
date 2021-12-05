@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: sidekiq_remove_dead_jobs
+# condition: 't
+# key: sidekiq_remove_dead_jobs
+# --
+Sidekiq::DeadSet.new.clear

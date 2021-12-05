@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: manual_wrap
+# key: /manual_wrap
+# --
+# expand-env: ((yas-wrap-around-region nil))

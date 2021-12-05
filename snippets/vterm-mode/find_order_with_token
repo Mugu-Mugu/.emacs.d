@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: find_order_with_token
+# condition: (mugu-vterm-snippet-condition-project-p "wakeo_platform")
+# key: find_order_with_token
+# --
+Order.find_by(token: "${1:`(current-kill 0)`}")$0
