@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: packages
+# key: home.packages
+# --
+home.packages = with pkgs; [
+  $0
+];

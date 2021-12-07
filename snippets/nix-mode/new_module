@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: new_module
+# key: new_module
+# --
+{ config, pkgs, ... }:
+
+{
+  $0
+}
