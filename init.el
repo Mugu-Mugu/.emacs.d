@@ -48,6 +48,7 @@
 (require 'mugu-conf-json)
 (require 'mugu-conf-sql)
 (require 'mugu-conf-rust)
+(require 'mugu-conf-plantuml)
 (require 'mugu-ada)
 
 
