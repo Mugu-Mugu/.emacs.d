@@ -12,8 +12,6 @@
 (require 'mugu-lang)
 (require 'dumb-jump)
 
-
-
 (defmenu mugu-lsp-menu (:color red :hint nil)
   "-- Language menu -- "
 
@@ -41,10 +39,27 @@
   ("ts" lsp-toggle-signature-auto-activate "toggle signature")
   ("q" nil "quit" :color blue :column nil))
 
-;;;###autoload
-(defun mugu-lsp-activate-for-keymap (keymap-sym)
-  "Configure lsp binding for the given KEYMAP-SYM symbol."
-  (general-define-key :keymaps keymap-sym
+(defun mugu-lsp-doc-show-and-focus ()
+  "."
+  (interactive)
+  (lsp-ui-doc-show)
+  (lsp-ui-doc-focus-frame))
+
+(defun mugu-lsp-doc-hide ()
+  "."
+  (interactive)
+  (lsp-ui-doc-unfocus-frame)
+  (lsp-ui-doc-hide))
+
+(defun mugu-lsp--activate ()
+  "Setup for mugu-lsp-mode."
+  (general-define-key :keymaps 'lsp-ui-peek-mode-map
+                      :predicate (lambda () mugu-lsp-mode-map)
+                      "h" 'lsp-ui-peek--select-prev-file
+                      "j" 'lsp-ui-peek--select-next
+                      "k" 'lsp-ui-peek--select-prev
+                      "l" 'lsp-ui-peek--select-next-file)
+  (general-define-key :keymaps 'mugu-lsp-mode-map
                       [remap mugu-lang-format-buffer] #'lsp-format-buffer
                       [remap mugu-lang-format-region] #'lsp-format-region
                       [remap mugu-lang-lsp-menu] #'mugu-lsp-menu
@@ -63,25 +78,16 @@
                       [remap mugu-lang-organize-imports] #'lsp-organize-imports
                       [remap mugu-lang-peek-find-workspace-symbol] #'lsp-ui-peek-find-workspace-symbol))
 
-(defun mugu-lsp-doc-show-and-focus ()
-  "."
-  (interactive)
-  (lsp-ui-doc-show)
-  (lsp-ui-doc-focus-frame))
+(defun mugu-lsp--deactivate ()
+  "Tear down for mugu-lsp-mode.")
 
-(defun mugu-lsp-doc-hide ()
-  "."
-  (interactive)
-  (lsp-ui-doc-unfocus-frame)
-  (lsp-ui-doc-hide))
-
-(defun mugu-lsp-activate-ui-keymap ()
-  "."
-  (general-define-key :keymaps 'lsp-ui-peek-mode-map
-                      "h" 'lsp-ui-peek--select-prev-file
-                      "j" 'lsp-ui-peek--select-next
-                      "k" 'lsp-ui-peek--select-prev
-                      "l" 'lsp-ui-peek--select-next-file))
+(define-minor-mode mugu-lsp-mode
+  "Define mugu-lsp-mode."
+  :group 'mugu
+  :keymap (make-sparse-keymap)
+  (if mugu-lsp-mode
+      (mugu-lsp--activate)
+    (mugu-lsp--deactivate)))
 
 (provide 'mugu-lsp)
 ;;; mugu-lsp ends here

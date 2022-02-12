@@ -9,8 +9,8 @@
 
 (use-package mugu-lang
   :straight nil
-  :hook
-  (prog-mode . mugu-lang-mode)
+  ;; :hook
+  ;; (prog-mode . mugu-lang-mode)
   :custom
   (xref-show-definitions-function #'xref-show-definitions-completing-read)
   :general
@@ -56,12 +56,7 @@
 
 (use-package mugu-lsp
   :straight nil
-  :after lsp-mode
-  :commands
-  mugu-lsp-menu
-  mugu-lsp-activate-for-keymap
-  :config
-  (mugu-lsp-activate-ui-keymap))
+  :commands mugu-lsp-mode)
 
 (use-package tree-sitter
   :defer

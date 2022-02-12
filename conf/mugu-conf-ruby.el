@@ -7,11 +7,18 @@
 (require 'mugu-hydra)
 (require 'mugu-menu)
 
+(use-package mugu-lang
+  :straight nil
+  :hook
+  (ruby-mode . mugu-lang-mode))
+
 (use-package rvm
+  :disabled "Obsolete thanks to nix"
   :after ruby-mode)
 
 (use-package rspec-mode
-  :hook ruby-mode
+  :hook
+  (ruby-mode . rspec-mode)
   :diminish
   :mode-hydra
   (rspec-compilation-mode
@@ -19,13 +26,12 @@
    ("commands"
     (("d" inf-ruby-switch-from-compilation "switch to debug"))))
   :custom
-  (rspec-use-rvm t)
   (rspec-use-docker-when-possible t)
   (rspec-docker-command "docker-compose exec")
   (compilation-scroll-output t))
 
 (use-package inf-ruby
-  :after ruby-mode
+  :defer
   :custom
   (inf-ruby-console-environment "development")
   :commands inf-ruby-switch-setup
@@ -72,7 +78,6 @@
   (mugu-lsp-activate-for-keymap 'mugu-ruby-minor-mode-map))
 
 (use-package robe
-  :after mugu-ruby
   :general
   (:keymaps 'robe-mode-map
             [remap mugu-lang-find-definition] #'robe-jump
@@ -80,7 +85,7 @@
             [remap mugu-lang-doc-toc] #'robe-jump-to-module
             [remap mugu-lang-doc-search] #'robe-ask)
   :hook
-  (ruby-mode . mugu-ruby-robe-mode-maybe))
+  (ruby-mode . robe-mode))
 
 (use-package docker-robe
   :disabled

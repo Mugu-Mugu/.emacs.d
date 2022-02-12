@@ -92,31 +92,18 @@
   ("d" mugu-lang-test-directory "test directory" :column "Submenu")
   ("D" mugu-test-debugger "start debugger" :column "debugger"))
 
-(defun mugu-lang-activate-for-mode (mode)
-  "Activate the mugu lang mode for MODE."
-  (general-define-key :keymaps (intern (format "%s-mode-map" mode))
-                      [remap mugu-menu-call-mode-menu] #'mugu-lang-menu))
-
-
-(defun mugu-lang--make-keymap ()
-  "Build a keymap for the minor lang mode."
-  (let ((map (make-sparse-keymap)))
-    (define-key map [remap mugu-menu-call-mode-menu] #'mugu-lang-menu)
-    map))
-
-
 (defun mugu-lang--activate ()
   "Setup for mugu-lang-mode."
   ;; I don't think this is ever the trouble with lsp or rg as fallback
   (add-hook 'xref-backend-functions #'dumb-jump-xref-activate 99 'local)
   (remove-hook 'xref-backend-functions #'etags--xref-backend 'local)
   ;; yeah i dunno why it gets added but it does
-  (remove-hook 'xref-backend-functions t 'local))
+  (remove-hook 'xref-backend-functions t 'local)
+  (general-define-key :keymaps 'mugu-lang-mode-map
+                      [remap mugu-menu-call-mode-menu] #'mugu-lang-menu))
 
 (defun mugu-lang--deactivate ()
-  "Tear down for mugu-lang-mode."
-
-  )
+  "Tear down for mugu-lang-mode.")
 
 (define-minor-mode mugu-lang-mode
   "Define mugu-lang-mode."
@@ -138,7 +125,7 @@ according to capability of the defined language This ensure all language have
 the same user interface."
   (let* ((mode-symbol (intern (format "mugu-%s-minor-mode" lang))))
     `(define-minor-mode ,mode-symbol ,(format "%s" doc)
-       :keymap (mugu-lang--make-keymap))))
+       :keymap (make-sparse-keymap))))
 
 (provide 'mugu-lang)
 ;;; mugu-lang ends here
