@@ -29,6 +29,9 @@
 (use-package nix-mode
   :mode "\\.nix\\'")
 
+ (use-package direnv
+ :config
+ (direnv-mode))
 
 (provide 'mugu-conf-temp)
 ;;; mugu-conf-temp ends here
