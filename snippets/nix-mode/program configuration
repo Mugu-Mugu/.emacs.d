@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: program configuration
+# key: pro
+# --
+programs.${1:what} = {
+  enable = true;$2
+};
+$3
