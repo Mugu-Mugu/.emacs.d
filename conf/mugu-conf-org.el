@@ -87,18 +87,24 @@
   :hook (org-mode . org-bullets-mode))
 
 (use-package org-roam
-  :straight (:host github :repo "jethrokuan/org-roam")
+  ;; :straight (:host github :repo "jethrokuan/org-roam")
   :after org
   :demand
   :config
   (org-roam-mode)
   (require 'org-roam-protocol)
+
+  (setq org-roam-dailies-capture-templates
+        '(("d" "default" entry
+           "* %?"
+           :target (file+head "%<%Y-%m-%d>.org"
+                              "#+title: %<%Y-%m-%d>\n"))))
   :custom
   (org-roam-directory (file-truename "~/org/roam"))
   (org-roam-dailies-directory "daily/")
   (org-roam-db-update-method 'immediate)
   :general (:keymaps 'global
-                     [remap mugu-feature-org-note] #'org-roam-find-file))
+                     [remap mugu-feature-org-note] #'org-roam-node-find))
 
 (use-package mugu-roam
   :after org-roam
