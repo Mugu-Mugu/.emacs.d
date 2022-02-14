@@ -6,6 +6,7 @@
 (require 'ivy)
 (require 'mugu-menu)
 (require 'mugu-window)
+(require 'mugu-feature)
 
 (defun mugu-ivy-yank-action (x)
   "Yank the candidate X."
@@ -53,6 +54,7 @@
                       "j" (general-key-dispatch 'self-insert-command
                             :timeout 0.2
                             "k" #'mugu-ivy-active-menu)))
+
 
 (defmenu mugu-ivy-passive-menu (:hint nil :color pink)
   ("M-h" ivy-previous-history-element "prev" :column "History")
@@ -109,6 +111,24 @@ Selected action : %s(ivy-action-name) %s(if ivy-calling \"auto called\" \"\")
   ("TAB" ivy-dispatching-done "done choose" :color blue)
   ("M-o" ivy-dispatching-done "done choose" :color blue)
   ("o" ivy-occur "make occur" :exit t))
+
+(defun mugu-ivy--activate ()
+  "Setup for mugu-ivy-mode."
+  (mugu-ivy-set-config)
+  (mugu-ivy-install-new-actions)
+  (mugu-ivy-install-keybinds))
+
+(defun mugu-ivy--deactivate ()
+  "Tear down for mugu-ivy-mode.")
+
+(define-minor-mode mugu-ivy-mode
+  "Define mugu-ivy-mode."
+  :global t
+  :group 'mugu
+  :keymap (make-sparse-keymap)
+  (if mugu-ivy-mode
+      (mugu-ivy--activate)
+    (mugu-ivy--deactivate)))
 
 (provide 'mugu-ivy)
 ;;; mugu-ivy ends here

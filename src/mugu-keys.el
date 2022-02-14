@@ -31,6 +31,7 @@
 
 ;;
 (general-def 'normal "ù" #'mugu-feature-slack)
+(general-def 'normal "é" #'mugu-feature-pop-binding-description)
 
 
 (provide 'mugu-keys)

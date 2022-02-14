@@ -13,10 +13,10 @@
   (defun mugu-dired-menu () (interactive))
   (hercules-def
    :keymap 'dired-mode-map
-
    :transient t))
 
 (use-package which-key
+  :disabled "does not play will with evil either"
   ;; it is used as a library
   :custom
   (which-key-mode 0)

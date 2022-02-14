@@ -158,7 +158,12 @@
           :function org-protocol-capture-html--with-pandoc)
         org-protocol-protocol-alist))
 
-;(require 'org-protocol-capture-html)
+(use-package org
+  :straight nil
+  :after mugu-counsel
+  :general
+  (:keymaps '(org-mode-map) :states 'normal
+            [remap mugu-feature-pop-binding-description] (mugu-counsel-generate-descbinds "org ^")))
 
 (provide 'mugu-conf-org)
 ;;; mugu-conf-org ends here

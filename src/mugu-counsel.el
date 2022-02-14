@@ -1,4 +1,4 @@
-;;; mugu-counsel --- Summary
+;;; mugu-counsel --- Summary -*- lexical-binding: t -*-
 ;; defines various various reader method
 ;; reimplement async with hackish but way faster method
 ;;; Commentary:
@@ -87,6 +87,18 @@ INITIAL-DIRECTORY ONLY-F-OR-D"
             :action (lambda (x)
                       (funcall counsel-describe-variable-function (intern x)))
             :caller 'counsel-describe-variable))
+
+(defun mugu-counsel-generate-descbinds (initial-input)
+  "Build a lambda describing bindings like `counsel-descbinds'.
+INITIAL-INPUT will be forwarded to the built method which enable to tailor the
+method to situation."
+  (lambda ()
+    (interactive)
+    (ivy-read "Bindings: " (counsel--descbinds-cands nil (current-buffer))
+              :initial-input initial-input
+              :action #'counsel-descbinds-action-describe
+              :history 'counsel-descbinds-history
+              :caller 'counsel-descbinds)))
 
 (defun mugu-counsel-set-config ()
   "."

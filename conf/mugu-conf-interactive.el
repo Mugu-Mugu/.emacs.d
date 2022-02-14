@@ -6,10 +6,6 @@
 (require 'use-package)
 (require 'general)
 
-(use-package smex
-  :defer
-  :disabled)
-
 (use-package mugu-space
   :straight nil
   :config
@@ -26,10 +22,7 @@
 (use-package mugu-ivy
   :straight nil
   :after ivy
-  :config
-  (mugu-ivy-set-config)
-  (mugu-ivy-install-new-actions)
-  (mugu-ivy-install-keybinds))
+  :config (mugu-ivy-mode))
 
 (use-package counsel
   :after ivy

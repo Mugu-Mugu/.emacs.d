@@ -15,6 +15,7 @@
 (require 'mugu-conf-lib)
 (require 'mugu-conf-vanilla)
 (require 'mugu-conf-evil)
+(require 'mugu-conf-bindings)
 (require 'mugu-conf-help)
 (require 'mugu-conf-session)
 (require 'mugu-conf-window)
