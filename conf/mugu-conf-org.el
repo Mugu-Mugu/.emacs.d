@@ -28,6 +28,9 @@
 (use-package org
   :straight nil
   :defer
+  :general
+  (:keymaps '(org-mode-map) :states '(normal motion)
+            "<tab>" #'org-cycle)
   :hook
   (org-mode . (lambda ()  (auto-fill-mode) (set-fill-column 110)))
   (org-capture-mode . (lambda () (evil-insert-state)))
