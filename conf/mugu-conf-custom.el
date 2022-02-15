@@ -209,6 +209,8 @@
      (clock-out . "")))
  '(org-log-reschedule 'time)
  '(org-lowest-priority 70)
+ '(org-modules
+   '(ol-bbdb ol-bibtex ol-docview ol-doi ol-eww ol-gnus org-habit org-id org-habit org-habit ol-info ol-irc ol-mhe ol-rmail ol-w3m))
  '(org-odd-levels-only nil)
  '(org-outline-path-complete-in-steps nil)
  '(org-pandoc-options-for-markdown_mmd '((wrap . "none")))

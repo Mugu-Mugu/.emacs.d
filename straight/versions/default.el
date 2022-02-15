@@ -105,7 +105,6 @@
  ("org-protocol-capture-html" . "3359ce9a2f3b48df26329adaee0c4710b1024250")
  ("org-reveal" . "58540c7dde7dbf4e922209d7fb3e6739570f49b5")
  ("org-roam" . "9065f6a999b98d4b495e3d8fa1fa4424eddd25a8")
- ("org-sql" . "8182dc045d9a21e9f26ac4b67c3a95d8cc134005")
  ("origami.el" . "e558710a975e8511b9386edc81cd6bdd0a5bda74")
  ("ox-pandoc" . "aa37dc7e94213d4ebedb85c384c1ba35007da18e")
  ("pfuture" . "d7926de3ba0105a36cfd00811fd6278aea903eef")

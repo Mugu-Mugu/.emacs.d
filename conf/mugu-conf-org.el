@@ -10,14 +10,7 @@
 
 (use-package org-agenda
   :after org
-  :straight nil
-  :general
-  (:keymaps 'org-agenda-mode-map
-           [remap mugu-menu-call-mode-menu] #'mugu-orgi-menu-agenda-major-mode)
-  :hook (org-agenda-mode . mugu-orgi-menu-agenda-major-mode)
-  :bind
-  (:map org-agenda-mode-map
-        ("SPC" . mugu-menu-main-menu)))
+  :straight nil)
 
 (use-package mugu-org-hack
   :straight nil
@@ -28,14 +21,41 @@
 (use-package org
   :straight nil
   :defer
+  :config
+  (add-to-list 'org-modules 'org-id)
+  (add-to-list 'org-modules 'org-habit)
+  (setq org-id-link-to-org-use-id 'use-existing)
   :general
   (:keymaps '(org-mode-map) :states '(normal motion)
             "<tab>" #'org-cycle)
   :hook
-  (org-mode . (lambda ()  (auto-fill-mode) (set-fill-column 110)))
+  (org-mode . (lambda () (auto-fill-mode) (set-fill-column 110)))
   (org-capture-mode . (lambda () (evil-insert-state)))
   :custom
-  (org-src-preserve-indentation t))
+  (org-src-preserve-indentation t)
+  (org-use-fast-todo-selection t)
+  (org-refile-use-outline-path t)
+  (org-refile-use-cache nil)
+  (org-refile-targets '((org-agenda-files :maxlevel . 3)))
+  (org-outline-path-complete-in-steps nil)
+  (org-startup-indented t)
+  (org-indirect-buffer-display 'current-window)
+  (org-agenda-window-setup 'only-window)
+  (org-agenda-restore-windows-after-quit 't)
+  (org-agenda-inhibit-startup t)
+  (org-agenda-dim-blocked-tasks nil)
+  (org-agenda-align-tags-to-column -150)
+  (org-agenda-tags-column -150)
+  (org-tags-column -120)
+  (org-agenda-log-mode-add-notes nil)
+  (org-log-reschedule nil)
+  (org-use-fast-todo-selection 'expert)
+  (org-habit-show-habits-only-for-today t)
+  (calendar-week-start-day 1)
+  (org-habit-graph-column 80)
+  (org-lowest-priority ?F)
+  (org-todo-keywords (quote ((sequence "TODO(t)" "ACTIVE(a)" "NEXT(n)" "WAIT(w)" "|" "DONE(d)" "STOP(s@)"))))
+  (org-agenda-files `(,(expand-file-name "~/org/") ,(expand-file-name "~/org/roam"))))
 
 (use-package org-plus-contrib
   :straight nil
@@ -52,11 +72,18 @@
   :general
   (:keymaps 'org-mode-map
             [remap mugu-menu-call-mode-menu] #'mugu-orgi-menu-org-major-mode)
-  :commands mugu-orgi-menu-global
+  :commands mugu-orgi-menu-global)
+
+(use-package mugu-org-interface
+  :straight nil
+  :demand :after org)
+
+(use-package evil-org
+  :after org
+  :hook (org-mode . evil-org-mode)
   :config
-  (mugu-orgi-set-configuration)
-  (mugu-orgi-configure-keys)
-  (mugu-orgi-define-ivy-actions))
+  (evil-org-set-key-theme '(textobjects insert navigation additional shift todo heading))
+  (evil-org-agenda-set-keys))
 
 (use-package mugu-org-wconf
   :straight nil
@@ -80,21 +107,15 @@
   :straight nil
   :after org-roam)
 
-(use-package mugu-org-workflow
-  :after org
-  :straight nil
-  :config
-  (mugu-orgw-set-configuration))
-
 (use-package org-bullets
   :hook (org-mode . org-bullets-mode))
 
 (use-package org-roam
-  ;; :straight (:host github :repo "jethrokuan/org-roam")
   :after org
   :demand
   :config
   (org-roam-mode)
+  (org-roam-db-autosync-mode)
   (require 'org-roam-protocol)
 
   (setq org-roam-dailies-capture-templates
@@ -111,31 +132,14 @@
 
 (use-package mugu-roam
   :after org-roam
+  :demand
   :straight nil
   :commands mugu-roam-capture-daily-note mugu-roam-capture-daily-todo-with-link mugu-roam-capture-daily-todo mugu-roam-daily-filename
   :general (:keymaps 'global
                      [remap mugu-feature-org-insert-link-note] #'mugu-roam-insert))
 
-(use-package company-org-roam
-  :disabled "it has been obsoleted and archived and now rely on company-cpaf"
-  :straight (:host github :repo "jethrokuan/company-org-roam")
-  :after org-roam
-  :config
-  (push 'company-org-roam company-backends))
-
-(use-package org-sql
-  :after org
-  :custom
-  (org-sql-use-tag-inheritance t)
-  (org-sql-files (-map #'file-truename org-agenda-files)))
-
-(use-package mugu-org-sql
-  :straight nil
-  :defer
-  :config
-  (mugu-org-sql-mode -1))
-
 (use-package org-protocol
+  :after org
   :defer
   :straight nil)
 
@@ -145,34 +149,29 @@
   :custom
   (org-reveal-root "https://cdn.jsdelivr.net/npm/reveal.js"))
 
-(use-package org-protocol-capture-html
-  :straight (:host github :repo "alphapapa/org-protocol-capture-html")
-  :after org)
-
-(use-package org-protocol-capture-html
-  :straight (:host github :repo "alphapapa/org-protocol-capture-html")
-  :defer)
-
-(use-package org-protocol-capture-html
-  :straight (:host github :repo "alphapapa/org-protocol-capture-html")
-  :config
-  (require 'mugu-org-protocol)
-  (push `("w" "Web site"
-          entry (file+headline ,mugu-orgp-capture-file-path ,mugu-orgp-capture-default-inbox)
-          "* %a :website:\n\n%U %?\n\n%:initial"
-          :immediate-finish t)
-        org-capture-templates)
-  (push '("capture-html"
-          :protocol "capture-html"
-          :function org-protocol-capture-html--with-pandoc)
-        org-protocol-protocol-alist))
-
 (use-package org
   :straight nil
   :after mugu-counsel
+  :defer
   :general
   (:keymaps '(org-mode-map) :states 'normal
             [remap mugu-feature-pop-binding-description] (mugu-counsel-generate-descbinds "org ^")))
+
+
+(use-package org-ql
+  :defer
+  :config
+  (setq org-agenda-custom-commands
+        '(("ces" "Custom: Agenda and Emacs SOMEDAY [#A] items"
+           ((org-ql-block '(and
+                            (priority "A")
+                            (todo "TODO"))
+                          ((org-ql-block-header "SOMEDAY :Emacs: High-priority")))
+            )))))
+
+(use-package org-transclusion
+  :disabled "Not applicable for todo but interesting for note taking nonetheless"
+  :defer)
 
 (provide 'mugu-conf-org)
 ;;; mugu-conf-org ends here

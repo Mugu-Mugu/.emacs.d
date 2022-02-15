@@ -49,16 +49,6 @@ A bit hacky but the roam interface is kinda bad."
       (org-capture nil "x")
       (evil-insert-state))))
 
-;;;###autoload
-(defun mugu-roam-capture-daily-todo-with-link ()
-  "Capture a todo and store it in the given HEADLINE as child.
-The hack with noflet is to prevent fucking orgmode to sabotage the windows configuration."
-  (noflet ((delete-other-windows (&optional _window) (set-window-configuration (org-capture-get :return-to-wconf))))
-    (let ((org-capture-templates `(("x" "capture a task todo"
-                                    entry (file ,(mugu-roam-daily-filename)) "* TODO %?\n%l\n%i"
-                                    :unnarrowed t))))
-      (org-capture nil "x"))))
-
 ;;; Code:
 
 (provide 'mugu-roam)
