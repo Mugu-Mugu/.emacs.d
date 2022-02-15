@@ -5,7 +5,8 @@
 ;;; Code:
 (require 'use-package)
 
-(use-package rustic)
+(use-package rustic
+  :defer)
 
 (use-package mugu-rust
   :straight nil
@@ -36,6 +37,7 @@
     (("p" rustic-popup "various command submenu")))))
 
 (use-package rustic
+  :defer
   :after mugu-window
   :config
   (mugu-window-configure-side-window "cargo" 'top 0.3)
