@@ -54,6 +54,8 @@
   (calendar-week-start-day 1)
   (org-habit-graph-column 80)
   (org-lowest-priority ?F)
+  (org-archive-location "~/org/archives/%s_archive::* From %s")
+
   (org-todo-keywords (quote ((sequence "TODO(t)" "ACTIVE(a)" "NEXT(n)" "WAIT(w)" "|" "DONE(d)" "STOP(s@)"))))
   (org-agenda-files `(,(expand-file-name "~/org/") ,(expand-file-name "~/org/roam"))))
 
