@@ -13,6 +13,7 @@
   (company-idle-delay 0.3)
   (company-minimum-prefix-length 1)
   (company-require-match nil)
+  (company-auto-commit nil)
   (setq company-frontends nil)
   :config
   (global-company-mode 1)
