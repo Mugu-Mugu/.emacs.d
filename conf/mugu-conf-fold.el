@@ -34,7 +34,7 @@
   :defer
   :commands mugu-origami-menu mugu-origami-toggle-node-and-activate
   :general
-  (:keymaps 'global
+  (:keymaps 'origami-mode-map
             :states 'motion
             :predicate '(not (eq major-mode 'org-mode))
             "<tab>" (general-key-dispatch #'mugu-origami-toggle-node-and-activate
