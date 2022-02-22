@@ -49,6 +49,7 @@
   (flyspell-lazy-mode))
 
 (use-package guess-language
+  :after flyspell
   :hook
   (text-mode . guess-language-mode)
   :custom
