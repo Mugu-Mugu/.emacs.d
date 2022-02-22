@@ -37,25 +37,25 @@
   :custom
   (vterm-module-cmake-args "-DUSE_SYSTEM_LIBVTERM=no"))
 
-(use-package mugu-vterm
-  :straight nil
-  :demand
-  :general
-  (:states 'motion "&" #'mugu-vterm-toggle)
-  :commands mugu-vterm-switch
-  :config
-  (mugu-vterm-activate))
-
 (use-package vterm
   :after yasnippet
+  :defer
   :mode-hydra
   (vterm-mode
    (:title (with-faicon "terminal" "Vterm Mode") :color blue :hint nil)
    ("Vterm commands"
     (("C" vterm-clear)))))
 
+(use-package mugu-vterm
+  :straight nil
+  :general
+  (:states 'motion "&" #'mugu-vterm-toggle)
+  :commands mugu-vterm-switch mugu-vterm-toggle
+  :config
+  (mugu-vterm-activate))
+
 (use-package mugu-yasnippet
-  :after vterm
+  :after (vterm yasnippet)
   :straight nil
   :general
   (:keymaps 'vterm-mode-map :states '(insert normal)
@@ -64,12 +64,11 @@
 
 (use-package mugu-vterm-snippet
   :straight nil
-  :after yasnippet
+  :after (yasnippet vterm mugu-vterm)
   :config
   (mugu-vterm-snippet-mode))
 
 (use-package evil-collection
-  :after vterm
   :config
   (evil-collection-vterm-setup))
 
