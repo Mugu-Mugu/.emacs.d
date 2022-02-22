@@ -14,6 +14,11 @@
 (define-mugu-feature org-note)
 (define-mugu-feature org-insert-note-link)
 
+(define-mugu-feature org-view-active-tasks "tasks currently active")
+(define-mugu-feature org-view-planned-tasks "tasks with a time component (scheduled or deadline)")
+(define-mugu-feature org-view-backlog-tasks "tasks active or ready to be started and priorized")
+(define-mugu-feature org-view-icebox-tasks "tasks not ready and requiring evaluation")
+
 ;;; Actions
 
 (defsubst mugu-orgi-goto-agenda-file ()
@@ -70,6 +75,10 @@ action is performed."
   ("fy" org-roam-dailies-goto-yesterday "yesterday note")
   ("fd" org-roam-dailies-goto-date "note at any date")
   ("fn" org-roam-node-find "a note")
+  ("vv" mugu-feature-org-view-active-tasks "active taks" :column "tasks")
+  ("vb" mugu-feature-org-view-backlog-tasks "backlog taks")
+  ("vp" mugu-feature-org-view-planned-tasks "planned taks")
+  ("vi" mugu-feature-org-view-icebox-tasks "icebox taks")
   ("n" mugu-feature-org-note "interface to org notes"))
 
 (defmenu mugu-orgi-menu-agenda-major-mode (:color amaranth :hint nil)
