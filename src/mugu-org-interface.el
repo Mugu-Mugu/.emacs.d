@@ -7,6 +7,7 @@
 (require 'mugu-feature)
 (require 'ivy)
 (require 'mugu-misc)
+(require 'mugu-org-utils)
 (require 'evil)
 (require 'f)
 
