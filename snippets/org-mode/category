@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: category
+# key: #+CATEGORY
+# --
+#+CATEGORY: ${1:cateogry}
+$0
