@@ -35,8 +35,7 @@
   (org-src-preserve-indentation t)
   (org-use-fast-todo-selection t)
   (org-refile-use-outline-path t)
-  (org-refile-use-cache nil)
-  (org-refile-targets '((org-agenda-files :maxlevel . 3)))
+  (org-refile-use-cache t)
   (org-outline-path-complete-in-steps nil)
   (org-startup-indented t)
   (org-indirect-buffer-display 'current-window)
@@ -54,10 +53,16 @@
   (calendar-week-start-day 1)
   (org-habit-graph-column 80)
   (org-lowest-priority ?F)
+  (org-default-priority ?F)
   (org-archive-location "~/org/archives/%s_archive::* From %s")
-
   (org-todo-keywords (quote ((sequence "TODO(t)" "ACTIVE(a)" "NEXT(n)" "WAIT(w)" "|" "DONE(d)" "STOP(s@)"))))
-  (org-agenda-files `(,(expand-file-name "~/org/") ,(expand-file-name "~/org/roam"))))
+  (org-agenda-files `(,(expand-file-name "~/org/legacy") ,(expand-file-name "~/org/roam")))
+  (org-refile-targets '((org-agenda-files :tag . "inbox"))))
+
+(use-package evil-collection
+  :after org-agenda
+  :custom
+  (evil-collection-calendar-want-org-bindings t))
 
 (use-package org-plus-contrib
   :straight nil
@@ -69,23 +74,29 @@
   :delight org-indent-mode)
 
 (use-package mugu-org-interface
-  :defer
   :straight nil
+  :defer
   :general
   (:keymaps 'org-mode-map
             [remap mugu-menu-call-mode-menu] #'mugu-orgi-menu-org-major-mode)
+  (:keymaps 'global [remap mugu-feature-org-insert-link-note] #'mugu-orgi-roam-insert-node)
   :commands mugu-orgi-menu-global)
 
 (use-package mugu-org-interface
   :straight nil
-  :demand :after org)
+  :demand
+  :after org)
 
 (use-package evil-org
   :after org
+  :functions (evil-org-set-key-theme evil-org-agenda-set-keys)
   :hook (org-mode . evil-org-mode)
   :config
   (evil-org-set-key-theme '(textobjects insert navigation additional shift todo heading))
-  (evil-org-agenda-set-keys))
+  (require 'evil-org-agenda)
+  (evil-org-agenda-set-keys)
+  :custom
+  (evil-org-use-additional-insert t))
 
 (use-package mugu-org-wconf
   :straight nil
@@ -105,10 +116,6 @@
   :config
   (mugu-org-wconf-tab-mode +1))
 
-(use-package mugu-org-interface
-  :straight nil
-  :after org-roam)
-
 (use-package org-bullets
   :hook (org-mode . org-bullets-mode))
 
@@ -125,20 +132,22 @@
            "* %?"
            :target (file+head "%<%Y-%m-%d>.org"
                               "#+title: %<%Y-%m-%d>\n"))))
+
   :custom
   (org-roam-directory (file-truename "~/org/roam"))
   (org-roam-dailies-directory "daily/")
   (org-roam-db-update-method 'immediate)
+  (org-roam-dailies-capture-templates
+   '(("d" "default" entry
+      "* %?"
+      :target (file+head "%<%Y-%m-%d>.org"
+                         "#+title: %<%Y-%m-%d>\n#+setupfile: ~/org/tags.org"))))
+  (org-roam-capture-templates
+   '(("d" "default" plain "%?" :target
+      (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+setupfile: ~/org/tags.org")
+      :unnarrowed t)))
   :general (:keymaps 'global
                      [remap mugu-feature-org-note] #'org-roam-node-find))
-
-(use-package mugu-roam
-  :after org-roam
-  :demand
-  :straight nil
-  :commands mugu-roam-capture-daily-note mugu-roam-capture-daily-todo-with-link mugu-roam-capture-daily-todo mugu-roam-daily-filename
-  :general (:keymaps 'global
-                     [remap mugu-feature-org-insert-link-note] #'mugu-roam-insert))
 
 (use-package org-protocol
   :after org
@@ -159,21 +168,31 @@
   (:keymaps '(org-mode-map) :states 'normal
             [remap mugu-feature-pop-binding-description] (mugu-counsel-generate-descbinds "org ^")))
 
-
 (use-package org-ql
-  :defer
+  :after org
   :config
-  (setq org-agenda-custom-commands
-        '(("ces" "Custom: Agenda and Emacs SOMEDAY [#A] items"
-           ((org-ql-block '(and
-                            (priority "A")
-                            (todo "TODO"))
-                          ((org-ql-block-header "SOMEDAY :Emacs: High-priority")))
-            )))))
+  ;; to fix a binding issue on headers for org-ql views
+  (setq org-super-agenda-header-map (make-sparse-keymap))
+  :custom
+  (org-ql-ask-unsafe-queries nil))
+
+(use-package mugu-org-workflow
+  :straight nil
+  :after org
+  :general
+  ([remap mugu-feature-org-view-active-tasks] #'mugu-orgw-view-active-tasks
+   [remap mugu-feature-org-goto-planification-note] #'mugu-orgw-goto-planification-note))
+
+(use-package org-super-agenda
+  :after mugu-counsel
+  :defer
+  :general
+  (:keymaps 'org-agenda-mode-map :states 'normal
+            [remap mugu-feature-pop-binding-description] (mugu-counsel-generate-descbinds "org ^")))
 
 (use-package org-transclusion
   :disabled "Not applicable for todo but interesting for note taking nonetheless"
   :defer)
 
 (provide 'mugu-conf-org)
-;;; mugu-conf-org ends here
+;;; mugu-conf-org.el ends here

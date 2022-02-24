@@ -4,28 +4,26 @@
 ;;; Code:
 
 (require 'mugu-menu)
-(require 'mugu-feature)
 (require 'ivy)
 (require 'mugu-misc)
-(require 'mugu-org-utils)
+(require 'org-roam)
 (require 'evil)
 (require 'f)
-
-;; variables
-(define-mugu-feature org-note)
-(define-mugu-feature org-insert-note-link)
-
-(define-mugu-feature org-view-active-tasks "tasks currently active")
-(define-mugu-feature org-view-planned-tasks "tasks with a time component (scheduled or deadline)")
-(define-mugu-feature org-view-backlog-tasks "tasks active or ready to be started and priorized")
-(define-mugu-feature org-view-icebox-tasks "tasks not ready and requiring evaluation")
+(require 'mugu-org-feature)
 
 ;;; Actions
+(defun mugu-orgi-get-last-buffer-name ()
+  "Return the name of the last visited org buffer.
+If no org buffer was visited return scratch"
+  (--first (string-match-p ".*.org$" it)
+           (--map (buffer-name it) (buffer-list))))
 
-(defsubst mugu-orgi-goto-agenda-file ()
-  "."
+(defun mugu-orgi-roam-insert-node ()
+  "A simple wrapper to allow to chain insert from normal state."
   (interactive)
-  (mugu-orgi-counsel-agenda-files #'find-file))
+  (require 'org-roam)
+  (org-roam-node-insert nil)
+  (insert " "))
 
 (defun mugu-orgi-insert-checkbox ()
   "Insert a checkbox."
@@ -50,15 +48,6 @@
     (org-cycle)
     (org-show-subtree)))
 
-(defun mugu-orgi-counsel-agenda-files (&optional default-action)
-  "Select an agenda file and apply it DEFAULT-ACTION.
-DEFAULT-ACTION should be a mugu-orgu-action-afile-*.  If it isnt defined, no
-action is performed."
-  (let ((action (or default-action 'identity)))
-    (ivy-read "Select an org agenda file : " (org-agenda-files)
-              :action action
-              :caller 'mugu)))
-
 ;; Menus
 (defmenu mugu-orgi-menu-global (:color blue :hint nil)
   "Org mode external interface"
@@ -69,7 +58,6 @@ action is performed."
   ("cl" org-store-link "a link to current location")
   ("CC" org-clock-cancel "cancel" :column "clocking")
   ("Co" org-clock-out "stop")
-  ("fa" #'mugu-orgi-goto-agenda-file "an agenda file" :column "Find in side window")
   ("ff" (lambda () (interactive) (switch-to-buffer (mugu-orgu-get-last-buffer-name))) "last org file")
   ("ft" org-roam-dailies-goto-tomorrow "")
   ("fj" org-roam-dailies-goto-today "today note")
@@ -77,15 +65,11 @@ action is performed."
   ("fd" org-roam-dailies-goto-date "note at any date")
   ("fn" org-roam-node-find "a note")
   ("vv" mugu-feature-org-view-active-tasks "active taks" :column "tasks")
-  ("vb" mugu-feature-org-view-backlog-tasks "backlog taks")
-  ("vp" mugu-feature-org-view-planned-tasks "planned taks")
-  ("vi" mugu-feature-org-view-icebox-tasks "icebox taks")
+  ("vp" mugu-feature-org-goto-planification-note "planification note")
   ("n" mugu-feature-org-note "interface to org notes"))
 
 (defmenu mugu-orgi-menu-agenda-major-mode (:color amaranth :hint nil)
   "Mugu"
-  ("l" mugu-org-utils/agenda-forward-block "next block" :column "1-Navigation")
-  ("h" mugu-org-utils/agenda-backward-block "previous block")
   ("j" org-agenda-next-item "next item")
   ("k" org-agenda-previous-item "previous item")
   ("J" org-agenda-drag-line-forward "drag up")
@@ -154,10 +138,6 @@ action is performed."
   ("t" org-todo "change TODO status")
   ("cc" org-ctrl-c-ctrl-c "ctrl-c²")
   ("cl" org-insert-link "insert link")
-  ("mj" (mugu-orgw-move-headline-to-dailies (apply-partially #'org-roam-dailies-capture-today 'goto)) "checkout headline to today" :column "Dailies")
-  ("mt" (mugu-orgw-move-headline-to-dailies (apply-partially #'org-roam-dailies-capture-tomorrow 1 'goto)) "checkout headline to tomorrow" )
-  ("my" (mugu-orgw-move-headline-to-dailies (apply-partially #'org-roam-dailies-capture-yesterday 1 'goto)) "checkout headline to yesterday")
-  ("md" (mugu-orgw-move-headline-to-dailies (apply-partially #'org-roam-dailies-capture-date 'goto)) "checkout headline to a date")
   ("j" org-roam-dailies-goto-next-note "next daily" :color red)
   ("k" org-roam-dailies-goto-previous-note "previous daily" :color red)
   ("f" (mugu-orgi-focus-headline) "focus")
