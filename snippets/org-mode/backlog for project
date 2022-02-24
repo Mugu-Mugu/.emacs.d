@@ -1,0 +1,29 @@
+# key: backlog for projet
+# name: backlog for project
+# --
+#+begin_src emacs-lisp  :eval yes :results none
+(org-ql-search
+  (org-agenda-files)
+  '(and (tags "${1:tag_of_project}")
+        (or (and (todo "TODO")
+                 (not (ancestors (todo))))
+            (and (todo "TODO") (planning))
+            (and (todo) (not (todo "TODO")))))
+  :title "Day planner"
+  :sort '(priority date todo)
+  :super-groups '((:name "Overdue"
+                         :scheduled past
+                         :deadline past)
+                  (:name "Active"
+                         :todo "ACTIVE"
+                         :scheduled today
+                         :deadline today)
+                  (:name "Active"
+                         :todo "ACTIVE")
+                  (:name "Next Perso"
+                         :todo "NEXT")
+                  (:name "Backlog"
+                         :and (:todo "TODO" :priority>= "F")
+                         :and (:date t :priority>= "F"))
+                  (:discard (:anything t))))
+#+end_src

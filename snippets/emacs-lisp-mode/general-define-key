@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: general-define-key
+# key: (general-define-key
+# --
+
+(general-define-key :keymaps '${1:mugu-lsp-mode-map}
+                    ${2:[remap mugu-feature-${3:org-view-backlog-tasks}]} #'${4:function})

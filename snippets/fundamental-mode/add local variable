@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: add local variable
+# key: # *-*
+# --
+# -*- ${1:variable}: ${2:value} -*-
+$0

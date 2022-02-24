@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: category dotfiles
+# key: category_dotfiles
+# --
+
+#+CATEGORY: dotfiles
+#+filetags: :dotfiles:

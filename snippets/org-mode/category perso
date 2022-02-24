@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: category perso
+# key: category perso
+# --
+#+CATEGORY: perso
+#+filetags: :perso:
