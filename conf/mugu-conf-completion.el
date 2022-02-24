@@ -14,6 +14,7 @@
   (company-minimum-prefix-length 1)
   (company-require-match nil)
   (company-auto-commit nil)
+  (company-auto-complete nil)
   (setq company-frontends nil)
   :config
   (global-company-mode 1)
