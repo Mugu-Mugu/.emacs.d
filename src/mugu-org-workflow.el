@@ -21,6 +21,12 @@
   (interactive)
   (find-file "~/org/roam/20220223132236-planification_avec_orgmode.org"))
 
+(defun mugu-orgw-goto-setupfile ()
+  "Go to the global setupfile for orgmode.
+It is much nicer to configure org within org."
+  (interactive)
+  (find-file "~/org/roam/20220223132236-planification_avec_orgmode.org"))
+
 (defun mugu-orgw-view-active-tasks ()
   "Return the current active tasks in agenda and in today daily."
   (interactive)

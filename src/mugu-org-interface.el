@@ -64,8 +64,9 @@ If no org buffer was visited return scratch"
   ("fy" org-roam-dailies-goto-yesterday "yesterday note")
   ("fd" org-roam-dailies-goto-date "note at any date")
   ("fn" org-roam-node-find "a note")
-  ("vv" mugu-feature-org-view-active-tasks "active taks" :column "tasks")
+  ("vv" mugu-feature-org-view-active-tasks "active taks" :column "workflow")
   ("vp" mugu-feature-org-goto-planification-note "planification note")
+  ("vs" mugu-feature-org-goto-setupfile "setupfile")
   ("n" mugu-feature-org-note "interface to org notes"))
 
 (defmenu mugu-orgi-menu-agenda-major-mode (:color amaranth :hint nil)

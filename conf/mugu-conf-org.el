@@ -79,7 +79,8 @@
   :general
   (:keymaps 'org-mode-map
             [remap mugu-menu-call-mode-menu] #'mugu-orgi-menu-org-major-mode)
-  (:keymaps 'global [remap mugu-feature-org-insert-link-note] #'mugu-orgi-roam-insert-node)
+  (:keymaps 'global [remap mugu-feature-org-insert-link-note] #'mugu-orgi-roam-insert-node
+            )
   :commands mugu-orgi-menu-global)
 
 (use-package mugu-org-interface
@@ -181,7 +182,8 @@
   :after org
   :general
   ([remap mugu-feature-org-view-active-tasks] #'mugu-orgw-view-active-tasks
-   [remap mugu-feature-org-goto-planification-note] #'mugu-orgw-goto-planification-note))
+   [remap mugu-feature-org-goto-planification-note] #'mugu-orgw-goto-planification-note
+   [remap mugu-feature-org-goto-setupfile] #'mugu-orgw-goto-setupfile))
 
 (use-package org-super-agenda
   :after mugu-counsel
