@@ -9,8 +9,7 @@
   (mugu-window-mode)
   :general
   (:states 'motion
-           "s-<backspace>" #'mugu-window-delete-or-toogle-lru-side
-           "<backspace>" #'mugu-window-delete-or-toogle-mru-side)
+           "<backspace>" #'window-toggle-side-windows)
   :hydra
   (mugu-window-resize-menu
    (:color red :hint nil)
@@ -41,7 +40,7 @@
    ("l" windmove-right "→ window")
    ("s" split-window-below "split window" :color blue :column "2-Split Management")
    ("v" split-window-right "split window vertically" :color blue)
-   ("d" mugu-window-delete "delete current window")
+   ("d" delete-window "delete current window")
    ("D" delete-other-windows "delete *all* other windows")
    ("u" winner-undo "undo window conf" :column "3-Undo/Redo")
    ("r" winner-redo "redo window conf")

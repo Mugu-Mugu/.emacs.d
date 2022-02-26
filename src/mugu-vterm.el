@@ -160,7 +160,7 @@ select the second buffer in the list instead."
    (ivy-add-actions 'vterm
                    '(("r" mugu-vterm-rename "rename")
                      ("k" mugu-vterm-kill "kill")))
-   (mugu-window-configure-side-window 'mugu-vterm-buffer-vterm-p 'top 0.7 t))
+   (mugu-window-configure-side-window 'mugu-vterm-buffer-vterm-p 'top 0.7))
 
 (provide 'mugu-vterm)
 ;;; mugu-vterm ends here
