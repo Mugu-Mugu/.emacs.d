@@ -72,6 +72,11 @@
   :config
   (evil-collection-vterm-setup))
 
+(use-package mugu-tab
+  :straight nil
+  :after mugu-vterm
+  :config
+  (mugu-tab-tabify-display-buffer-alist-rules #'mugu-vterm-buffer-vterm-p))
 
 (provide 'mugu-conf-shell)
 ;;; mugu-conf-shell ends here

@@ -117,7 +117,7 @@ tab should own the buffer or nil if the rule doesn't cover it.")
   "Clean the window configuration of current tab."
   (interactive)
   (delete-other-windows)
-  (display-buffer-use-some-window (get-buffer-create "*Messages*") (list)))
+  (display-buffer-reuse-window (get-buffer-create "*Messages*") (list)))
 
 (defalias 'mugu-tab-rename 'tab-bar-rename-tab)
 
@@ -165,55 +165,34 @@ ALIST is not used but will be forwarded to `display-buffer' functions."
         (mugu-tab--store-local-variables)
         (display-buffer-in-tab buffer alist)
         (mugu-tab--restore-local-variables)
-        (run-hooks 'mugu-tab-after-switch-hook)))))
+        (run-hooks 'mugu-tab-after-switch-hook))))
+  nil
+  )
+
+;;; Miscs
+(defun mugu-tab-tabify-display-buffer-alist-rules (buffer-pattern-or-predicate)
+  "Change value of `display-buffer-alist' to take tabs into account.
+All rules matching BUFFER-PATTERN-OR-PREDICATE will be udpated."
+  (setq display-buffer-alist
+        (--map
+         (-let* (((condition . actions) it)
+                 ((display-functions . alist) actions)
+                 (new-display-functions (if (and (equal buffer-pattern-or-predicate condition)
+                                                 (not (-contains? display-functions #'mugu-tab-display-buffer)))
+                                            (cons #'mugu-tab-display-buffer display-functions)
+                                          display-functions)))
+           (cons condition
+                 (cons new-display-functions alist)))
+         display-buffer-alist)))
 
 ;;; Mode functions
-(defun mugu-tab--add-to-display-buffer-action (display-buffer-action)
-  "Add `mugu-tab-display-buffer' to DISPLAY-BUFFER-ACTION."
-  (-let* (((functions . flat-alist) display-buffer-action)
-          (missing (or (not (listp functions)) (not (-contains? functions #'mugu-tab-display-buffer)))))
-    (if missing
-        `((mugu-tab-display-buffer ,@functions) ,@flat-alist)
-      display-buffer-action)))
-
-(defun mugu-tab--remove-from-display-buffer-action (display-buffer-action)
-  "Remove `mugu-tab-display-buffer' to DISPLAY-BUFFER-ACTION."
-  (-let* (((functions . flat-alist) display-buffer-action)
-          (functions-without (-reject (lambda (func) (equal #'mugu-tab-display-buffer func)) functions)))
-    `(,functions-without ,@flat-alist)))
-
-(defun mugu-tab--activate-display-buffer-action ()
-  "."
-  (setq display-buffer-alist
-        (-map (lambda (display-buffer-entry)
-                (-let* (((pattern . action) display-buffer-entry))
-                  (cons pattern (mugu-tab--add-to-display-buffer-action action))))
-              display-buffer-alist)))
-
-(defun mugu-tab--deactivate-display-buffer-action ()
-  "."
-  (setq display-buffer-alist
-        (-map (lambda (display-buffer-entry)
-                (-let* (((pattern . action) display-buffer-entry))
-                  (cons pattern (mugu-tab--remove-from-display-buffer-action action))))
-              display-buffer-alist)))
-
-(defun mugu-tab-ensure-tab-rule-prioritary ()
-  "Ensure the tab `display-buffer' rule has most priority."
-  (mugu-tab--activate-display-buffer-action))
-
 (defun mugu-tab--activate ()
   "Initialize the mode."
   (general-def
     mugu-tab-mode-map
     [remap winner-undo] #'tab-bar-history-back
     [remap winner-redo] #'tab-bar-history-forward)
-  (add-to-list 'display-buffer-alist
-               `(".*" ,(cons #'mugu-tab-display-buffer
-                             (list)))
-               'append)
-  (mugu-tab-ensure-tab-rule-prioritary)
-  (add-hook 'mugu-window-display-rules-added-hook #'mugu-tab-ensure-tab-rule-prioritary)
+  (push #'mugu-tab-display-buffer (car display-buffer-base-action))
   (advice-add 'tab-bar-select-tab :before #'mugu-tab--store-local-variables)
   (advice-add 'tab-bar-select-tab :after #'mugu-tab--restore-local-variables)
   (tab-bar-mode 1)
@@ -223,7 +202,6 @@ ALIST is not used but will be forwarded to `display-buffer' functions."
 
 (defun mugu-tab--deactivate ()
   "Initialize the mode."
-  (mugu-tab--deactivate-display-buffer-action)
   (customize-set-variable 'display-buffer-base-action (mugu-tab--remove-from-display-buffer-action display-buffer-base-action))
   (advice-remove 'tab-bar-select-tab #'mugu-tab--store-local-variables)
   (advice-remove 'tab-bar-select-tab #'mugu-tab--restore-local-variables)
