@@ -19,40 +19,38 @@
         #'display-buffer-use-some-window)
   "A list of functions to specifies base display action.")
 
-(defvar mugu-window-display-rules-added-hook
-  (list)
-  "Hook triggered after a new display rule have been added.")
-
-(defun mugu-window-generate-side-window-settings (buffer-name-or-predicate direction size)
+(defun mugu-window-generate-side-window-settings (buffer-name-or-predicate direction size &optional slot)
   "Create a `display-buffer' rule.
 The rule will be assigned to BUFFER-NAME-OR-PREDICATE.
 The side window will be open from DIRECTION which should be top, bottom, right
 or left.
 The SIZE of the window determine how much room it takes.  It must be a float
 between 0.0 and 1.0."
-  (let ((height-or-width (if (or (eq direction 'top)
-                                  (eq direction 'bottom))
+  (let ((slot (or slot -1))
+        (height-or-width (if (or (eq direction 'top)
+                                 (eq direction 'bottom))
                               'window-height
                            'window-width)))
     `(,buffer-name-or-predicate
-      (display-buffer-in-side-window display-buffer-same-window display-buffer-use-some-window)
+      (display-buffer-in-side-window)
       (side . ,direction)
-      (slot . -1)
+      (slot . ,slot)
       (,height-or-width . ,size)
       (inhibit-switch-frame . t))))
 
 (defun mugu-window-configure-side-window (&rest args)
   "Add a rule to `display-buffer-alist' to display a buffer as side window.
 For ARGS definition, refer to `mugu-window-generate-side-window-settings'."
-  (add-to-list 'display-buffer-alist (apply #'mugu-window-generate-side-window-settings args))
-  (run-hooks 'mugu-window-display-rules-added-hook))
+  (add-to-list 'display-buffer-alist
+               (apply #'mugu-window-generate-side-window-settings args)
+               'append))
 
 (defun mugu-window-configure-normal-window (condition)
   "Add a CONDITION to `display-buffer-alist' to display a buffer as a normaly.
 It will defines a policy to reuse window in a sane and coherent way."
   (add-to-list 'display-buffer-alist
-               `(,condition . ((display-buffer-reuse-window display-buffer-in-previous-window display-buffer-reuse-mode-window display-buffer-same-window))))
-  (run-hooks 'mugu-window-display-rules-added-hook))
+               `(,condition . ((display-buffer-reuse-window display-buffer-in-previous-window display-buffer-reuse-mode-window display-buffer-same-window)))
+               'append))
 
 (defun mugu-window-remove-display-rule (condition &rest _)
   "Remove all display rules matching CONDITION."

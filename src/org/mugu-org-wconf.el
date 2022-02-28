@@ -13,7 +13,8 @@
 (defun mugu-org-wconf--configure (is-activation)
   "Activate wconf if IS-ACTIVATION is true.  Deactivate otherwise."
   (let ((func (if is-activation #'mugu-window-configure-side-window #'mugu-window-remove-display-rule)))
-    (funcall func #'mugu-org-wconf-org-buffer-p 'bottom 0.5)
+    (funcall func #'mugu-org-wconf-org-buffer-p 'bottom 0.5 0)
+    (funcall func "\\*org-roam\\*" 'bottom 0.2 1)
     (funcall func "^CAPTURE.*.org" 'bottom 0.2)
     (funcall func "\\*Org Note\\*" 'bottom 0.2)))
 

@@ -12,12 +12,6 @@
 (require 'mugu-org-feature)
 
 ;;; Actions
-(defun mugu-orgi-get-last-buffer-name ()
-  "Return the name of the last visited org buffer.
-If no org buffer was visited return scratch"
-  (--first (string-match-p ".*.org$" it)
-           (--map (buffer-name it) (buffer-list))))
-
 (defun mugu-orgi-roam-insert-node ()
   "A simple wrapper to allow to chain insert from normal state."
   (interactive)
@@ -48,8 +42,21 @@ If no org buffer was visited return scratch"
     (org-cycle)
     (org-show-subtree)))
 
+
+;; Layout
+(defun mugu-orgi--last-note-buffer ()
+  "Return the last buffer that was visited."
+  (--first (eq 'org-mode (buffer-local-value 'major-mode it)) (buffer-list)))
+
+(defun mugu-orgi-display-layout-org ()
+  "."
+  (interactive)
+  (switch-to-buffer (mugu-orgi--last-note-buffer))
+  (unless (get-buffer-window org-roam-buffer)
+    (org-roam-buffer-toggle)))
+
 ;; Menus
-(defmenu mugu-orgi-menu-global (:color blue :hint nil)
+(defmenu mugu-orgi-menu-global (:color blue :hint nil :body-pre (mugu-orgi-display-layout-org))
   "Org mode external interface"
   ("cc" (org-roam-dailies-capture-today) "today" :column "Capture to journal")
   ("cd" (org-roam-dailies-capture-date) "a date")
@@ -58,8 +65,8 @@ If no org buffer was visited return scratch"
   ("cl" org-store-link "a link to current location")
   ("CC" org-clock-cancel "cancel" :column "clocking")
   ("Co" org-clock-out "stop")
-  ("ff" (lambda () (interactive) (switch-to-buffer (mugu-orgu-get-last-buffer-name))) "last org file")
-  ("ft" org-roam-dailies-goto-tomorrow "")
+  ("ff" quit "last org file" :column "goto")
+  ("ft" org-roam-dailies-goto-tomorrow "tomorrow")
   ("fj" org-roam-dailies-goto-today "today note")
   ("fy" org-roam-dailies-goto-yesterday "yesterday note")
   ("fd" org-roam-dailies-goto-date "note at any date")
@@ -67,7 +74,8 @@ If no org buffer was visited return scratch"
   ("vv" mugu-feature-org-view-active-tasks "active taks" :column "workflow")
   ("vp" mugu-feature-org-goto-planification-note "planification note")
   ("vs" mugu-feature-org-goto-setupfile "setupfile")
-  ("n" mugu-feature-org-note "interface to org notes"))
+  ("n" mugu-feature-org-note "interface to org notes" :column "misc")
+  ("o" quit "Edit current file"))
 
 (defmenu mugu-orgi-menu-agenda-major-mode (:color amaranth :hint nil)
   "Mugu"
