@@ -29,7 +29,7 @@
   (:keymaps '(org-mode-map) :states '(normal motion)
             "<tab>" #'org-cycle)
   :hook
-  (org-mode . (lambda () (auto-fill-mode) (set-fill-column 110)))
+  (org-mode . (lambda () (auto-fill-mode) (set-fill-column 90)))
   (org-capture-mode . (lambda () (evil-insert-state)))
   :custom
   (org-src-preserve-indentation t)
@@ -52,8 +52,8 @@
   (org-habit-show-habits-only-for-today t)
   (calendar-week-start-day 1)
   (org-habit-graph-column 80)
-  (org-lowest-priority ?F)
-  (org-default-priority ?F)
+  (org-priority-lowest ?F)
+  (org-priority-default ?F)
   (org-archive-location "~/org/archives/%s_archive::* From %s")
   (org-todo-keywords (quote ((sequence "TODO(t)" "ACTIVE(a)" "NEXT(n)" "WAIT(w)" "|" "DONE(d)" "STOP(s@)"))))
   (org-agenda-files `(,(expand-file-name "~/org/legacy") ,(expand-file-name "~/org/roam")))
@@ -91,7 +91,9 @@
 (use-package evil-org
   :after org
   :functions (evil-org-set-key-theme evil-org-agenda-set-keys)
-  :hook (org-mode . evil-org-mode)
+  :hook
+  (org-mode . evil-org-mode)
+  (org-agenda-mode . evil-org-mode)
   :config
   (evil-org-set-key-theme '(textobjects insert navigation additional shift todo heading))
   (require 'evil-org-agenda)
@@ -174,6 +176,9 @@
   :config
   ;; to fix a binding issue on headers for org-ql views
   (setq org-super-agenda-header-map (make-sparse-keymap))
+  :general
+  (:keymaps '(org-ql-view-map)
+            [remap mugu-feature-pop-binding-description] (mugu-counsel-generate-descbinds "org ^"))
   :custom
   (org-ql-ask-unsafe-queries nil))
 
@@ -189,8 +194,10 @@
   :after mugu-counsel
   :defer
   :general
-  (:keymaps 'org-agenda-mode-map :states 'normal
-            [remap mugu-feature-pop-binding-description] (mugu-counsel-generate-descbinds "org ^")))
+  (:keymaps 'org-agenda-mode-map
+            [remap mugu-feature-pop-binding-description] (mugu-counsel-generate-descbinds "org agenda ^"))
+  (:keymaps 'org-agenda-mode-map :states 'motion
+            "p" #'org-agenda-priority))
 
 (use-package org-transclusion
   :disabled "Not applicable for todo but interesting for note taking nonetheless"

@@ -7,8 +7,10 @@
   :straight nil
   :config
   (mugu-window-mode)
+  (add-to-list 'minor-mode-overriding-map-alist
+               (cons 'mugu-window-mode-map mugu-window-mode-map))
   :general
-  (:states 'motion
+  (:states 'motion :keymaps 'mugu-window-mode-map
            "<backspace>" #'window-toggle-side-windows)
   :hydra
   (mugu-window-resize-menu

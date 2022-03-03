@@ -10,6 +10,7 @@
 (require 'evil)
 (require 'f)
 (require 'mugu-org-feature)
+(require 'mugu-org-workflow)
 
 ;;; Actions
 (defun mugu-orgi-roam-insert-node ()
@@ -42,7 +43,6 @@
     (org-cycle)
     (org-show-subtree)))
 
-
 ;; Layout
 (defun mugu-orgi--last-note-buffer ()
   "Return the last buffer that was visited."
@@ -51,31 +51,53 @@
 (defun mugu-orgi-display-layout-org ()
   "."
   (interactive)
-  (switch-to-buffer (mugu-orgi--last-note-buffer))
-  (unless (get-buffer-window org-roam-buffer)
-    (org-roam-buffer-toggle)))
+  (mugu-window-delete-all-side-windows)
+  (when (mugu-orgi--last-note-buffer)
+    (switch-to-buffer (mugu-orgi--last-note-buffer))
+    (unless (get-buffer-window org-roam-buffer)
+      (org-roam-buffer-toggle))))
+
+(defun mugu-orgi-display-layout-workflow ()
+  "."
+  (interactive)
+  (when (mugu-orgw-active-view-buffers)
+    (mugu-orgi-display-layout-org)
+    (switch-to-buffer (-first-item (mugu-orgw-active-view-buffers)))))
+
+(defun mugu-orgi-switch-to-view ()
+  "."
+  (interactive)
+  (ivy-read "Switch to view: "
+            (-map 'buffer-name (mugu-orgw-active-view-buffers))
+            :action 'switch-to-buffer)
+  )
 
 ;; Menus
+(defmenu mugu-orgi-menu-workflow (:color blue :hint nil :body-pre (mugu-orgi-display-layout-workflow))
+  ("w" nil "last" :column "View")
+  ("s" mugu-orgi-switch-to-view "select")
+  ("a" mugu-orgw-view-active-tasks "active")
+  ("f" mugu-feature-org-goto-setupfile "go to setupfile" :column "Other")
+  ("p" mugu-feature-org-goto-planification-note "go to planification note"))
+
 (defmenu mugu-orgi-menu-global (:color blue :hint nil :body-pre (mugu-orgi-display-layout-org))
   "Org mode external interface"
-  ("cc" (org-roam-dailies-capture-today) "today" :column "Capture to journal")
-  ("cd" (org-roam-dailies-capture-date) "a date")
-  ("ct" (org-roam-dailies-capture-tomorrow) "tomorrow")
-  ("cy" (org-roam-dailies-capture-yesterday) "yesterday")
+  ("cc" org-roam-dailies-capture-today "today" :column "Capture to journal")
+  ("cd" org-roam-dailies-capture-date "a date")
+  ("ct" org-roam-dailies-capture-tomorrow "tomorrow")
+  ("cy" org-roam-dailies-capture-yesterday "yesterday")
   ("cl" org-store-link "a link to current location")
   ("CC" org-clock-cancel "cancel" :column "clocking")
   ("Co" org-clock-out "stop")
-  ("ff" quit "last org file" :column "goto")
+  ("ff" nil "last org file" :column "goto")
   ("ft" org-roam-dailies-goto-tomorrow "tomorrow")
   ("fj" org-roam-dailies-goto-today "today note")
   ("fy" org-roam-dailies-goto-yesterday "yesterday note")
   ("fd" org-roam-dailies-goto-date "note at any date")
   ("fn" org-roam-node-find "a note")
-  ("vv" mugu-feature-org-view-active-tasks "active taks" :column "workflow")
-  ("vp" mugu-feature-org-goto-planification-note "planification note")
-  ("vs" mugu-feature-org-goto-setupfile "setupfile")
   ("n" mugu-feature-org-note "interface to org notes" :column "misc")
-  ("o" quit "Edit current file"))
+  ("w" mugu-orgi-menu-workflow "interface to workflow")
+  ("o" nil "Edit current file"))
 
 (defmenu mugu-orgi-menu-agenda-major-mode (:color amaranth :hint nil)
   "Mugu"

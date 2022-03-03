@@ -4,6 +4,8 @@
 ;;; Code:
 (require 'org-ql)
 (require 'org-roam)
+(require 's)
+(require 'mugu-window)
 
 (defun mugu-orgw-roam-get-daily-location ()
   "Return the filepath to the current daily note."
@@ -26,6 +28,10 @@
 It is much nicer to configure org within org."
   (interactive)
   (find-file "~/org/roam/20220223132236-planification_avec_orgmode.org"))
+
+(defun mugu-orgw-active-view-buffers ()
+  "."
+  (--select (s-starts-with? org-ql-view-buffer-name-prefix (buffer-name it)) (buffer-list)))
 
 (defun mugu-orgw-view-active-tasks ()
   "Return the current active tasks in agenda and in today daily."
