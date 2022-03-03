@@ -197,6 +197,7 @@
   (:keymaps 'org-agenda-mode-map
             [remap mugu-feature-pop-binding-description] (mugu-counsel-generate-descbinds "org agenda ^"))
   (:keymaps 'org-agenda-mode-map :states 'motion
+            "w" #'org-save-all-org-buffers
             "p" #'org-agenda-priority))
 
 (use-package org-transclusion
