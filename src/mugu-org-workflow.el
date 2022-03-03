@@ -42,7 +42,7 @@ It is much nicer to configure org within org."
           (or (todo "ACTIVE")
               (scheduled)
               (deadline)))
-    :title "Day planner"
+    :title "Active tasks"
     :sort '(priority date todo)
     :super-groups '((:name "Overdue"
                           :scheduled past
@@ -52,6 +52,27 @@ It is much nicer to configure org within org."
                           :scheduled today
                           :deadline today)
                    (:discard (:anything t)))))
+
+(defun mugu-orgw--after-refile (&rest args)
+  "."
+  (org-save-all-org-buffers))
+
+(defun mugu-orgw--activate ()
+  "Setup for mugu-orgw-mode."
+  (advice-add 'org-refile :after #'mugu-orgw--after-refile))
+
+(defun mugu-orgw--deactivate ()
+  "Tear down for mugu-orgw-mode."
+  (advice-remove 'org-refile  #'mugu-orgw--after-refile))
+
+(define-minor-mode mugu-orgw-mode
+  "Define mugu-orgw-mode."
+  :global t
+  :group 'mugu
+  :keymap (make-sparse-keymap)
+  (if mugu-orgw-mode
+      (mugu-orgw--activate)
+    (mugu-orgw--deactivate)))
 
 (provide 'mugu-org-workflow)
 ;;; mugu-org-workflow.el ends here
