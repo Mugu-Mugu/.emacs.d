@@ -29,6 +29,8 @@ tab should own the buffer or nil if the rule doesn't cover it.")
   "Hook run just after a tab switch has occurred.")
 (defvar mugu-tab-before-switch-hook (list)
   "Hook run just before a tab switch will occur.")
+(defvar mugu-tab-after-creation-hook (list)
+  "Hook run just before a tab switch will occur.")
 
 ;;; Variables management
 (defun mugu-tab-make-variable-local (var-symbol)
@@ -79,8 +81,6 @@ tab should own the buffer or nil if the rule doesn't cover it.")
   (mugu-tab-tab-name (mugu-tab-current-tab)))
 
 ;;; Actions
-(defalias 'mugu-tab-new #'tab-new)
-
 (defun mugu-tab-delete (&optional tab-name)
   "Delete tab with TAB-NAME or current one if nil."
   (interactive)
@@ -113,24 +113,27 @@ tab should own the buffer or nil if the rule doesn't cover it.")
   (with-current-buffer (or buffer (current-buffer))
     (setq mugu-tab-pinned-tab-name nil)))
 
- (defun mugu-tab-clean ()
-  "Clean the window configuration of current tab."
-  (interactive)
-  (delete-other-windows)
-  (display-buffer-reuse-window (get-buffer-create "*Messages*") (list)))
+(defun mugu-tab-new (tab-name)
+  "Create a new tab with TAB-NAME."
+  (tab-new)
+  (tab-rename tab-name)
+  (run-hooks 'mugu-tab-after-creation-hook))
 
 (defalias 'mugu-tab-rename 'tab-bar-rename-tab)
 
 ;;; Selection
 (defun mugu-tab-switch-or-create (tab-name)
   "Switch to tab with TAB-NAME creating it if needed."
-  (mugu-tab--store-local-variables)
-  (if (mugu-tab-get-tab-with-name tab-name)
-      (tab-bar-switch-to-tab tab-name)
-    (tab-new)
-    (mugu-tab-clean)
-    (tab-rename tab-name))
-  (mugu-tab--restore-local-variables))
+  (unless (eq tab-name (mugu-tab-current-tab-name))
+    (run-hooks 'mugu-tab-before-switch-hook)
+    (mugu-tab--store-local-variables)
+    (if (mugu-tab-get-tab-with-name tab-name)
+        (progn
+          (tab-bar-switch-to-tab tab-name)
+          (mugu-tab--restore-local-variables))
+      (mugu-tab-new tab-name))
+    (run-hooks 'mugu-tab-after-switch-hook)))
+
 (defalias 'mugu-tab-switch #'tab-bar-switch-to-tab)
 (defalias 'mugu-tab-switch-to-next #'tab-bar-switch-to-next-tab)
 (defalias 'mugu-tab-switch-to-previous #'tab-bar-switch-to-prev-tab)
@@ -161,15 +164,19 @@ ALIST is not used but will be forwarded to `display-buffer' functions."
     (let* ((tab-name (mugu-tab-attribution-evaluate buffer))
            (alist (asoc-merge alist `((tab-name . ,tab-name)))))
       (when (and tab-name (not (equal tab-name (mugu-tab-current-tab-name))))
-        (run-hooks 'mugu-tab-before-switch-hook)
-        (mugu-tab--store-local-variables)
-        (display-buffer-in-tab buffer alist)
-        (mugu-tab--restore-local-variables)
-        (run-hooks 'mugu-tab-after-switch-hook))))
-  nil
-  )
+        (mugu-tab-switch-or-create tab-name))))
+  nil)
 
-;;; Miscs
+(defun mugu-tab-change-tab (buffer &rest _args)
+  "Switch tab before switching to BUFFER.
+This is required because for some reason, even with
+`switch-to-buffer-obey-display-actions', the `switch-to-buffer' still don't
+listen to rules in `display-buffer-base-action' because it calls
+`pop-to-buffer-same-window'.
+Therefore the only way to fix this is to advice before it is called."
+  (mugu-tab-display-buffer (get-buffer-create buffer) (list)))
+
+;;; For display-buffer
 (defun mugu-tab-tabify-display-buffer-alist-rules (buffer-pattern-or-predicate)
   "Change value of `display-buffer-alist' to take tabs into account.
 All rules matching BUFFER-PATTERN-OR-PREDICATE will be udpated."
@@ -195,6 +202,7 @@ All rules matching BUFFER-PATTERN-OR-PREDICATE will be udpated."
   (push #'mugu-tab-display-buffer (car display-buffer-base-action))
   (advice-add 'tab-bar-select-tab :before #'mugu-tab--store-local-variables)
   (advice-add 'tab-bar-select-tab :after #'mugu-tab--restore-local-variables)
+  (advice-add 'pop-to-buffer-same-window :before #'mugu-tab-change-tab)
   (tab-bar-mode 1)
   (tab-bar-history-mode 1)
   (when (eq 1 (length (tab-bar-tabs)))
@@ -202,9 +210,10 @@ All rules matching BUFFER-PATTERN-OR-PREDICATE will be udpated."
 
 (defun mugu-tab--deactivate ()
   "Initialize the mode."
-  (customize-set-variable 'display-buffer-base-action (mugu-tab--remove-from-display-buffer-action display-buffer-base-action))
+  (setf (car display-buffer-base-action) (delete #'mugu-tab-display-buffer (car display-buffer-base-action)))
   (advice-remove 'tab-bar-select-tab #'mugu-tab--store-local-variables)
   (advice-remove 'tab-bar-select-tab #'mugu-tab--restore-local-variables)
+  (advice-remove 'pop-to-buffer-same-window #'mugu-tab-change-tab)
   (tab-bar-mode -1)
   (tab-bar-history-mode -1))
 

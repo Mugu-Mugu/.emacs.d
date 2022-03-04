@@ -6,6 +6,7 @@
 (require 'mugu-tab)
 
 (defvar mugu-tab-project-root nil "Stores the root of the project for the current tab.")
+(defvar mugu-tab-project-default-buffer-name nil "Stores the name of the default project buffer.")
 
 (defun mugu-tab-project-root ()
   "Consider the pinned project for the tab as project root."
@@ -16,42 +17,49 @@
   (with-current-buffer buffer
     (and (mugu-project-root) (mugu-project-name (mugu-project-root)))))
 
-(defun mugu-tab-project-switch-to-current-project ()
-  "Switch tab to current project and prompt for a file if needed."
-  ;; on switch projectile-project-name is set
-  (mugu-tab-switch-or-create projectile-project-name)
-  (unless mugu-tab-project-root
-    (setq mugu-tab-project-root (mugu-project-by-name projectile-project-name))))
-
-(defun mugu-tab-project-after-switch ()
+(defun mugu-tab-project-change-tab ()
   "."
-  (unless
-      (let ((buffer-root (mugu-project-root-of-buffer (current-buffer))))
-        (and mugu-tab-project-root
-             buffer-root
-             (not (f-same? buffer-root mugu-tab-project-root))
-             (with-temp-buffer
-               (projectile-find-file))))))
+  (mugu-tab-switch-or-create projectile-project-name))
 
-(defun mugu-tab-project--save-project ()
-  "Record current root."
-  (unless mugu-tab-project-root
-    (setq mugu-tab-project-root (mugu-project-root))))
+(defun mugu-tab-project-fix-wconf-maybe ()
+  "When switching to a new project, there may be remnant of the old wconf.
+This ensure a clean wconf if this is the case.
+This can't be one on the tab change because the process happens in a
+temporary buffer."
+  (unless (and mugu-tab-project-root
+               (--select (equal (mugu-project-root-of-buffer (window-buffer it))
+                                mugu-tab-project-root)
+                         (window-list-1)))
+    (switch-to-buffer (-first-item (mugu-project-buffers mugu-tab-project-root)))
+    (delete-other-windows)))
+
+(defun mugu-tab-project-init ()
+  "."
+  (let* ((project-name (mugu-tab-current-tab-name))
+         (project-root (mugu-project-by-name project-name))
+         (default-buffer-name (format "scratch (%s)" project-name))
+         (default-buffer (get-buffer-create default-buffer-name)))
+    (setq mugu-tab-project-default-buffer-name default-buffer-name)
+    (mugu-tab-pin-buffer default-buffer projectile-project-name)
+    (when project-root
+      (mugu-project-pin-buffer default-buffer project-root)
+      (setq mugu-tab-project-root project-root))))
 
 (defun mugu-tab-project--activate ()
   "."
   (mugu-tab-make-variable-local 'mugu-tab-project-root)
   (mugu-tab-attribution-rule-add #'mugu-tab-project-attribution-rule)
   (add-to-list 'mugu-project-root-fallback-functions #'mugu-tab-project-root)
-  (add-hook 'mugu-tab-before-switch-hook #'mugu-tab-project--save-project)
-  (add-hook 'projectile-after-switch-project-hook #'mugu-tab-project-after-switch)
-  (setq projectile-switch-project-action #'mugu-tab-project-switch-to-current-project))
+  (add-hook 'mugu-tab-after-creation-hook #'mugu-tab-project-init)
+  (add-hook 'projectile-after-switch-project-hook #'mugu-tab-project-fix-wconf-maybe)
+  (setq projectile-switch-project-action #'mugu-tab-project-change-tab))
 
 (defun mugu-tab-project--deactivate ()
   "."
   (setq mugu-project-root-fallback-functions (delete #'mugu-tab-project-root mugu-project-root-fallback-functions))
   (custom-reevaluate-setting 'projectile-switch-project-action)
-  (remove-hook 'mugu-tab-before-switch-hook #'mugu-tab-project--save-project)
+  (remove-hook 'mugu-tab-after-creation-hook #'mugu-tab-project-init)
+  (remove-hook 'projectile-after-switch-project-hook #'mugu-tab-project-fix-wconf-maybe)
   (mugu-tab-attribution-rule-remove #'mugu-tab-project-attribution-rule))
 
 (define-minor-mode mugu-tab-project-mode
