@@ -38,6 +38,7 @@
  '(comint-move-point-for-output nil)
  '(comint-prompt-read-only t)
  '(comint-scroll-to-bottom-on-input 'this)
+ '(company-auto-commit-chars nil)
  '(company-auto-complete-chars nil)
  '(company-dabbrev-char-regexp "\\/?\\sw")
  '(company-dabbrev-code-everywhere t)
@@ -216,7 +217,8 @@
  '(python-indent-trigger-commands '(indent-for-tab-command))
  '(ruby-insert-encoding-magic-comment nil)
  '(safe-local-variable-values
-   '((org-current-tag-alist quote
+   '((checkdoc-package-keywords-flag)
+     (org-current-tag-alist quote
                             (("inbox")
                              ("review")))
      (org-tag-alist quote
