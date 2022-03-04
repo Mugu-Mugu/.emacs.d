@@ -9,7 +9,6 @@
 ;;; Code:
 (defun mugu-vterm-snippet-condition-project-p (project-name)
   "Predicate enabling snippet if current project name is PROJECT-NAME."
-   (message "mugu %s" project-name)
    (equal project-name (mugu-project-current-project-name)))
 
 (defun mugu-vterm-snippet--before-expansion ()

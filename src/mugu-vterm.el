@@ -46,12 +46,7 @@
                       [remap redo] #'ignore
                       "C-c" #'vterm--self-insert
                       [up] #'vterm-send-up
-                      [down] #'vterm-send-down)
-  ;; hard
-  ;; (general-define-key :keymaps '(vterm-mode-map) :states 'normal
-  ;;                     "C-r" #'vterm--self-insert)
-  (general-define-key :states '(motion normal)
-                      "&" #'mugu-vterm-toggle))
+                      [down] #'vterm-send-down))
 
 (defun mugu-vterm-buffer-vterm-p (buffer &rest _args)
   "Predicate indicating if BUFFER is a vterm."

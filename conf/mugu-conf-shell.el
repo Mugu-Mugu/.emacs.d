@@ -34,22 +34,18 @@
   :commands vterm
   :init
   (add-to-list 'load-path "/home/david/.emacs.d/straight/build/vterm")
-  :custom
-  (vterm-module-cmake-args "-DUSE_SYSTEM_LIBVTERM=no"))
-
-(use-package vterm
-  :after yasnippet
-  :defer
   :mode-hydra
   (vterm-mode
    (:title (with-faicon "terminal" "Vterm Mode") :color blue :hint nil)
    ("Vterm commands"
-    (("C" vterm-clear)))))
+    (("C" vterm-clear))))
+  :custom
+  (vterm-module-cmake-args "-DUSE_SYSTEM_LIBVTERM=no"))
 
 (use-package mugu-vterm
   :straight nil
   :general
-  (:states 'motion "&" #'mugu-vterm-toggle)
+  (:states 'normal "&" #'mugu-vterm-toggle)
   :commands mugu-vterm-switch mugu-vterm-toggle
   :config
   (mugu-vterm-activate))
@@ -69,6 +65,8 @@
   (mugu-vterm-snippet-mode))
 
 (use-package evil-collection
+  :after vterm
+  :functions evil-collection-vterm-setup
   :config
   (evil-collection-vterm-setup))
 
