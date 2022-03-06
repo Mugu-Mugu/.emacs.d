@@ -168,17 +168,15 @@
   :after mugu-counsel
   :defer
   :general
-  (:keymaps '(org-mode-map) :states 'normal
-            [remap mugu-feature-pop-binding-description] (mugu-counsel-generate-descbinds "org ^")))
+  (:keymaps '(org-mode-map org-ql-view-map org-agenda-mode-map)
+            [remap mugu-feature-pop-binding-description] (mugu-counsel-generate-descbinds "org ^"))
+  )
 
 (use-package org-ql
   :after org
   :config
   ;; to fix a binding issue on headers for org-ql views
   (setq org-super-agenda-header-map (make-sparse-keymap))
-  :general
-  (:keymaps '(org-ql-view-map)
-            [remap mugu-feature-pop-binding-description] (mugu-counsel-generate-descbinds "org ^"))
   :custom
   (org-ql-ask-unsafe-queries nil))
 
@@ -194,8 +192,6 @@
   :after mugu-counsel
   :defer
   :general
-  (:keymaps 'org-agenda-mode-map
-            [remap mugu-feature-pop-binding-description] (mugu-counsel-generate-descbinds "org agenda ^"))
   (:keymaps 'org-agenda-mode-map :states 'motion
             "w" #'org-save-all-org-buffers
             "p" #'org-agenda-priority))
