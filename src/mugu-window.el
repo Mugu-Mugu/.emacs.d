@@ -79,6 +79,20 @@ on this method causing all sort of problem with my side windows."
   (when (mugu-window-side-p)
     (select-window (-first-item (mugu-window-non-side-windows)))))
 
+(defun mugu-window-frame-top-parent (&optional frame)
+  "Return the top level parent of FRAME."
+  (when frame
+    (or (mugu-window-frame-top-parent (frame-parent frame))
+        frame)))
+
+(defun mugu-window-display-buffer-top-level-child-frame (buffer alist)
+  "Wrapper around `display-buffer-in-child-frame' where parent is top level.
+Refer to `display-buffer' for BUFFER and ALIST meanings."
+  (let* ((cfp (asoc-get alist 'child-frame-parameters))
+         (merged-cfp (asoc-merge cfp `((parent-frame . ,(mugu-window-frame-top-parent (selected-frame))))))
+         (merged-alist (asoc-merge alist `((child-frame-parameters . ,merged-cfp)))))
+    (display-buffer-in-child-frame buffer merged-alist)))
+
 (defun mugu-window-defaults--activate ()
   "Define various sane defaults for window management/display."
   (winner-mode 1)
