@@ -124,6 +124,15 @@
   (company-prescient-sort-length-enable nil))
 
 ;;; Completion styles and filtering
+(use-package mugu-vanilla
+  ;; common completion settings
+  :straight nil
+  :defer
+  :custom
+  (read-file-name-completion-ignore-case t)
+  (read-buffer-completion-ignore-case t)
+  (completion-ignore-case t))
+
 (use-package orderless
   :defer
   :custom
