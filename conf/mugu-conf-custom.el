@@ -128,7 +128,6 @@
  '(ivy-count-format "(%d/%d) ")
  '(ivy-extra-directories '("./"))
  '(ivy-height 20)
- '(ivy-mode t)
  '(ivy-use-virtual-buffers t)
  '(ivy-wrap t)
  '(js2-ignored-warnings '("missing ; after statement"))
