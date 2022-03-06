@@ -7,6 +7,9 @@
 
 (use-package mugu-vanilla
   :straight nil
+  :demand
+  :hook
+  (after-save . executable-make-buffer-file-executable-if-script-p)
   :config
   (mugu-vanilla-set-perf-settings)
   (mugu-vanilla-set-startup-settings)
@@ -17,6 +20,9 @@
   (mugu-vanilla-set-evil-initial-states)
   (superword-mode)
   (global-so-long-mode)
+  :custom
+  (sentence-end-double-space nil)
+  (delete-selection-mode t)
   )
 
 (use-package diminish)

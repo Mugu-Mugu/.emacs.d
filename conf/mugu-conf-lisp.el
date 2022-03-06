@@ -62,6 +62,12 @@
             [remap mugu-lang-find-definition] #'elisp-slime-nav-find-elisp-thing-at-point
             [remap mugu-menu-call-mode-menu] #'mugu-lisp-lang-menu))
 
+(use-package checkdoc
+  :straight nil
+  :defer
+  :custom
+  (checkdoc-force-docstrings-flag nil))
+
 (use-package eldoc
   :defer
   :custom
