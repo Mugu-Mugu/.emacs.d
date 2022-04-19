@@ -22,8 +22,7 @@
   (interactive (list buffer-file-name))
   (if (eq major-mode 'ruby-mode)
       (progn
-        (shell-command (format "%s %s" mugu-ruby-prettify-cmd
-                               (rspec--shell-quote-local file)))
+        (shell-command (format "%s %s" mugu-ruby-prettify-cmd file))
         (revert-buffer 'ignore-auto 'no-confirm))
     (message "Can only prettify ruby file")))
 
