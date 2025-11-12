@@ -3,6 +3,7 @@
 
 ;;; Code:
 (require 'org-ql)
+(require 'org-ql-view)
 (require 'org-roam)
 (require 's)
 (require 'mugu-window)
@@ -53,7 +54,43 @@ It is much nicer to configure org within org."
                           :deadline today)
                    (:discard (:anything t)))))
 
-(defun mugu-orgw--after-refile (&rest args)
+;; (completing-read
+;;  "select"
+;;   (org-ql-select (mugu-orgw-agenda-files-with-daily)
+;;     `(and (tags-local "inbox"))))
+;; :action (byte-compile
+   ;;          (lambda ()
+   ;;            (let ((e (org-element-headline-parser (line-end-position))))
+   ;;              (cons (org-element-property :raw-value e) e))))))
+
+(defun mugu-orgw-view-overview (&optional tag)
+  "Generate a search displaying tasks matching TAG."
+  (let* ((searched-tags (or (and tag (list tag))
+                            '("work" "dotfiles" "perso")))
+         (tags (-concat searched-tags '("daily")))
+         (title (if tag (format "Overview for %s" tag)
+                  "Global overview")))
+    (org-ql-search
+      (mugu-orgw-agenda-files-with-daily)
+      `(and (tags ,@tags)
+            (or (and (todo "TODO") (not (ancestors (todo))))
+                (and (todo "TODO") (planning))
+                (and (todo) (not (todo "TODO")))))
+      :sort '(priority date todo)
+      :super-groups '((:name "Overdue" :scheduled past :deadline past)
+                      (:name "Active" :todo "ACTIVE" :scheduled today :deadline today)
+                      (:name "Active" :todo "ACTIVE")
+                      (:name "Next" :todo "NEXT")
+                      (:name "Wait" :todo "WAIT")
+                      (:name "Backlog" :and
+                             (:todo "TODO" :priority>= "F")
+                             :and
+                             (:date t :priority>= "F"))
+                      (:name "Icebox" :todo "TODO")
+                      (:discard (:anything t)))
+      :title title)))
+
+'(defun mugu-orgw--after-refile (&rest args)
   "."
   (org-save-all-org-buffers))
 

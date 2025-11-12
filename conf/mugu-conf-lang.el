@@ -68,6 +68,7 @@
   :after tree-sitter)
 
 (use-package lsp-treemacs
+  :disabled "very very slow (major hanging during refresh on lsp update)"
   :after lsp-mode)
 
 (use-package dumb-jump

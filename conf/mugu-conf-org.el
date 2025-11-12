@@ -130,12 +130,6 @@
   (org-roam-db-autosync-mode)
   (require 'org-roam-protocol)
 
-  (setq org-roam-dailies-capture-templates
-        '(("d" "default" entry
-           "* %?"
-           :target (file+head "%<%Y-%m-%d>.org"
-                              "#+title: %<%Y-%m-%d>\n"))))
-
   :custom
   (org-roam-directory (file-truename "~/org/roam"))
   (org-roam-dailies-directory "daily/")
@@ -144,7 +138,7 @@
    '(("d" "default" entry
       "* %?"
       :target (file+head "%<%Y-%m-%d>.org"
-                         "#+title: %<%Y-%m-%d>\n#+setupfile: ~/org/tags.org"))))
+                         "#+title: %<%Y-%m-%d>\n#+filetags: daily\n#+setupfile: ~/org/tags.org"))))
   (org-roam-capture-templates
    '(("d" "default" plain "%?" :target
       (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+setupfile: ~/org/tags.org")
@@ -199,6 +193,17 @@
 (use-package org-transclusion
   :disabled "Not applicable for todo but interesting for note taking nonetheless"
   :defer)
+
+(use-package org-babel
+  ;; move elsewhere?
+  :straight nil
+  :defer
+  :after org
+  :config
+  (org-babel-do-load-languages 'org-babel-load-languages '((plantuml . t)))
+  :custom
+  (org-plantuml-executable-path "~/.nix-profile/bin/plantuml")
+  (org-plantuml-exec-mode 'plantuml))
 
 (provide 'mugu-conf-org)
 ;;; mugu-conf-org.el ends here

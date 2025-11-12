@@ -11,7 +11,7 @@
   :hook (prog-mode . company-mode)
   :custom
   (company-idle-delay 0.3)
-  (company-minimum-prefix-length 1)
+  (company-minimum-prefix-length 3)
   (company-require-match nil)
   (company-auto-commit nil)
   (company-auto-complete nil)

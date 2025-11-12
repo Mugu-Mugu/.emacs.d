@@ -21,7 +21,7 @@
   (mugu-org-wconf-mode +1)
   (mugu-window-configure-normal-window #'mugu-org-wconf-tab--eligible-buffer-p)
   (save-current-tab
-   (mugu-tab-new)
+   (mugu-tab-new "org")
    (mugu-tab-rename mugu-org-wconf-tab-name)))
 
 (defun mugu-org-wconf-tab--deactivate ()

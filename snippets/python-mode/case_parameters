@@ -1,0 +1,11 @@
+# -*- mode: snippet -*-
+# name: case_parameters
+# key: CaseParameters
+# --
+
+return CaseParameters(
+    container_number="UACU6008006",
+    bl_number="",
+    booking_number="63152606",
+    expected_item=ExpectedItem().snapshot(
+        {}))

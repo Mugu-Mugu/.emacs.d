@@ -33,5 +33,11 @@
  :config
  (direnv-mode))
 
+;(use-package dap-mode
+  ;; :defer)
+
+(use-package org-transclusion
+  :defer)
+
 (provide 'mugu-conf-temp)
 ;;; mugu-conf-temp ends here

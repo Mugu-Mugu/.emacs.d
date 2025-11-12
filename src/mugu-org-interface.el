@@ -76,7 +76,10 @@
 (defmenu mugu-orgi-menu-workflow (:color blue :hint nil :body-pre (mugu-orgi-display-layout-workflow))
   ("w" nil "last" :column "View")
   ("s" mugu-orgi-switch-to-view "select")
-  ("a" mugu-orgw-view-active-tasks "active")
+  ("g" (mugu-orgw-view-overview) "global")
+  ("d" (mugu-orgw-view-overview "dotfiles") "dotfiles")
+  ("m" (mugu-orgw-view-overview "perso") "mugu perso")
+  ("j" (mugu-orgw-view-overview "work") "job")
   ("f" mugu-feature-org-goto-setupfile "go to setupfile" :column "Other")
   ("p" mugu-feature-org-goto-planification-note "go to planification note"))
 

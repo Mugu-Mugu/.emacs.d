@@ -64,3 +64,4 @@
 ;; (put 'list-timers 'disabled nil)
 (put 'erase-buffer 'disabled nil)
 (put 'narrow-to-region 'disabled nil)
+(put 'magit-clean 'disabled nil)

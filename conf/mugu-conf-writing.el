@@ -7,7 +7,7 @@
 (use-package flyspell
   :hook
   (text-mode . flyspell-mode)
-  (prog-mode . flyspell-prog-mode)
+  ;; (prog-mode . flyspell-prog-mode)
   :custom
   (ispell-quietly t)
   (flyspell-issue-message-flag nil)

@@ -151,6 +151,7 @@
 
 (use-package evil-owl
   :defer 2
+  :disabled "I never trully used it anyway"
   :config
   (setq evil-owl-display-method 'posframe
         evil-owl-extra-posframe-args '(:width 100 :height 50)

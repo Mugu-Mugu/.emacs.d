@@ -6,7 +6,6 @@
 
 ;;; Code:
 (require 'use-package)
-(require 'blacken)
 (require 'lsp-pyright)
 (require 'general)
 
@@ -21,7 +20,6 @@ This hack removes it."
 
 (defun mugu-pyright--activate ()
   "Setup for mugu-pyright-mode."
-  (blacken-mode 1)
   (general-define-key :keymaps 'mugu-pyright-mode-map
                       [remap mugu-lang-format-buffer] #'blacken-buffer)
   (add-to-list 'minor-mode-overriding-map-alist

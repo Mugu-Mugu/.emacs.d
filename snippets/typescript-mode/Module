@@ -1,0 +1,12 @@
+# key: @Module
+# name: Module
+# --
+import { Module } from '@nestjs/common'
+
+@Module({
+${1:imports: [$11],}
+${2:controllers: [$21],}
+${3:providers: [$31],}
+${4:exports: [$41],}
+})
+export class ${5:Name}Module {}

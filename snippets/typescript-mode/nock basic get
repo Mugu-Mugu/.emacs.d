@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: nock basic get
+# key: nockGet
+# --
+nock('${1:base url}')
+.get('${2:route}')
+.reply(${3:200}, ${4:{}})

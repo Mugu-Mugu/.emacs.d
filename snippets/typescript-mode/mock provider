@@ -1,0 +1,6 @@
+# key:
+# name: mock provider
+# --
+let ${1:providerName}: DeepMocked<${2:ProviderClass}>
+.overrideProvider($2)
+.useValue(createMock<$2>())

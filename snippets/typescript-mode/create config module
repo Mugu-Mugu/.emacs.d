@@ -1,0 +1,29 @@
+# -*- mode: snippet -*-
+# name: create config module
+# key:
+# --
+import { Injectable } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
+import Joi from 'joi'
+
+export const translatorConfSchema = {
+TRANSLATOR_ENDPOINT: Joi.string().required(),
+TRANSLATOR_API_KEY: Joi.string().required(),
+TRANSLATOR_KV_BUCKET_NAME: Joi.string().required(),
+}
+
+@Injectable()
+export class TranslatorConfig {
+constructor(private configService: ConfigService) {}
+
+get appEndpoint(): string {
+return this.configService.get('TRANSLATOR_ENDPOINT')!
+}
+
+get appApiKey(): string {
+return this.configService.get('TRANSLATOR_API_KEY')!
+}
+
+get translatorBucketName(): string {
+return this.configService.get('TRANSLATOR_KV_BUCKET_NAME')!
+}

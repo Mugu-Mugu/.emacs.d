@@ -1,0 +1,16 @@
+# -*- mode: snippet -*-
+# name: add special test
+# key:
+# --
+def test_CO_580_delivery_defined_by__unloaded_from_rail_at_inbound_rail_destination(
+    self, generate_item
+):
+    assert (
+        generate_item(
+            CaseParameters(
+                container_number="NYKU8197240",
+                booking_number="BKKCH6372500",
+            )
+        )
+        == ExpectedItem.snapshot({})
+    )

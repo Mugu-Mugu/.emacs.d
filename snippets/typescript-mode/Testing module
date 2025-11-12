@@ -1,0 +1,25 @@
+# -*- mode: snippet -*-
+# name: Testing module
+# key:
+# --
+
+let moduleRef: TestingModule
+let testApp: INestMicroservice
+
+beforeAll(async () => {
+    moduleRef = await Test.createTestingModule({
+        imports: [
+            ${1:AppConfigModule.forRoot('apps/slapp/', slAppConfSchema),}
+            ${2:TypeOrmModule.forRootAsync(
+                    typeOrmConfigFactory({
+                    entities: [Entities],
+                    keepConnectionAlive: true,
+                    }),
+                ),
+            }
+            ${3:Module},
+        ],
+    }).compile()
+    testApp = moduleRef.createNestMicroservice({})
+    await testApp.init()
+})

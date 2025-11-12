@@ -13,10 +13,10 @@
   "."
   (run-at-time 0.1 nil (lambda ()
                          (when (-none? 'identity (-map #'frame-focus-state (frame-list)))
-                           (message "garbage collect on focus out at %s with state %s"
+                           (message "garbage collect on focus out at %s with memory used %s MB"
                                     (format-time-string "%M:%S" (current-time))
-                                    (-map #'frame-focus-state (frame-list)))
-                           (garbage-collect)))))
+                                    (/ (-sum (-map '-second-item (garbage-collect)))
+                                       (* 1024.0 1024.0)))))))
 
 (defun mugu-vanilla--kill-scratch ()
   "Scratch buffer is hard coded to Emacs Lisp mode.
